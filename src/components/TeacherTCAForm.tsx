@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from './ui/Button';
-import { X, User, Mail, Phone, CheckCircle, AlertCircle, GraduationCap } from 'lucide-react';
+import { X, User, Mail, Phone, AlertCircle, GraduationCap } from 'lucide-react';
 
 interface TeacherTCAFormProps {
   isOpen: boolean;
@@ -83,29 +83,85 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="p-6">
-          {/* Success Message */}
-          {showSuccess && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center space-x-3">
-              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-              <div>
-                <p className="text-green-800 font-medium">Votre candidature est confirmée.</p>
-                <p className="text-green-600 text-sm">Nous examinerons votre profil et vous contacterons bientôt.</p>
+          {/* Thank You Success State */}
+          {showSuccess ? (
+            <div className="text-center py-8">
+              {/* Success Animation */}
+              <div className="mb-8">
+                <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-400 to-teal-500 rounded-full shadow-2xl mb-6 animate-pulse">
+                  <GraduationCap className="w-12 h-12 text-white" />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2">🎓 Merci de votre intérêt !</h3>
+                  <p className="text-xl text-gray-700 font-medium">Votre candidature d'enseignant a été transmise avec succès</p>
+                </div>
+              </div>
+
+              {/* Thank You Content */}
+              <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-2xl p-8 mb-8">
+                <div className="space-y-4">
+                  <h4 className="text-2xl font-semibold text-green-900 mb-4">Processus de Candidature</h4>
+                  <div className="grid gap-4">
+                    <div className="flex items-center space-x-3 text-left">
+                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">1</span>
+                      </div>
+                      <p className="text-gray-700">Évaluation de votre profil par notre équipe pédagogique</p>
+                    </div>
+                    <div className="flex items-center space-x-3 text-left">
+                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">2</span>
+                      </div>
+                      <p className="text-gray-700">Entretien téléphonique pour discuter de vos compétences</p>
+                    </div>
+                    <div className="flex items-center space-x-3 text-left">
+                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">3</span>
+                      </div>
+                      <p className="text-gray-700">Intégration dans notre réseau d'enseignants qualifiés</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Call to Action */}
+              <div className="space-y-6">
+                <p className="text-lg text-gray-600">
+                  Rejoignez l'excellence éducative avec <strong>SmartHub</strong> - Nous connectons les meilleurs enseignants aux étudiants les plus motivés
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    onClick={onClose}
+                    className="flex items-center justify-center space-x-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
+                  >
+                    <span>Découvrir SmartHub</span>
+                  </button>
+                  <a
+                    href="https://wa.me/21699730144?text=Bonjour! Je viens de postuler comme enseignant et j'aimerais discuter des opportunités chez SmartHub."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>Discuter Maintenant</span>
+                  </a>
+                </div>
               </div>
             </div>
-          )}
+          ) : (
+            <>
+              {/* Error Message */}
+              {showError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-3">
+                  <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-red-800 font-medium">Nous n'avons pas pu enregistrer votre candidature.</p>
+                    <p className="text-red-600 text-sm">Veuillez réessayer ou nous contacter directement.</p>
+                  </div>
+                </div>
+              )}
 
-          {/* Error Message */}
-          {showError && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-3">
-              <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
-              <div>
-                <p className="text-red-800 font-medium">Nous n'avons pas pu enregistrer votre candidature.</p>
-                <p className="text-red-600 text-sm">Veuillez réessayer ou nous contacter directement.</p>
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nom */}
             <div>
               <label htmlFor="nom" className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
@@ -231,8 +287,10 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
                   </>
                 )}
               </button>
-            </div>
-          </form>
+              </div>
+            </form>
+            </>
+          )}
         </div>
       </div>
     </div>

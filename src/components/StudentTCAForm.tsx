@@ -83,29 +83,85 @@ const StudentTCAForm: React.FC<StudentTCAFormProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="p-6">
-          {/* Success Message */}
-          {showSuccess && (
-            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center space-x-3">
-              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-              <div>
-                <p className="text-green-800 font-medium">Votre inscription est confirmée.</p>
-                <p className="text-green-600 text-sm">Nous vous contacterons bientôt avec plus d'informations.</p>
+          {/* Thank You Success State */}
+          {showSuccess ? (
+            <div className="text-center py-8">
+              {/* Success Animation */}
+              <div className="mb-8">
+                <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-400 to-blue-500 rounded-full shadow-2xl mb-6 animate-pulse">
+                  <CheckCircle className="w-12 h-12 text-white" />
+                </div>
+                <div className="space-y-4">
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2">🎉 Félicitations !</h3>
+                  <p className="text-xl text-gray-700 font-medium">Votre demande d'information a été envoyée avec succès</p>
+                </div>
+              </div>
+
+              {/* Thank You Content */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 mb-8">
+                <div className="space-y-4">
+                  <h4 className="text-2xl font-semibold text-blue-900 mb-4">Prochaines Étapes</h4>
+                  <div className="grid gap-4">
+                    <div className="flex items-center space-x-3 text-left">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">1</span>
+                      </div>
+                      <p className="text-gray-700">Notre équipe examine votre demande (sous 24h)</p>
+                    </div>
+                    <div className="flex items-center space-x-3 text-left">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">2</span>
+                      </div>
+                      <p className="text-gray-700">Vous recevrez un email avec toutes les informations</p>
+                    </div>
+                    <div className="flex items-center space-x-3 text-left">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <span className="text-white font-bold text-sm">3</span>
+                      </div>
+                      <p className="text-gray-700">Un conseiller vous contactera pour personnaliser votre parcours</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Call to Action */}
+              <div className="space-y-6">
+                <p className="text-lg text-gray-600">
+                  En attendant, découvrez tout ce que <strong>SmartHub</strong> peut vous offrir
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    onClick={onClose}
+                    className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
+                  >
+                    <span>Explorer SmartHub</span>
+                  </button>
+                  <a
+                    href="https://wa.me/21699730144?text=Bonjour! Je viens de m'inscrire et j'aimerais en savoir plus sur SmartHub."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
+                  >
+                    <Phone className="w-4 h-4" />
+                    <span>Contact Direct</span>
+                  </a>
+                </div>
               </div>
             </div>
-          )}
+          ) : (
+            <>
+              {/* Error Message */}
+              {showError && (
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-3">
+                  <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
+                  <div>
+                    <p className="text-red-800 font-medium">Nous n'avons pas pu confirmer votre inscription.</p>
+                    <p className="text-red-600 text-sm">Veuillez réessayer ou nous contacter directement.</p>
+                  </div>
+                </div>
+              )}
 
-          {/* Error Message */}
-          {showError && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-3">
-              <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
-              <div>
-                <p className="text-red-800 font-medium">Nous n'avons pas pu confirmer votre inscription.</p>
-                <p className="text-red-600 text-sm">Veuillez réessayer ou nous contacter directement.</p>
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6">
             {/* Nom */}
             <div>
               <label htmlFor="nom" className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
@@ -229,8 +285,10 @@ const StudentTCAForm: React.FC<StudentTCAFormProps> = ({ isOpen, onClose }) => {
                   </>
                 )}
               </button>
-            </div>
-          </form>
+              </div>
+            </form>
+            </>
+          )}
         </div>
       </div>
     </div>
