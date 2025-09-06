@@ -1,13 +1,16 @@
-import { Languages, Calculator, Laptop, Briefcase, BookOpen, Globe, MessageCircle } from 'lucide-react';
+import { Languages, Calculator, Laptop, Briefcase, BookOpen, Globe, MessageCircle, Target, Settings, TrendingUp, Star, Award } from 'lucide-react';
 
 const Teachers = () => {
   const subjects = [
-    { name: 'Langues', icon: Languages, color: 'from-blue-500 to-indigo-500' },
-    { name: 'Mathématiques', icon: Calculator, color: 'from-green-500 to-teal-500' },
-    { name: 'Informatique', icon: Laptop, color: 'from-purple-500 to-pink-500' },
-    { name: 'Business', icon: Briefcase, color: 'from-orange-500 to-red-500' },
-    { name: 'Littérature', icon: BookOpen, color: 'from-indigo-500 to-purple-500' },
-    { name: 'Examens Globaux', icon: Globe, color: 'from-teal-500 to-blue-500' },
+    { name: 'Mathématiques', icon: Calculator, color: 'from-purple-500 to-pink-500' },
+    { name: 'Physique', icon: Target, color: 'from-blue-500 to-indigo-500' },
+    { name: 'Français', icon: Languages, color: 'from-green-500 to-teal-500' },
+    { name: 'Anglais', icon: Globe, color: 'from-orange-500 to-red-500' },
+    { name: 'Sciences Naturelles', icon: BookOpen, color: 'from-emerald-500 to-green-500' },
+    { name: 'Arabe', icon: Settings, color: 'from-cyan-500 to-blue-500' },
+    { name: 'Informatique', icon: Laptop, color: 'from-violet-500 to-purple-500' },
+    { name: 'Économie & Gestion', icon: TrendingUp, color: 'from-rose-500 to-pink-500' },
+    { name: 'ESP: Anglais Spécialisé', icon: Star, color: 'from-yellow-500 to-amber-500' }
   ];
 
   const handleWhatsAppContact = () => {
@@ -37,10 +40,14 @@ const Teachers = () => {
       {/* Subject Categories */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
+          <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">
             Matières Enseignées
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <p className="text-xl text-gray-600 text-center mb-12 max-w-4xl mx-auto leading-relaxed">
+            à tous les niveaux académiques : Primaire, Collège, Secondaire et Universitaire<br/>
+            aussi bien qu'aux adultes : Développement professionnel, préparation aux concours et examens internationaux.
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
             {subjects.map((subject, index) => (
               <div
                 key={index}

@@ -38,10 +38,64 @@ export const Home = () => {
 
   return (
     <div className="text-center">
-      {/* Hero section will be inline or removed */}
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white section-padding overflow-hidden">
+        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
+          <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-indigo-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
+        </div>
+        
+        <div className="relative w-full px-4 sm:px-6 lg:px-8 text-center">
+          <div className="text-center mb-16 max-w-6xl mx-auto">
+            <div className="flex items-center justify-center mb-8">
+              <div className="p-6 bg-white bg-opacity-10 rounded-3xl backdrop-blur-sm">
+                <Building className="w-16 h-16 text-white" />
+              </div>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold mb-8 text-center">
+              Bienvenue chez
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
+                SmartHub
+              </span>
+            </h1>
+            
+            <p className="text-xl md:text-2xl text-blue-100 mb-12 text-center max-w-5xl mx-auto leading-relaxed">
+              Centre éducatif premium au cœur de Tunis qui connecte des enseignants compétents avec des étudiants sérieux. 
+              Nous offrons des espaces d'apprentissage modernes et une sélection rigoureuse pour une expérience d'enseignement exceptionnelle.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
+              <Link to="/rooms">
+                <Button size="lg" className="flex items-center space-x-3 bg-white text-gray-900 hover:bg-gray-100 px-10 py-5 text-xl rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-200">
+                  <Building className="w-6 h-6" />
+                  <span>Découvrir nos Salles</span>
+                </Button>
+              </Link>
+              <Link to="/teachers">
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="flex items-center space-x-3 border-2 border-white text-white hover:bg-white hover:text-gray-900 px-10 py-5 text-xl rounded-3xl transition-all duration-200"
+                >
+                  <Users className="w-6 h-6" />
+                  <span>Nos Enseignants</span>
+                </Button>
+              </Link>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-2 text-blue-200">
+              <CheckCircle className="w-6 h-6 text-green-400" />
+              <span className="text-center text-lg">Centre éducatif premium • Enseignants qualifiés • Équipements modernes</span>
+            </div>
+          </div>
+        </div>
+      </section>
       
       {/* Enhanced Stats Section */}
-      <section className="relative -mt-16 z-10 mb-20 text-center">
+      <section className="relative section-padding text-center bg-white">
         <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
@@ -73,7 +127,12 @@ export const Home = () => {
             </h2>
             <p className="text-xl md:text-2xl text-gray-600 text-center leading-relaxed">
               Tout ce dont vous avez besoin pour un apprentissage et un enseignement efficaces dans notre{' '}
-              <span className="font-semibold text-blue-600">centre de Tunis</span>.
+              <span 
+                className="font-semibold text-blue-600 hover:text-blue-800 transition-colors duration-200 cursor-pointer"
+                onClick={() => setShowMap(true)}
+              >
+                centre de Tunis
+              </span>.
             </p>
           </div>
 
@@ -218,7 +277,7 @@ export const Home = () => {
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-white mb-4">Adresse</h3>
                   <p className="text-blue-100 text-lg leading-relaxed">
-                    Rue de Belgique, Immeuble MAE<br/>
+                    13, Rue de Belgique, Immeuble MAE<br/>
                     1er étage, Bureau 1.1<br/>
                     1000 Tunis
                   </p>
@@ -273,7 +332,7 @@ export const Home = () => {
             <div className="p-6">
               <div className="mb-4 text-center">
                 <p className="text-lg text-gray-700 font-medium mb-2">Notre Adresse :</p>
-                <p className="text-gray-600">Rue de Belgique, Immeuble MAE<br/>1er étage, Bureau 1.1<br/>1000 Tunis</p>
+                <p className="text-gray-600">13, Rue de Belgique, Immeuble MAE<br/>1er étage, Bureau 1.1<br/>1000 Tunis</p>
               </div>
               <GoogleMapEmbed
                 mapSrc={mapSrc}

@@ -3,42 +3,22 @@ import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { 
   MapPin, Users, BookOpen, Award, Languages, UserPlus, 
-  Calendar, MessageCircle, Search,
-  Phone, CheckCircle, ArrowRight,
+  Calendar, Calculator, Laptop,
+  Phone, ArrowRight,
   Settings, BarChart3, Target, Bookmark, Video,
   Star, TrendingUp, Globe
 } from 'lucide-react';
 
 export const LearnMore: React.FC = () => {
-  const dashboardFeatures = [
-    {
-      icon: Search,
-      title: 'Parcourir et Trouver des Enseignants',
-      description: 'Recherchez parmi plus de 29 enseignants qualifiés par matière, note, disponibilité et gamme de prix.',
-      benefits: ['Filtrer par domaine de matière', 'Voir les notes et avis des enseignants', 'Vérifier la disponibilité en temps réel', 'Comparer les prix']
-    },
-    {
-      icon: MessageCircle,
-      title: 'Communication Directe',
-      description: 'Chattez directement avec les enseignants avant et après la réservation de sessions.',
-      benefits: ['Système de messagerie intégré', 'Poser des questions à tout moment', 'Partager du matériel d\'apprentissage', 'Obtenir des réponses rapides']
-    },
-    {
-      icon: BarChart3,
-      title: 'Suivre Vos Progrès',
-      description: 'Surveillez votre parcours d\'apprentissage avec des analyses et rapports détaillés.',
-      benefits: ['Historique des sessions', 'Graphiques de progrès d\'apprentissage', 'Suivi des objectifs', 'Insights de performance']
-    }
-  ];
 
   const subjects = [
-    { name: 'Mathématiques', teachers: 6, icon: Award, color: 'from-purple-500 to-pink-500' },
+    { name: 'Mathématiques', teachers: 6, icon: Calculator, color: 'from-purple-500 to-pink-500' },
     { name: 'Physique', teachers: 4, icon: Target, color: 'from-blue-500 to-indigo-500' },
     { name: 'Français', teachers: 4, icon: Languages, color: 'from-green-500 to-teal-500' },
     { name: 'Anglais', teachers: 3, icon: Globe, color: 'from-orange-500 to-red-500' },
     { name: 'Sciences Naturelles', teachers: 4, icon: BookOpen, color: 'from-emerald-500 to-green-500' },
     { name: 'Arabe', teachers: 2, icon: Settings, color: 'from-cyan-500 to-blue-500' },
-    { name: 'Informatique', teachers: 3, icon: BarChart3, color: 'from-violet-500 to-purple-500' },
+    { name: 'Informatique', teachers: 3, icon: Laptop, color: 'from-violet-500 to-purple-500' },
     { name: 'Économie & Gestion', teachers: 2, icon: TrendingUp, color: 'from-rose-500 to-pink-500' },
     { name: 'ESP: Anglais Spécialisé', teachers: 1, icon: Star, color: 'from-yellow-500 to-amber-500' }
   ];
@@ -46,24 +26,18 @@ export const LearnMore: React.FC = () => {
   const steps = [
     {
       number: '01',
-      title: 'Créer Votre Compte',
-      description: 'Inscrivez-vous avec vos informations de base et préférences d\'apprentissage.',
-      icon: UserPlus
+      title: 'Nous Contacter',
+      description: 'Contactez-nous pour discuter de vos besoins et trouver l\'enseignant qui vous correspond.',
+      icon: Phone
     },
     {
       number: '02',
-      title: 'Parcourir les Enseignants',
-      description: 'Explorez nos profils d\'enseignants, lisez les avis et vérifiez la disponibilité.',
-      icon: Search
+      title: 'Vous Inscrire à un Cours',
+      description: 'Finalisez votre inscription et planifiez vos sessions d\'apprentissage.',
+      icon: UserPlus
     },
     {
       number: '03',
-      title: 'Réserver Votre Session',
-      description: 'Planifiez votre première session d\'apprentissage à l\'heure de votre choix.',
-      icon: Calendar
-    },
-    {
-      number: '04',
       title: 'Commencer à Apprendre',
       description: 'Rencontrez votre enseignant dans notre centre de Tunis et commencez votre parcours.',
       icon: BookOpen
@@ -112,66 +86,13 @@ export const LearnMore: React.FC = () => {
         </div>
       </section>
 
-      {/* Dashboard Features Overview */}
-      <section className="pt-24 pb-16 px-4 sm:px-6 lg:px-8 text-center bg-gray-50">
-        <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-center max-w-4xl mx-auto mb-16">
-            <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 text-center">
-              Tout ce dont vous avez besoin pour
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                Décoller et Réussir
-              </span>
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-600 text-center leading-relaxed">
-Une fois inscrit, vous aurez accès à un tableau de bord puissant conçu pour rendre l'apprentissage simple et efficace
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {dashboardFeatures.map((feature, index) => {
-              const IconComponent = feature.icon;
-              return (
-                <div 
-                  key={index} 
-                  className="group relative overflow-hidden bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-50 to-purple-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  
-                  <div className="relative p-8">
-                    <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-gradient-to-br from-blue-600 to-purple-600 mb-6 shadow-xl transform group-hover:scale-110 transition-transform duration-300">
-                      <IconComponent className="w-10 h-10 text-white" />
-                    </div>
-                    
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center group-hover:text-blue-600 transition-colors">
-                      {feature.title}
-                    </h3>
-                    
-                    <p className="text-gray-600 text-center leading-relaxed mb-6">{feature.description}</p>
-                    
-                    <div className="space-y-3">
-                      {feature.benefits.map((benefit, benefitIndex) => (
-                        <div key={benefitIndex} className="flex items-center space-x-3">
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                          <span className="text-gray-700 text-left">{benefit}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  
-                  <div className="absolute bottom-0 left-0 right-0 h-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* Subject Preview */}
       <section className="section-padding text-center bg-white">
         <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
           <div className="text-center max-w-4xl mx-auto mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center">
-              Matières Que Vous Pouvez Apprendre
+              Ce que nos enseignants vous offrent actuellement
             </h2>
             <p className="text-xl text-gray-600 text-center">
               Cours particuliers et préparation aux examens nationaux (Baccalauréat, Collège Pilote, Lycée Pilote)
@@ -223,7 +144,7 @@ Une fois inscrit, vous aurez accès à un tableau de bord puissant conçu pour r
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {steps.map((step, index) => {
               const IconComponent = step.icon;
               return (
