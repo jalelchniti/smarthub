@@ -288,10 +288,10 @@ const StudentTCAForm: React.FC<StudentTCAFormProps> = ({ isOpen, onClose }) => {
                   </>
                 )}
               </button>
-              </div>
-            </form>
-            </>
-          )}
+            </div>
+          </form>
+          </>
+        )}
         </div>
       </div>
     </div>
