@@ -119,6 +119,15 @@ backend/                 # Node.js + Express API server (MVC)
 - **All Other Dashboards**: NO money references whatsoever
 - **Replacement Metrics**: Use engagement, sessions, interactions, completions instead
 
+### Content & Messaging Guidelines
+**Core Value Proposition**: SmartHub connects competent teachers with serious students
+- **Dual Audience**: All content should address both teachers and students
+- **Quality Focus**: Emphasize "compétents" (competent) teachers and "sérieux" (serious) students
+- **Selection Process**: Highlight "sélection rigoureuse" (rigorous selection)
+- **Academic Coverage**: Comprehensive levels from primary through university plus adult professional development
+- **Location Integration**: "centre de Tunis" should be clickable and lead to location popup
+- **Contact Priority**: WhatsApp +216 99 730 144 as primary contact method
+
 ### Styling Guidelines
 **CRITICAL: All content must be center-aligned**
 - Global CSS rules: `* { text-align: center; }` in `src/index.css`
@@ -129,6 +138,26 @@ backend/                 # Node.js + Express API server (MVC)
 - **Progressive Integration**: Frontend operates with static data or dynamic backend via feature flags
 - **Component-Based Design**: Reusable UI components with consistent styling patterns
 - **Premium Design System**: Gradient backgrounds, glassmorphism effects, hover animations
+
+## Recent UI/UX Improvements (Latest Update)
+
+### Home Page Enhancements
+- **Hero Section Added**: Complete hero section with compelling messaging about connecting competent teachers with serious students
+- **Interactive Location Links**: "centre de Tunis" text is clickable and opens location popup modal
+- **Enhanced Value Proposition**: Clear messaging about SmartHub's core service of matching quality teachers with committed students
+
+### Content Standardization
+- **Unified Subject Categories**: 9 comprehensive subjects aligned across Teachers and LearnMore pages:
+  - Mathématiques (Calculator icon), Physique (Target icon), Français (Languages icon)
+  - Anglais (Globe icon), Sciences Naturelles (BookOpen icon), Arabe (Settings icon)
+  - Informatique (Laptop icon), Économie & Gestion (TrendingUp icon), ESP: Anglais Spécialisé (Star icon)
+- **Academic Level Coverage**: Explicitly states coverage for "Primaire, Collège, Secondaire et Universitaire" plus adult professional development
+- **Process Simplification**: LearnMore page streamlined to 3-step process: Contact → Enroll → Learn
+
+### Footer & Contact Updates
+- **Address Standardization**: Updated to "13, Rue de Belgique" across all pages
+- **Schedule Optimization**: Removed Sunday hours, updated Saturday to split schedule (9:00-13:00, 15:00-18:00)
+- **Visual Improvements**: Clock icon properly aligned with "Horaires" header
 
 ## Dashboard System
 
@@ -161,10 +190,10 @@ The platform features **13 specialized dashboards** with unique gradient themes:
 ## Business Context
 
 **SmartHub Educational Facility - Tunis City Center**
-- **Address**: Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
+- **Address**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
 - **Contact**: +216 99 730 144 | contact@smarthub.com.tn
-- **Hours**: Mon-Fri (8:00-20:00), Sat-Sun (9:00-18:00)
-- **Services**: Teacher workspace rental (3 rooms), in-person educational services only
+- **Hours**: Mon-Fri (8:00-20:00), Sat (9:00-13:00, 15:00-18:00)
+- **Services**: Teacher workspace rental (3 rooms), in-person educational services connecting competent teachers with serious students
 
 ## Quick Development Workflow
 
@@ -312,6 +341,9 @@ npm run build
 - **Privacy Protection**: Individual teachers' personal data secured in backend
 - **Content Validation**: French/Arabic profanity detection across form inputs
 - **Activity Logging**: Comprehensive tracking with filtering and export capabilities
+- **Subject Consistency**: Always use the standardized 9-subject list with proper icons across all pages
+- **Hero Section**: Home page includes comprehensive hero section with value proposition messaging
+- **Interactive Elements**: Location references should be clickable and open map popup
 - **Git Deployment Preferred**: Use OVH Git integration for automatic deployment
 - **Webhook Integration**: GitHub pushes trigger automatic deployments via OVH webhook
 - **Fallback Methods**: FTP/SSH available for manual deployment when needed

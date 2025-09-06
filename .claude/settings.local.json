@@ -16,7 +16,9 @@
       "WebFetch(domain:u-smart.tn)",
       "WebFetch(domain:www.u-smart.tn)",
       "Bash(ssh:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git rm:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []

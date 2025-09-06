@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import GoogleMapEmbed from '../components/GoogleMapEmbed';
-import StudentTCA from '../components/StudentTCA';
+import StudentTCAForm from '../components/StudentTCAForm';
+import TeacherTCAForm from '../components/TeacherTCAForm';
 import { MapPin, Users, Clock, Star, CheckCircle, ArrowRight, Building, Globe, Phone, X, UserPlus, BookOpen } from 'lucide-react';
 
 export const Home = () => {
   const [showMap, setShowMap] = useState(false);
   const [showStudentTCA, setShowStudentTCA] = useState(false);
+  const [showTeacherTCA, setShowTeacherTCA] = useState(false);
   
   const mapSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3194.927527841475!2d10.17702587640448!3d36.79628796791918!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd3472cdcd2081%3A0x6e5339efe27057be!2s13%20Rue%20de%20Belgique%2C%20Tunis!5e0!3m2!1sfr!2stn!4v1756241843416!5m2!1sfr!2stn';
 
@@ -232,14 +234,22 @@ export const Home = () => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Button 
                 size="lg" 
-                className="flex items-center space-x-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white px-12 py-6 text-xl rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-200"
+                className="flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-200"
                 onClick={() => setShowStudentTCA(true)}
               >
-                <UserPlus className="w-8 h-8" />
-                <span>Test Formulaire Étudiant</span>
+                <UserPlus className="w-6 h-6" />
+                <span>Inscription Étudiant</span>
+              </Button>
+              <Button 
+                size="lg" 
+                className="flex items-center space-x-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-4 text-lg rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-200"
+                onClick={() => setShowTeacherTCA(true)}
+              >
+                <BookOpen className="w-6 h-6" />
+                <span>Candidature Enseignant</span>
               </Button>
               <Link to="/learn-more">
-                <Button variant="outline" size="lg" className="px-12 py-6 text-xl rounded-3xl border-2 border-gray-300 hover:border-indigo-600 hover:text-indigo-600 transition-all duration-200">
+                <Button variant="outline" size="lg" className="px-8 py-4 text-lg rounded-3xl border-2 border-gray-300 hover:border-indigo-600 hover:text-indigo-600 transition-all duration-200">
                   En Savoir Plus
                 </Button>
               </Link>
@@ -349,10 +359,16 @@ export const Home = () => {
         </div>
       )}
 
-      {/* Student TCA Modal */}
-      <StudentTCA 
+      {/* Student TCA Form Modal */}
+      <StudentTCAForm 
         isOpen={showStudentTCA} 
         onClose={() => setShowStudentTCA(false)} 
+      />
+
+      {/* Teacher TCA Form Modal */}
+      <TeacherTCAForm 
+        isOpen={showTeacherTCA} 
+        onClose={() => setShowTeacherTCA(false)} 
       />
     </div>
   );
