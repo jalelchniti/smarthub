@@ -1,4 +1,4 @@
-import { MapPin, Phone, Mail, MessageCircle, Clock } from 'lucide-react';
+import { MapPin, Phone, Mail, MessageCircle } from 'lucide-react';
 
 const Footer = () => {
   const handleWhatsAppClick = () => {

@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { 
-  MapPin, Users, BookOpen, Award, Languages, UserPlus, 
-  Calendar, Calculator, Laptop,
+  MapPin, Users, BookOpen, Languages, UserPlus, 
+  Calculator, Laptop,
   Phone, ArrowRight,
-  Settings, BarChart3, Target, Bookmark, Video,
+  Settings, Target, Bookmark, Video,
   Star, TrendingUp, Globe
 } from 'lucide-react';
 

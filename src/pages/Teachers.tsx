@@ -1,4 +1,4 @@
-import { Languages, Calculator, Laptop, Briefcase, BookOpen, Globe, MessageCircle, Target, Settings, TrendingUp, Star, Award } from 'lucide-react';
+import { Languages, Calculator, Laptop, BookOpen, Globe, MessageCircle, Target, Settings, TrendingUp, Star } from 'lucide-react';
 
 const Teachers = () => {
   const subjects = [
