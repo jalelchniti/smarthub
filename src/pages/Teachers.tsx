@@ -1,4 +1,4 @@
-import { Star, Languages, Calculator, Laptop, Briefcase, BookOpen, Globe, MessageCircle } from 'lucide-react';
+import { Languages, Calculator, Laptop, Briefcase, BookOpen, Globe, MessageCircle } from 'lucide-react';
 
 const Teachers = () => {
   const subjects = [
@@ -10,59 +10,8 @@ const Teachers = () => {
     { name: 'Examens Globaux', icon: Globe, color: 'from-teal-500 to-blue-500' },
   ];
 
-  const teachers = [
-    {
-      name: 'Dr. Amina Khalil',
-      subject: 'Français & Anglais',
-      experience: '8 ans',
-      rating: 4.9,
-      specialties: ['DELF', 'TOEFL', 'Conversation'],
-      description: 'Docteure en linguistique, spécialisée dans l\'enseignement des langues étrangères.'
-    },
-    {
-      name: 'Prof. Mohamed Triki',
-      subject: 'Mathématiques',
-      experience: '12 ans',
-      rating: 4.8,
-      specialties: ['Algèbre', 'Géométrie', 'Préparation Concours'],
-      description: 'Ancien professeur universitaire, expert en méthodes pédagogiques modernes.'
-    },
-    {
-      name: 'Ing. Sarah Ben Ali',
-      subject: 'Informatique',
-      experience: '6 ans',
-      rating: 4.9,
-      specialties: ['Programmation', 'Web Design', 'IA'],
-      description: 'Ingénieure informatique et formatrice certifiée en nouvelles technologies.'
-    },
-    {
-      name: 'Dr. Karim Mansouri',
-      subject: 'Business & Management',
-      experience: '10 ans',
-      rating: 4.7,
-      specialties: ['Leadership', 'Marketing', 'Finance'],
-      description: 'Consultant en management avec une expérience internationale.'
-    },
-    {
-      name: 'Prof. Leila Bouaziz',
-      subject: 'Littérature Arabe',
-      experience: '15 ans',
-      rating: 4.8,
-      specialties: ['Poésie', 'Histoire', 'Rhétorique'],
-      description: 'Professeure agrégée, passionnée par le patrimoine littéraire arabe.'
-    },
-    {
-      name: 'Dr. Ahmed Khedher',
-      subject: 'Préparation IELTS/TOEIC',
-      experience: '9 ans',
-      rating: 4.9,
-      specialties: ['IELTS', 'TOEIC', 'Cambridge Exams'],
-      description: 'Formateur certifié pour les examens internationaux d\'anglais.'
-    }
-  ];
-
-  const handleWhatsAppContact = (teacherName: string) => {
-    const message = `Bonjour! Je suis intéressé(e) par les cours de ${teacherName} chez SmartHub.`;
+  const handleWhatsAppContact = () => {
+    const message = `Bonjour! Je suis intéressé(e) par les services SmartHub.`;
     window.open(`https://wa.me/21699730144?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -109,82 +58,14 @@ const Teachers = () => {
         </div>
       </section>
 
-      {/* Teachers Grid */}
-      <section className="py-16 bg-white/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
-            Notre Équipe Pédagogique
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teachers.map((teacher, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 group"
-              >
-                {/* Avatar */}
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-2xl font-bold">
-                  {teacher.name.split(' ').map(n => n[0]).join('')}
-                </div>
-
-                {/* Teacher Info */}
-                <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-1">
-                    {teacher.name}
-                  </h3>
-                  <p className="text-blue-600 font-semibold mb-2">
-                    {teacher.subject}
-                  </p>
-                  <div className="flex items-center justify-center mb-2">
-                    <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                    <span className="ml-1 text-gray-700 font-semibold">
-                      {teacher.rating}
-                    </span>
-                    <span className="ml-2 text-gray-500">
-                      ({teacher.experience})
-                    </span>
-                  </div>
-                </div>
-
-                {/* Specialties */}
-                <div className="mb-4">
-                  <div className="flex flex-wrap gap-2 justify-center">
-                    {teacher.specialties.map((specialty, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full"
-                      >
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Description */}
-                <p className="text-gray-600 text-sm text-center mb-6">
-                  {teacher.description}
-                </p>
-
-                {/* Contact Button */}
-                <button
-                  onClick={() => handleWhatsAppContact(teacher.name)}
-                  className="w-full flex items-center justify-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
-                >
-                  <MessageCircle className="w-5 h-5 mr-2" />
-                  Contacter sur WhatsApp
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* Stats Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-blue-600 mb-2">14+</div>
-              <div className="text-gray-700">Enseignants Experts</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">3</div>
+              <div className="text-gray-700">Salles Équipées</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
               <div className="text-3xl font-bold text-green-600 mb-2">4.8/5</div>
@@ -212,7 +93,7 @@ const Teachers = () => {
             Contactez-nous dès maintenant pour trouver l'enseignant parfait pour vos besoins
           </p>
           <button
-            onClick={() => handleWhatsAppContact('notre équipe')}
+            onClick={handleWhatsAppContact}
             className="inline-flex items-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-xl"
           >
             <MessageCircle className="w-6 h-6 mr-3" />

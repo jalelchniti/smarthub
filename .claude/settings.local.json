@@ -6,7 +6,17 @@
       "Bash(npm run lint)",
       "Bash(git add:*)",
       "Bash(git init:*)",
-      "Bash(git remote add:*)"
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "WebFetch(domain:smarthub.com.tn)",
+      "WebFetch(domain:www.smarthub.com.tn)",
+      "WebFetch(domain:fohaixl.cluster100.hosting.ovh.net)",
+      "WebFetch(domain:cluster100.hosting.ovh.net)",
+      "Bash(curl:*)",
+      "WebFetch(domain:u-smart.tn)",
+      "WebFetch(domain:www.u-smart.tn)",
+      "Bash(ssh:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

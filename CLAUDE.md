@@ -106,6 +106,13 @@ backend/                 # Node.js + Express API server (MVC)
 - **ALWAYS** verify zero build errors before deployment discussions
 - **NEVER** commit without successful build verification
 
+### Privacy Protection Policy
+**CRITICAL: No personal data shall be displayed in public pages**
+- **Public Pages**: NO personal teacher data, names, photos, or private information
+- **Contact Integration**: All contact buttons must use WhatsApp +216 99 730 144
+- **Data Protection**: Individual teachers' personal data secured in backend only
+- **Public Content**: Only facility information, subjects, and general statistics allowed
+
 ### Financial Information Policy
 **CRITICAL: Money references are ONLY allowed in SuperAdmin Dashboard**
 - **SuperAdmin Dashboard**: Full financial data (revenue, earnings, payments)
