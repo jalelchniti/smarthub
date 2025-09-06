@@ -127,24 +127,27 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
               {/* Call to Action */}
               <div className="space-y-6">
                 <p className="text-lg text-gray-600">
-                  Rejoignez l'excellence éducative avec <strong>SmartHub</strong> - Nous connectons les meilleurs enseignants aux étudiants les plus motivés
+                  Rejoignez l'excellence éducative avec <strong>SmartHub</strong>. Nous connectons les meilleurs enseignants compétents aux étudiants les plus sérieux. Notre équipe pédagogique est disponible pour discuter de votre profil et des opportunités qui correspondent à vos compétences.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={onClose}
-                    className="flex items-center justify-center space-x-2 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
-                  >
-                    <span>Découvrir SmartHub</span>
-                  </button>
+                <div className="flex flex-col gap-4 justify-center max-w-md mx-auto">
+                  {/* Primary CTA - Contact */}
                   <a
                     href="https://wa.me/21699730144?text=Bonjour! Je viens de postuler comme enseignant et j'aimerais discuter des opportunités chez SmartHub."
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center space-x-2 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
+                    className="flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg text-lg font-semibold"
                   >
-                    <Phone className="w-4 h-4" />
-                    <span>Discuter Maintenant</span>
+                    <Phone className="w-5 h-5" />
+                    <span>Discuter avec l'Équipe</span>
                   </a>
+                  
+                  {/* Secondary CTA - Discover */}
+                  <button
+                    onClick={onClose}
+                    className="flex items-center justify-center space-x-2 bg-white border-2 border-green-300 text-green-600 hover:border-green-500 hover:text-green-700 hover:bg-green-50 px-6 py-3 rounded-xl transition-all duration-200 font-medium"
+                  >
+                    <span>Découvrir SmartHub</span>
+                  </button>
                 </div>
               </div>
             </div>

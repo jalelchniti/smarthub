@@ -127,24 +127,27 @@ const StudentTCAForm: React.FC<StudentTCAFormProps> = ({ isOpen, onClose }) => {
               {/* Call to Action */}
               <div className="space-y-6">
                 <p className="text-lg text-gray-600">
-                  En attendant, découvrez tout ce que <strong>SmartHub</strong> peut vous offrir
+                  Commencez votre parcours éducatif dès maintenant ! Notre équipe est prête à vous accompagner et à répondre à toutes vos questions sur <strong>SmartHub</strong> et nos services personnalisés.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <button
-                    onClick={onClose}
-                    className="flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
-                  >
-                    <span>Explorer SmartHub</span>
-                  </button>
+                <div className="flex flex-col gap-4 justify-center max-w-md mx-auto">
+                  {/* Primary CTA - Contact */}
                   <a
                     href="https://wa.me/21699730144?text=Bonjour! Je viens de m'inscrire et j'aimerais en savoir plus sur SmartHub."
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl transition-all duration-200 transform hover:scale-105"
+                    className="flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg text-lg font-semibold"
                   >
-                    <Phone className="w-4 h-4" />
-                    <span>Contact Direct</span>
+                    <Phone className="w-5 h-5" />
+                    <span>Parler à un Conseiller</span>
                   </a>
+                  
+                  {/* Secondary CTA - Explore */}
+                  <button
+                    onClick={onClose}
+                    className="flex items-center justify-center space-x-2 bg-white border-2 border-blue-300 text-blue-600 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl transition-all duration-200 font-medium"
+                  >
+                    <span>Explorer le Site</span>
+                  </button>
                 </div>
               </div>
             </div>
