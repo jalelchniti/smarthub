@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from './Button';
 import { X, User, Mail, Phone, CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -8,6 +9,7 @@ interface StudentSubscriptionFormProps {
 }
 
 const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpen, onClose }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     NOM: '',
     PRENOM: '',
@@ -93,8 +95,8 @@ const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpe
         document.body.removeChild(iframe);
       }, 2000);
 
-      // Redirect to our thank you page immediately (user never sees Brevo page)
-      window.location.href = '/thank-you/student';
+      // Redirect to our thank you page immediately using React Router
+      navigate('/thank-you/student');
       
     } catch (error) {
       console.error('Form submission error:', error);
