@@ -39,8 +39,10 @@ export const Rooms: React.FC = () => {
         { icon: Clock, text: '78 heures/semaine' }
       ],
       pricing: [
-        { capacity: '1-10 personnes', rate: 30 },
-        { capacity: '11-15 personnes', rate: 40 }
+        { capacity: 'Individuel (1 apprenant)', rate: 20 },
+        { capacity: '2-6 personnes', rate: 25 },
+        { capacity: '7-9 personnes', rate: 30 },
+        { capacity: '10-15 personnes', rate: 35 }
       ],
       availability: '78 hours/week',
       image: '/images/room-1.jpg'
@@ -61,7 +63,8 @@ export const Rooms: React.FC = () => {
       ],
       pricing: [
         { capacity: 'Individuel (1 apprenant)', rate: 15 },
-        { capacity: 'Jusqu\'à 9 personnes', rate: 20 }
+        { capacity: '2-7 personnes', rate: 20 },
+        { capacity: '8-9 personnes', rate: 25 }
       ],
       availability: '78 hours/week',
       image: '/images/room-2.jpg'
@@ -82,7 +85,8 @@ export const Rooms: React.FC = () => {
       ],
       pricing: [
         { capacity: 'Individuel (1 apprenant)', rate: 15 },
-        { capacity: 'Jusqu\'à 9 personnes', rate: 20 }
+        { capacity: '2-7 personnes', rate: 20 },
+        { capacity: '8-9 personnes', rate: 25 }
       ],
       availability: '78 hours/week',
       image: '/images/room-3.jpg'
@@ -144,7 +148,7 @@ export const Rooms: React.FC = () => {
                 
                 <div className="text-center">
                   <div className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600 mb-2">
-                    15-40
+                    15-35
                   </div>
                   <div className="text-xl font-semibold text-gray-700 mb-2">TND/Heure</div>
                   <div className="text-gray-600">Tarification flexible</div>

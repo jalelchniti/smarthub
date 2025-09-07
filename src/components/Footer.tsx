@@ -28,15 +28,8 @@ const Footer = () => {
               </span>
             </div>
             <p className="text-gray-300 mb-6 leading-relaxed">
-              Centre éducatif premium au cœur de Tunis, offrant des espaces d'apprentissage modernes et des enseignants qualifiés.
+              Centre éducatif premium au cœur de Tunis, offrant des espaces d'apprentissage modernes, des enseignants compétents et qualifiés, et une expérience d'enseignement exceptionnelle.
             </p>
-            <button
-              onClick={handleWhatsAppClick}
-              className="inline-flex items-center px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
-            >
-              <MessageCircle className="w-5 h-5 mr-2" />
-              WhatsApp
-            </button>
           </div>
 
           {/* Contact Info */}
@@ -117,12 +110,6 @@ const Footer = () => {
                 className="text-gray-400 hover:text-blue-400 transition-colors"
               >
                 <Mail className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleWhatsAppClick}
-                className="text-gray-400 hover:text-green-400 transition-colors"
-              >
-                <MessageCircle className="w-5 h-5" />
               </button>
             </div>
           </div>
