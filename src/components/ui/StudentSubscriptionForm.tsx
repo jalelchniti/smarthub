@@ -1,22 +1,21 @@
 import React, { useState } from 'react';
-import { Button } from './ui/Button';
-import { X, User, Mail, Phone, AlertCircle, GraduationCap } from 'lucide-react';
+import { Button } from './Button';
+import { X, User, Mail, Phone, CheckCircle, AlertCircle } from 'lucide-react';
 
-interface TeacherTCAFormProps {
+interface StudentSubscriptionFormProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
+const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
-    nom: '',
-    prenom: '',
-    sms: '',
-    email: ''
+    NOM: '',
+    PRENOM: '',
+    LANDLINE_NUMBER: '',
+    EMAIL: ''
   });
   const [countryCode, setCountryCode] = useState('+216');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
   const [showError, setShowError] = useState(false);
 
   if (!isOpen) return null;
@@ -28,38 +27,45 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
     } else {
       setFormData(prev => ({
         ...prev,
-        [name.toLowerCase()]: value
+        [name]: value
       }));
     }
+  };
+
+  const validateSMS = (sms: string): boolean => {
+    // SMS must contain 6-19 digits only (no +/0 prefix)
+    const smsRegex = /^[1-9]\d{5,18}$/;
+    return smsRegex.test(sms);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setShowError(false);
+
+    // Validate SMS format
+    if (!validateSMS(formData.LANDLINE_NUMBER)) {
+      setShowError(true);
+      setIsSubmitting(false);
+      return;
+    }
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append('NOM', formData.nom);
-      formDataToSend.append('PRENOM', formData.prenom);
-      formDataToSend.append('SMS', formData.sms);
+      formDataToSend.append('NOM', formData.NOM);
+      formDataToSend.append('PRENOM', formData.PRENOM);
+      formDataToSend.append('SMS', formData.LANDLINE_NUMBER);
       formDataToSend.append('SMS__COUNTRY_CODE', countryCode);
-      formDataToSend.append('EMAIL', formData.email);
+      formDataToSend.append('EMAIL', formData.EMAIL);
       formDataToSend.append('locale', 'fr');
+      formDataToSend.append('email_address_check', '');
 
-      const response = await fetch('https://e631d0f7.sibforms.com/serve/MUIFAB9eTKN19ZZHzLB3pDy9iApj7i7hfmfRJ5Et7AdQTncSEzLJg8sta7_1VK90zoVLBw-KysxwK2AABJbQ5wa6Ej_dsh5MeGMMg1l3COydke0Eis5wM6601UBH-HUb4TXc1W1WF7iOCbI4z2Zsz2-yyBb6s40JMppq_NCsoAgyDm6Wy7lHBXZsdoSB3b6sLw-3iRkfK2v9PXdI', {
-        method: 'POST',
-        body: formDataToSend
-      });
-
-      if (response.ok) {
-        setShowSuccess(true);
-        setFormData({ nom: '', prenom: '', sms: '', email: '' });
-      } else {
-        setShowError(true);
-      }
+      // Submit to Brevo - Brevo will handle redirect to custom thank you page
+      window.location.href = 'https://e631d0f7.sibforms.com/serve/MUIFAEgozu5Cca9Jp36zIv9OU7jqOFwCXFCcBNF_j-Zl2eQCC9MlfaFL4NeD8zYoIxKezBKg0rryxl72m3ZqICKkRAZEcMshaIBF9Cvl6VyI1n3FiiQ-HZmBbmQPcR0Q2azaLiToZ6Wn9ztLEVj75c2xfWV5CI_IkXQM87K3YCpH7vCi2C3yLFY5Puty-t-XT9qUr9GYXA8sxQi7?' + new URLSearchParams(formDataToSend as any).toString();
+      
     } catch (error) {
+      console.error('Form submission error:', error);
       setShowError(true);
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -69,8 +75,8 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
       <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b border-gray-200">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 text-center">Rejoignez notre Équipe</h3>
-            <p className="text-gray-600 text-center mt-1">Candidature pour devenir enseignant chez SmartHub</p>
+            <h3 className="text-2xl font-bold text-gray-900 text-center">Plus d'Information</h3>
+            <p className="text-gray-600 text-center mt-1">Rejoignez SmartHub en tant qu'étudiant</p>
           </div>
           <Button 
             variant="outline" 
@@ -83,42 +89,42 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
         </div>
 
         <div className="p-6">
-          {/* Thank You Success State */}
-          {showSuccess ? (
+          {/* Form Content */}
+          {false ? (
             <div className="text-center py-8">
               {/* Success Animation */}
               <div className="mb-8">
-                <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-400 to-teal-500 rounded-full shadow-2xl mb-6 animate-pulse">
-                  <GraduationCap className="w-12 h-12 text-white" />
+                <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-400 to-blue-500 rounded-full shadow-2xl mb-6 animate-pulse">
+                  <CheckCircle className="w-12 h-12 text-white" />
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">🎓 Merci de votre intérêt !</h3>
-                  <p className="text-xl text-gray-700 font-medium">Votre candidature d'enseignant a été transmise avec succès</p>
+                  <h3 className="text-3xl font-bold text-gray-900 mb-2">🎉 Félicitations !</h3>
+                  <p className="text-xl text-gray-700 font-medium">Votre demande d'information a été envoyée avec succès</p>
                 </div>
               </div>
 
               {/* Thank You Content */}
-              <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-2xl p-8 mb-8">
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 mb-8">
                 <div className="space-y-4">
-                  <h4 className="text-2xl font-semibold text-green-900 mb-4">Processus de Candidature</h4>
+                  <h4 className="text-2xl font-semibold text-blue-900 mb-4">Prochaines Étapes</h4>
                   <div className="grid gap-4">
                     <div className="flex items-center space-x-3 text-left">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span className="text-white font-bold text-sm">1</span>
                       </div>
-                      <p className="text-gray-700">Évaluation de votre profil par notre équipe pédagogique</p>
+                      <p className="text-gray-700">Notre équipe examine votre demande (sous 24h)</p>
                     </div>
                     <div className="flex items-center space-x-3 text-left">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span className="text-white font-bold text-sm">2</span>
                       </div>
-                      <p className="text-gray-700">Entretien téléphonique pour discuter de vos compétences</p>
+                      <p className="text-gray-700">Vous recevrez un email avec toutes les informations</p>
                     </div>
                     <div className="flex items-center space-x-3 text-left">
-                      <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                      <div className="flex-shrink-0 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span className="text-white font-bold text-sm">3</span>
                       </div>
-                      <p className="text-gray-700">Intégration dans notre réseau d'enseignants qualifiés</p>
+                      <p className="text-gray-700">Un conseiller vous contactera pour personnaliser votre parcours</p>
                     </div>
                   </div>
                 </div>
@@ -127,26 +133,26 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
               {/* Call to Action */}
               <div className="space-y-6">
                 <p className="text-lg text-gray-600">
-                  Rejoignez l'excellence éducative avec <strong>SmartHub</strong>. Nous connectons les meilleurs enseignants compétents aux étudiants les plus sérieux. Notre équipe pédagogique est disponible pour discuter de votre profil et des opportunités qui correspondent à vos compétences.
+                  Commencez votre parcours éducatif dès maintenant ! Notre équipe est prête à vous accompagner et à répondre à toutes vos questions sur <strong>SmartHub</strong> et nos services personnalisés.
                 </p>
                 <div className="flex flex-col gap-4 justify-center max-w-md mx-auto">
                   {/* Primary CTA - Contact */}
                   <a
-                    href="https://wa.me/21699730144?text=Bonjour! Je viens de postuler comme enseignant et j'aimerais discuter des opportunités chez SmartHub."
+                    href="https://wa.me/21699730144?text=Bonjour! Je viens de m'inscrire et j'aimerais en savoir plus sur SmartHub."
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg text-lg font-semibold"
+                    className="flex items-center justify-center space-x-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg text-lg font-semibold"
                   >
                     <Phone className="w-5 h-5" />
-                    <span>Discuter avec l'Équipe</span>
+                    <span>Parler à un Conseiller</span>
                   </a>
                   
-                  {/* Secondary CTA - Discover */}
+                  {/* Secondary CTA - Explore */}
                   <button
                     onClick={onClose}
-                    className="flex items-center justify-center space-x-2 bg-white border-2 border-green-300 text-green-600 hover:border-green-500 hover:text-green-700 hover:bg-green-50 px-6 py-3 rounded-xl transition-all duration-200 font-medium"
+                    className="flex items-center justify-center space-x-2 bg-white border-2 border-blue-300 text-blue-600 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl transition-all duration-200 font-medium"
                   >
-                    <span>Découvrir SmartHub</span>
+                    <span>Explorer le Site</span>
                   </button>
                 </div>
               </div>
@@ -158,8 +164,8 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-3">
                   <AlertCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
                   <div>
-                    <p className="text-red-800 font-medium">Nous n'avons pas pu enregistrer votre candidature.</p>
-                    <p className="text-red-600 text-sm">Veuillez réessayer ou nous contacter directement.</p>
+                    <p className="text-red-800 font-medium">Nous n'avons pas pu confirmer votre inscription.</p>
+                    <p className="text-red-600 text-sm">Vérifiez le format de votre numéro de téléphone (6-19 chiffres, sans +/0) ou contactez-nous directement.</p>
                   </div>
                 </div>
               )}
@@ -177,9 +183,9 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
                 name="NOM"
                 required
                 maxLength={200}
-                value={formData.nom}
+                value={formData.NOM}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="Entrez votre nom"
               />
             </div>
@@ -196,16 +202,16 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
                 name="PRENOM"
                 required
                 maxLength={200}
-                value={formData.prenom}
+                value={formData.PRENOM}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="Entrez votre prénom"
               />
             </div>
 
             {/* Téléphone */}
             <div>
-              <label htmlFor="sms" className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="landline" className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
                 <Phone className="w-4 h-4" />
                 <span>Numéro de téléphone *</span>
               </label>
@@ -214,10 +220,10 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
                   name="SMS__COUNTRY_CODE"
                   value={countryCode}
                   onChange={handleInputChange}
-                  className="px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors bg-white"
+                  className="px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors bg-white"
                   required
                 >
-                  <option value="+216">+216 TN</option>
+                  <option value="+216" selected>+216 TN</option>
                   <option value="+33">+33 FR</option>
                   <option value="+1">+1 US</option>
                   <option value="+44">+44 GB</option>
@@ -227,17 +233,19 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
                 </select>
                 <input
                   type="tel"
-                  id="sms"
-                  name="SMS"
+                  id="landline"
+                  name="LANDLINE_NUMBER"
                   required
-                  value={formData.sms}
+                  value={formData.LANDLINE_NUMBER}
                   onChange={handleInputChange}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
-                  placeholder="Numéro de téléphone"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                  placeholder="99123456"
+                  pattern="[1-9][0-9]{5,18}"
+                  title="Le numéro doit contenir entre 6 et 19 chiffres sans +/0 au début"
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Le champ doit contenir entre 6 et 19 chiffres (ex: 99730144 pour la Tunisie)
+                Le champ LANDLINE_NUMBER doit contenir entre 6 et 19 chiffres sans utiliser +/0 (ex: 99123456 pour la Tunisie)
               </p>
             </div>
 
@@ -248,26 +256,24 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
                 <span>Adresse email *</span>
               </label>
               <input
-                type="email"
+type="text"
                 id="email"
                 name="EMAIL"
                 required
-                value={formData.email}
+                value={formData.EMAIL}
                 onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-colors"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 placeholder="votre.email@exemple.com"
               />
               <p className="text-xs text-gray-500 mt-1">
-                Votre adresse email professionnelle pour la communication
+                Veuillez renseigner votre adresse email pour recevoir nos actualités
               </p>
             </div>
 
-            {/* Information Notice */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <p className="text-green-800 text-sm text-center">
-                <strong>Devenez enseignant chez SmartHub!</strong><br/>
-                Rejoignez notre équipe d'enseignants compétents et contribuez à l'excellence éducative. 
-                Nous vous contacterons pour discuter de votre profil et des opportunités disponibles.
+            {/* Newsletter Notice */}
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+              <p className="text-blue-800 text-sm text-center">
+                Inscrivez-vous à notre newsletter pour suivre nos actualités et recevoir des informations exclusives sur nos services éducatifs.
               </p>
             </div>
 
@@ -276,7 +282,7 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex items-center space-x-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-3 text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-3 text-lg rounded-xl shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
                 {isSubmitting ? (
                   <>
@@ -285,8 +291,8 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
                   </>
                 ) : (
                   <>
-                    <GraduationCap className="w-5 h-5" />
-                    <span>Postuler Maintenant</span>
+                    <CheckCircle className="w-5 h-5" />
+                    <span>S'inscrire</span>
                   </>
                 )}
               </button>
@@ -300,4 +306,4 @@ const TeacherTCAForm: React.FC<TeacherTCAFormProps> = ({ isOpen, onClose }) => {
   );
 };
 
-export default TeacherTCAForm;
+export default StudentSubscriptionForm;

@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import GoogleMapEmbed from '../components/GoogleMapEmbed';
-import StudentTCAForm from '../components/StudentTCAForm';
-import TeacherTCAForm from '../components/TeacherTCAForm';
+import StudentSubscriptionForm from '../components/ui/StudentSubscriptionForm';
+import TeacherSubscriptionForm from '../components/ui/TeacherSubscriptionForm';
 import { MapPin, Users, Clock, Star, CheckCircle, ArrowRight, Building, Globe, Phone, X, UserPlus, BookOpen } from 'lucide-react';
 
 export const Home = () => {
@@ -360,13 +360,13 @@ export const Home = () => {
       )}
 
       {/* Student TCA Form Modal */}
-      <StudentTCAForm 
+      <StudentSubscriptionForm 
         isOpen={showStudentTCA} 
         onClose={() => setShowStudentTCA(false)} 
       />
 
       {/* Teacher TCA Form Modal */}
-      <TeacherTCAForm 
+      <TeacherSubscriptionForm 
         isOpen={showTeacherTCA} 
         onClose={() => setShowTeacherTCA(false)} 
       />

@@ -74,7 +74,7 @@
     </div>
     <div></div>
     <div id="sib-container" class="sib-container--large sib-container--vertical" style="text-align:center; background-color:rgba(240,236,236,1); max-width:540px; border-radius:3px; border-width:1px; border-color:#C0CCD9; border-style:solid; direction:ltr">
-      <form id="sib-form" method="POST" action="https://e631d0f7.sibforms.com/serve/MUIFAB9eTKN19ZZHzLB3pDy9iApj7i7hfmfRJ5Et7AdQTncSEzLJg8sta7_1VK90zoVLBw-KysxwK2AABJbQ5wa6Ej_dsh5MeGMMg1l3COydke0Eis5wM6601UBH-HUb4TXc1W1WF7iOCbI4z2Zsz2-yyBb6s40JMppq_NCsoAgyDm6Wy7lHBXZsdoSB3b6sLw-3iRkfK2v9PXdI" data-type="subscription">
+      <form id="sib-form" method="POST" action="https://e631d0f7.sibforms.com/serve/MUIFACvHSaSIPfdX8Y0Psnzjuj2q8MMWOWpx2sh9lKPVAA5F77YNGTBHOiOnQGLyMC6x8kuo8Ap2gPMWbqPWsRlcQUusaKe9RW-hLm2IVRsGzv5AhDcU7OIDf2yW1zOQxWCGzPtP1FyZlfRkaNEUuw4t30fto9rqoadK4LS83aITM3eQ5cZHJRzJ60VqePYhPXPtkA3WD5fOoM7N" data-type="subscription">
         <div style="padding: 8px 0;">
           <div class="sib-form-block" style="font-size:32px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#156fe7; background-color:transparent; text-align:left">
             <p>Plus d'info</p>
@@ -122,10 +122,10 @@
           <div class="sib-sms-field sib-form-block">
             <div class="form__entry entry_block">
               <div class="form__label-row ">
-                <label class="entry__label" style="font-weight: 700; text-align:left; font-size:16px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#3c4858;" for="SMS" data-required="*">Entrez votre SMS</label>
+                <label class="entry__label" style="font-weight: 700; text-align:left; font-size:16px; text-align:left; font-weight:700; font-family:Helvetica, sans-serif; color:#3c4858;" for="LANDLINE_NUMBER" data-required="*">Entrez votre numéro du téléphone</label>
 
                 <div class="sib-sms-input-wrapper" style="direction:ltr">
-                  <div class="sib-sms-input" data-placeholder="SMS" data-required="1" data-country-code="TN" data-whatsapp-country-code="TN" data-value="" data-whatsappvalue="" data-attributename="SMS">
+                  <div class="sib-sms-input" data-placeholder="LANDLINE_NUMBER" data-required="1" data-country-code="TN" data-whatsapp-country-code="TN" data-value="" data-whatsappvalue="" data-attributename="LANDLINE_NUMBER">
                     <div class="entry__field">
                       <select class="input" name="SMS__COUNTRY_CODE" data-required="true">
                         <option value="+93">
@@ -893,12 +893,12 @@
                       </select>
                     </div>
                     <div class="entry__field" style="width: 100%">
-                      <input type="tel" type="text" class="input" id="SMS" name="SMS" autocomplete="off" placeholder="SMS" data-required="true" required />
+                      <input type="tel" type="text" class="input" id="SMS" name="SMS" autocomplete="off" placeholder="LANDLINE_NUMBER" data-required="true" required />
                     </div>
                   </div>
                   <div class="sib-sms-tooltip">
                     <div class="sib-sms-tooltip__box">
-                      Le champ SMS doit contenir entre 6 et 19 chiffres et inclure le code pays sans utiliser +/0 (ex. : 33xxxxxxxxx pour la France)
+                      Le champ LANDLINE_NUMBER doit contenir entre 6 et 19 chiffres et inclure le code pays sans utiliser +/0 (ex. : 33xxxxxxxxx pour la France)
                     </div>
                     <span class="sib-sms-tooltip__icon">?</span>
                   </div>
@@ -910,7 +910,7 @@
               <label class="entry__error entry__error--secondary" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949;">
               </label>
               <label class="entry__specification" style="font-size:12px; text-align:left; font-family:Helvetica, sans-serif; color:#8390A4; text-align:left">
-                Personnalisez ce texte d&#039;aide facultatif avant de publier votre formulaire..
+                Veuillez renseigner votre numéro de téléphone fixe pour vous inscrire. Ex. : +33123456789
               </label>
             </div>
           </div>
@@ -982,7 +982,7 @@
     }
   };
 
-  var AUTOHIDE = Boolean(0);
+  var AUTOHIDE = Boolean(1);
 </script>
 
 <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>

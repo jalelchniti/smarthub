@@ -26,7 +26,7 @@ git commit -m "feat: update deployment with webhook automation
 🤖 Automated deployment setup:
 - Added webhook-deploy.php for GitHub integration
 - Configured automatic build and deploy process
-- Updated repository to smarthubnew
+- Updated repository to u-smart-net
 
 Deployment triggered: $(date)"
 

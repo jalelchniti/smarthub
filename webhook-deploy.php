@@ -9,7 +9,7 @@
 
 // Configuration
 define('WEBHOOK_SECRET', 'smarthub_deploy_2024_secure'); // Match GitHub webhook secret
-define('REPO_URL', 'https://github.com/jalelchniti/smarthubnew.git');
+define('REPO_URL', 'https://github.com/your-username/u-smart-net.git');
 define('BRANCH', 'master');
 define('DEPLOY_PATH', '/home/fohaixl/www/smarthub');
 define('TEMP_PATH', '/tmp/smarthub_deploy');
