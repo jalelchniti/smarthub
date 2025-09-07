@@ -24,7 +24,8 @@
       "Bash(dir:*)",
       "Bash(git config:*)",
       "Bash(git pull:*)",
-      "Bash(git remote get-url:*)"
+      "Bash(git remote get-url:*)",
+      "Bash(npm run preview:*)"
     ],
     "deny": [],
     "ask": []

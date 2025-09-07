@@ -1,153 +1,143 @@
-# SmartHub - Educational Platform
+# SmartHub - Espaces d'Apprentissage & Enseignants Experts
 
-SmartHub is a comprehensive educational platform built with React + TypeScript + Vite, featuring a complete dashboard ecosystem for educational workspace management in Tunis City Center.
+SmartHub est une vitrine web statique construite avec React + TypeScript + Vite, présentant une facilité éducative professionnelle située au centre-ville de Tunis. La plateforme met en valeur les services éducatifs, la location d'espaces de travail, et facilite la connection entre enseignants compétents et étudiants sérieux.
 
-## 🚀 Quick Start
+## 🚀 Démarrage Rapide
 
-### Frontend Development
 ```bash
 npm install
 npm run dev
 ```
-Visit `http://localhost:5173`
-
-### Backend Development
-```bash
-cd backend
-npm install
-npm run dev
-```
-Backend runs on `http://localhost:3001`
+Visitez `http://localhost:5173`
 
 ## 🏗️ Architecture
 
-- **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS + Socket.IO Client
-- **Backend**: Node.js + Express + Prisma ORM + SQLite/PostgreSQL + Socket.IO
-- **Authentication**: JWT with role-based permissions
-- **Real-Time**: WebSocket server & client with live notifications
-- **Messaging**: Instant messaging with conversations
-- **Notifications**: Priority-based sounds and visual indicators
-- **Design**: Premium glassmorphism with gradient themes
+- **Frontend**: React 19 + TypeScript 5.8 + Vite 7.1
+- **Styling**: Tailwind CSS 3.4 avec thème personnalisé
+- **Routage**: React Router DOM 7.8
+- **Icons**: Lucide React
+- **Déploiement**: Site statique sur hébergement OVH
+- **Intégrations**: Formulaires Brevo + Contact WhatsApp
 
-## 📊 Dashboard System
+## 📄 Pages Disponibles
 
-### 13 Specialized Dashboards
+### Pages Principales
+- **Accueil** (`/`) - Section héro avec présentation des services
+- **Espaces** (`/rooms`) - Location d'espaces de travail (3 salles)
+- **Enseignants** (`/teachers`) - Services et matières enseignées
+- **Apprendre Plus** (`/learn-more`) - Programmes éducatifs détaillés
 
-**SuperAdmin Dashboard** (`/super-admin`)
-- Platform oversight with crown theme
-- System health and performance monitoring
+### Pages de Remerciement
+- **Étudiant** (`/thank-you/student`) - Confirmation d'inscription étudiant
+- **Enseignant** (`/thank-you/teacher`) - Confirmation d'inscription enseignant
 
-**10 Specialized Admin Dashboards**
-- General Admin (`/generaladmin`) - Blue theme
-- Teacher Admin (`/teacheradmin`) - Green theme  
-- Content Admin (`/contentadmin`) - Purple theme
-- Marketing Admin (`/marketingadmin`) - Pink theme
-- Analytics Admin (`/analyticsadmin`) - Cyan theme
-- Financial Admin (`/financialadmin`) - Yellow theme
-- Support Admin (`/supportadmin`) - Gray theme
-- Academic Admin (`/academicadmin`) - Emerald theme
-- Safety Admin (`/safetyadmin`) - Red theme
-- User Admin (`/useradmin`) - Indigo theme
+## 🎯 Fonctionnalités
 
-**User Self-Service Dashboards**
-- Teacher Dashboard (`/teacher`) - Emerald theme - Session & earnings management
-- Student Dashboard (`/student`) - Blue theme - Course booking & progress tracking
+- **Localisation Française**: Contenu entièrement en français
+- **Design Responsive**: Mobile-first avec effets premium glassmorphisme
+- **Intégration WhatsApp**: Contact direct via +216 99 730 144
+- **Formulaires Brevo**: Collecte de leads avec autorépondeurs email
+- **Carte Interactive**: Localisation Google Maps intégrée
+- **9 Matières**: Mathématiques, Physique, Français, Anglais, Sciences Naturelles, Arabe, Informatique, Économie & Gestion, ESP
 
-## 🎯 Features
+## 🏢 Contexte Professionnel
 
-- **Multi-Role Authentication**: SuperAdmin, Specialized Admins, Teachers, Students
-- **French Localization**: Complete French language support
-- **Responsive Design**: Mobile-first with premium styling
-- **Real-Time Features**: Live notifications, calendar updates, messaging
-- **WebSocket Integration**: Instant updates and presence tracking
-- **Progressive Architecture**: Static showcase + dynamic backend + live features
+**SmartHub - Facilité Éducative**
+- **Adresse**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
+- **Contact**: +216 99 730 144 | admin@u-smart.net
+- **Horaires**: Lun-Ven (8:00-20:00), Sam (9:00-13:00, 15:00-18:00)
+- **Services**: Location d'espaces de travail pour enseignants, services éducatifs en présentiel
 
-## 🏢 Business Context
+## 🛠️ Commandes de Développement
 
-**SmartHub Educational Facility**
-- Location: Tunis City Center (Rue de Belgique, Immeuble MAE)
-- Services: Teacher workspace rental, educational sessions
-- Contact: +216 99 730 144 | admin@u-smart.net
-- Hours: Mon-Fri (8:00-20:00), Weekends (9:00-18:00)
-
-## 🛠️ Development
-
-### Build Commands
 ```bash
-# Frontend
-npm run build    # Production build
-npm run lint     # Code quality check
-npm run preview  # Preview production build
-
-# Backend
-cd backend
-npm run build    # Backend build
-npm run test     # Run tests
-npm run db:studio # Database GUI
+# Développement
+npm run dev          # Serveur de développement (port 5173)
+npm run build        # Build de production
+npm run lint         # Vérification qualité du code
+npm run preview      # Aperçu du build de production
 ```
 
-### Environment Setup
-Create `.env` file in project root:
-```env
-VITE_USE_BACKEND=true
-VITE_API_URL=http://localhost:3001/api
-```
+## 🌐 Déploiement
 
-Create `backend/.env` file:
-```env
-DATABASE_URL="file:./dev.db"
-JWT_SECRET="your-jwt-secret"
-PORT=3001
-```
+### Déploiement Automatique Git (OVH)
+- **Dépôt**: https://github.com/jalelchniti/u-smart-net.git
+- **Branche**: master
+- **Domaines**:
+  - https://smarthub.com.tn/
+  - https://www.smarthub.com.tn/
+  - https://u-smart.tn/
+  - https://www.u-smart.tn/
 
-## 📋 Test Accounts
+### Configuration Build
+- **Base Path**: `/smarthub/` (pour déploiement OVH)
+- **Output**: `dist/` directory
+- **Assets**: `assets/` subdirectory
 
-**Development Access** (No login required currently)
-- SuperAdmin: admin@u-smart.net/admin123456
-- Specialized Admins: [role]admin@u-smart.net/admin123456
-- Teacher: marie.dubois@example.com/teacher123
-- Student: student@example.com/student123
+## 📋 Intégrations
 
-## 🚦 Development Status
+### Formulaires Brevo
+- **Collecte de Leads**: Formulaires étudiants et enseignants
+- **Champs**: NOM, PRENOM, EMAIL, SMS (avec code pays)
+- **Autorépondeurs**: Emails de bienvenue personnalisés
+- **Redirection**: Pages de remerciement locales
 
-✅ **Phase 1**: Static showcase website
-✅ **Phase 2**: Backend + Authentication + Role system
-✅ **Phase 3**: Complete dashboard ecosystem  
-✅ **Phase 4**: Real-time backend infrastructure (Complete)
-🚧 **Phase 5**: Frontend real-time integration (Week 1 Complete ✅)
+### WhatsApp Business
+- **Numéro**: +216 99 730 144
+- **Integration**: Boutons d'appel à l'action sur toutes les pages
+- **Messages Pré-remplis**: Contexte personnalisé selon la page
 
-**Current Status**: Real-time notifications fully integrated - 1 week remaining
-
-## 📁 Project Structure
+## 📁 Structure du Projet
 
 ```
 src/
-├── components/          # React components
-│   └── notifications/  # Real-time notification components
-├── pages/              # Dashboard pages (13 total)
-├── contexts/           # Authentication & Notification contexts
-├── services/           # API services & WebSocket client
-├── utils/              # Notification sound system
-└── types/              # TypeScript definitions
+├── components/
+│   ├── ui/                 # Composants UI réutilisables
+│   ├── Navigation.tsx      # Navigation principale
+│   ├── Footer.tsx          # Pied de page
+│   ├── GoogleMapEmbed.tsx  # Carte Google Maps
+│   ├── Student/TeacherTCA.tsx  # Boutons d'appel à l'action
+│   └── Student/TeacherTCAForm.tsx  # Formulaires Brevo
+├── pages/
+│   ├── Home.tsx           # Page d'accueil
+│   ├── Rooms.tsx          # Espaces de travail
+│   ├── Teachers.tsx       # Services enseignants
+│   └── LearnMore.tsx      # Programmes éducatifs
+├── App.tsx                # Composant principal
+└── main.tsx               # Point d'entrée
 
-backend/
-├── src/
-│   ├── controllers/    # API endpoints
-│   ├── services/       # Business logic
-│   ├── routes/         # Route definitions
-│   └── types/          # Backend types
-└── prisma/            # Database schema
+public/
+├── images/               # Assets d'images
+└── index.html           # Template HTML
 ```
+
+## 🎨 Design System
+
+- **Couleurs Principales**: Bleus (#3b82f6, #1e40af, #1e3a8a)
+- **Couleurs Secondaires**: Violets (#8b5cf6, #7c3aed, #6d28d9)
+- **Typographie**: Inter (Google Fonts)
+- **Effets**: Gradients, glassmorphisme, animations hover
+- **Alignement**: Centré par défaut (text-center global)
 
 ## 📖 Documentation
 
-See `CLAUDE.md` for comprehensive development guidelines and architecture details.
+Voir `CLAUDE.md` pour les directives complètes de développement, les règles critiques, et les détails d'architecture.
 
-## 🤝 Contributing
+## 🚦 Status Actuel
 
-This is a private educational platform project for SmartHub Tunis.
+✅ **Application Statique Complète**
+- 4 pages principales fonctionnelles
+- Intégration Brevo pour collecte de leads
+- Contact WhatsApp intégré
+- Déploiement OVH automatisé
+- Design responsive premium
+
+❌ **Fonctionnalités Futures** (non implémentées)
+- Backend API
+- Système d'authentification
+- Dashboards administrateur
+- Fonctionnalités temps réel
 
 ---
 
-**SmartHub** - Educational Excellence in Tunis City Center
-<!-- OVH Git Integration Test - Thu, Sep  4, 2025  5:56:06 PM -->
+**SmartHub** - Excellence Éducative au Centre-Ville de Tunis
