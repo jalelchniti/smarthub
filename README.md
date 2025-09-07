@@ -67,7 +67,7 @@ Backend runs on `http://localhost:3001`
 **SmartHub Educational Facility**
 - Location: Tunis City Center (Rue de Belgique, Immeuble MAE)
 - Services: Teacher workspace rental, educational sessions
-- Contact: +216 99 730 144 | contact@smarthub.com.tn
+- Contact: +216 99 730 144 | admin@u-smart.net
 - Hours: Mon-Fri (8:00-20:00), Weekends (9:00-18:00)
 
 ## 🛠️ Development
@@ -103,8 +103,8 @@ PORT=3001
 ## 📋 Test Accounts
 
 **Development Access** (No login required currently)
-- SuperAdmin: jalel@smarthub.com.tn/admin123456
-- Specialized Admins: [role]admin@smarthub.com.tn/admin123456
+- SuperAdmin: admin@u-smart.net/admin123456
+- Specialized Admins: [role]admin@u-smart.net/admin123456
 - Teacher: marie.dubois@example.com/teacher123
 - Student: student@example.com/student123
 

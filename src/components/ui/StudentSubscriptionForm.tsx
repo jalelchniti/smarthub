@@ -11,7 +11,7 @@ const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpe
   const [formData, setFormData] = useState({
     NOM: '',
     PRENOM: '',
-    LANDLINE_NUMBER: '',
+    SMS: '',
     EMAIL: ''
   });
   const [countryCode, setCountryCode] = useState('+216');
@@ -44,24 +44,57 @@ const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpe
     setShowError(false);
 
     // Validate SMS format
-    if (!validateSMS(formData.LANDLINE_NUMBER)) {
+    if (!validateSMS(formData.SMS)) {
       setShowError(true);
       setIsSubmitting(false);
       return;
     }
 
     try {
-      const formDataToSend = new FormData();
-      formDataToSend.append('NOM', formData.NOM);
-      formDataToSend.append('PRENOM', formData.PRENOM);
-      formDataToSend.append('SMS', formData.LANDLINE_NUMBER);
-      formDataToSend.append('SMS__COUNTRY_CODE', countryCode);
-      formDataToSend.append('EMAIL', formData.EMAIL);
-      formDataToSend.append('locale', 'fr');
-      formDataToSend.append('email_address_check', '');
+      // Create a hidden iframe for form submission (bypasses popup security + stays on our site)
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.name = 'brevo-submit-frame';
+      document.body.appendChild(iframe);
 
-      // Submit to Brevo - Brevo will handle redirect to custom thank you page
-      window.location.href = 'https://e631d0f7.sibforms.com/serve/MUIFAEgozu5Cca9Jp36zIv9OU7jqOFwCXFCcBNF_j-Zl2eQCC9MlfaFL4NeD8zYoIxKezBKg0rryxl72m3ZqICKkRAZEcMshaIBF9Cvl6VyI1n3FiiQ-HZmBbmQPcR0Q2azaLiToZ6Wn9ztLEVj75c2xfWV5CI_IkXQM87K3YCpH7vCi2C3yLFY5Puty-t-XT9qUr9GYXA8sxQi7?' + new URLSearchParams(formDataToSend as any).toString();
+      // Create a hidden form that targets the iframe
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://e631d0f7.sibforms.com/serve/MUIFACIS_HvUBL38dN3sbehcT-uiPwKQ5Js32ozCj4_6JnlMRkBf-X9MjN62cIkuWWom-z41m6gDgRKIlxq9dHliaq6skHgdAALE4jWto2JyyjMtP9asgwdYnG-Z4oSdUSUo7T45jGoJD9fYqhijgraWcAKtoDVwUg_1HxbG8ivPIqPXcBZ5dHVrryAyzi-lD5jyxXuGTmkOuUkG';
+      form.target = 'brevo-submit-frame'; // Submit to hidden iframe
+      form.style.display = 'none';
+
+      // Add all form fields
+      const fields = {
+        'NOM': formData.NOM,
+        'PRENOM': formData.PRENOM,
+        'SMS': formData.SMS,
+        'SMS__COUNTRY_CODE': countryCode,
+        'EMAIL': formData.EMAIL,
+        'locale': 'fr',
+        'email_address_check': ''
+      };
+
+      Object.entries(fields).forEach(([name, value]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      // Append form to body and submit
+      document.body.appendChild(form);
+      form.submit();
+
+      // Clean up after submission
+      setTimeout(() => {
+        document.body.removeChild(form);
+        document.body.removeChild(iframe);
+      }, 2000);
+
+      // Redirect to our thank you page immediately (user never sees Brevo page)
+      window.location.href = '/thank-you/student';
       
     } catch (error) {
       console.error('Form submission error:', error);
@@ -90,6 +123,7 @@ const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpe
 
         <div className="p-6">
           {/* Form Content */}
+          {/* eslint-disable-next-line no-constant-condition */}
           {false ? (
             <div className="text-center py-8">
               {/* Success Animation */}
@@ -211,7 +245,7 @@ const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpe
 
             {/* Téléphone */}
             <div>
-              <label htmlFor="landline" className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="sms" className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
                 <Phone className="w-4 h-4" />
                 <span>Numéro de téléphone *</span>
               </label>
@@ -233,19 +267,19 @@ const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpe
                 </select>
                 <input
                   type="tel"
-                  id="landline"
-                  name="LANDLINE_NUMBER"
+                  id="sms"
+                  name="SMS"
                   required
-                  value={formData.LANDLINE_NUMBER}
+                  value={formData.SMS}
                   onChange={handleInputChange}
                   className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                  placeholder="99123456"
+                  placeholder="LANDLINE_NUMBER"
                   pattern="[1-9][0-9]{5,18}"
                   title="Le numéro doit contenir entre 6 et 19 chiffres sans +/0 au début"
                 />
               </div>
               <p className="text-xs text-gray-500 mt-1">
-                Le champ LANDLINE_NUMBER doit contenir entre 6 et 19 chiffres sans utiliser +/0 (ex: 99123456 pour la Tunisie)
+                Le champ SMS doit contenir entre 6 et 19 chiffres sans utiliser +/0 (ex: 99123456 pour la Tunisie)
               </p>
             </div>
 
@@ -256,7 +290,7 @@ const StudentSubscriptionForm: React.FC<StudentSubscriptionFormProps> = ({ isOpe
                 <span>Adresse email *</span>
               </label>
               <input
-type="text"
+                type="text"
                 id="email"
                 name="EMAIL"
                 required

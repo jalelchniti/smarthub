@@ -121,7 +121,7 @@ public/                  # Static assets
 - **Component-Based Design**: Reusable UI components with consistent styling patterns
 - **Premium Design System**: Gradient backgrounds, glassmorphism effects, hover animations
 
-## Recent UI/UX Improvements (Latest Update)
+## Recent UI/UX Improvements & Bug Fixes (Latest Update)
 
 ### Home Page Enhancements
 - **Hero Section Added**: Complete hero section with compelling messaging about connecting competent teachers with serious students
@@ -143,6 +143,15 @@ public/                  # Static assets
 - **WhatsApp Button Cleanup**: Removed WhatsApp TCA buttons from footer for cleaner design
 - **Description Enhancement**: Expanded footer description with professional messaging about competent teachers and exceptional teaching experience
 
+### Critical Bug Fixes (Sept 2025)
+- **✅ RESOLVED: Form Redirect Issue**: Both student and teacher subscription forms now properly redirect to local thank you pages instead of Brevo's default form pages
+  - StudentSubscriptionForm: Fixed redirect to `/thank-you/student`
+  - TeacherSubscriptionForm: Fixed redirect to `/thank-you/teacher`
+  - **UPDATED**: Forms now use iframe submission method to bypass popup security restrictions
+- **✅ RESOLVED: Thank You Page Navigation**: "Explorer le Site" and "Découvrir nos Services" buttons now redirect to Home page (`/`) instead of external URLs that showed blank pages
+- **✅ RESOLVED: Git Repository URL**: Updated CLAUDE.md documentation to reflect correct repository URL (`jalelchniti/u-smart-net.git`) instead of placeholder
+- **🔄 ONGOING: Brevo Integration Issue**: Despite multiple attempts, forms are still not successfully sending data to Brevo CRM
+
 ## Page Structure
 
 The platform features **4 main pages** with consistent styling:
@@ -163,7 +172,7 @@ The platform features **4 main pages** with consistent styling:
 
 **SmartHub Educational Facility - Tunis City Center**
 - **Address**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
-- **Contact**: +216 99 730 144 | contact@smarthub.com.tn
+- **Contact**: +216 99 730 144 | admin@u-smart.net
 - **Hours**: Mon-Fri (8:00-20:00), Sat (9:00-13:00, 15:00-18:00)
 - **Services**: Teacher workspace rental (3 rooms), in-person educational services connecting competent teachers with serious students
 
@@ -217,14 +226,14 @@ cp .env.example .env         # Configure environment for future backend integrat
 ### Form Configuration
 The subscription forms are fully integrated with Brevo (formerly Sendinblue) for email marketing and lead collection:
 
-**Student Form Endpoint:**
+**Student Form Endpoint:** (CORRECTED - from original Brevo form)
 ```
-https://e631d0f7.sibforms.com/serve/MUIFAOeSp7kQzmTnCIZXqDW5hlLlP3eBg9PgrFIiLRk1VEAV-v0-RIdcAFxVFdEjW-oTyIuJxIEgGoSdYSREB_eI1Oe0RHpvqDS3Gji2q0bIZIn6WJORhXVK_lqSg8ZHvK40oHTxrISE08Yxyc9R1the9mpr2w1NMNEE75NK_BGWXDlxcv8Pd9E2mvme9RMT3rpHikMgiQHXeaOZ
+https://e631d0f7.sibforms.com/serve/MUIFACIS_HvUBL38dN3sbehcT-uiPwKQ5Js32ozCj4_6JnlMRkBf-X9MjN62cIkuWWom-z41m6gDgRKIlxq9dHliaq6skHgdAALE4jWto2JyyjMtP9asgwdYnG-Z4oSdUSUo7T45jGoJD9fYqhijgraWcAKtoDVwUg_1HxbG8ivPIqPXcBZ5dHVrryAyzi-lD5jyxXuGTmkOuUkG
 ```
 
-**Teacher Form Endpoint:**
+**Teacher Form Endpoint:** (CORRECTED - from original Brevo form)
 ```
-https://e631d0f7.sibforms.com/serve/MUIFAGVcUSw9RrTrfN8aGXbXi0dU0h9FIIpvMGaXycSaNDxMHgn7957J8QcCpMweShQvL1h7S1FXA90zfM9THdLppvrl4HVn7-lE-iYQIWQ4mJmRRxuoOWwb1YxS6_AGldlG8YW7MX6wKJ0ljCJSWT5_RCmCEkwYnMjzi_l1vxEvNjDD3ICI8JChnuzLxYSN2rwpheecBYGg_IqQ
+https://e631d0f7.sibforms.com/serve/MUIFAOl0zZjF9_ETgLWZ1u9kUW5ZHwhDBg3EkmUE5vao2JdvBLDFgKQfMyG7fHUYoTlRcZ-vdATljkhFuMWnM3VYg4OnDhVv4C8Cc2j_P8CRHn94CbppJIbDDiHoyB7Lw7PLYY-zw4P7jL_cMhTsudsYJ_Vk5jWWj5zhxWtUsPJWHXvXWQp9VxM_iaUoKbl4Jxu6RnvCV8ZLqi5x
 ```
 
 ### Field Mapping Requirements
@@ -262,10 +271,39 @@ const handleInputChange = (e) => {
 - **Success**: Shows premium thank-you page with WhatsApp integration
 - **Error**: Displays user-friendly error message with retry option
 - **Validation**: Client-side validation with Brevo server-side verification
+- **Fixed Redirect Issue**: Forms now properly redirect to local thank you pages (`/thank-you/student`, `/thank-you/teacher`) instead of Brevo's default pages
 
 ### Troubleshooting Brevo Integration
-**CRITICAL ISSUE - COMPATIBILITY NOT FULLY RESOLVED:**
-⚠️ **Compatibility of the subscription forms in the app with the Brevo configuration is still to be fixed.**
+**CRITICAL ISSUE - STILL UNRESOLVED:**
+🚨 **Despite multiple attempted solutions, Brevo is still not receiving form submissions.**
+
+#### **Attempted Solutions (All Failed):**
+
+**Solution 1: Quick Field/URL Fix**
+- ❌ Fixed endpoint URLs to match original Brevo HTML forms exactly
+- ❌ Corrected field names from `LANDLINE_NUMBER` to `SMS`
+- ❌ Reverted email input type from 'email' to 'text'
+- ❌ Updated placeholders to match Brevo originals
+- **Result**: Still no data received by Brevo
+
+**Solution 2: Native Form Submission**
+- ❌ Replaced `fetch()` with native HTML form submission
+- ❌ Used `document.createElement('form')` and `form.submit()`
+- ❌ Opened submissions in `_blank` target
+- **Problem**: User redirected to Brevo success page instead of our thank you pages
+
+**Solution 3: Hidden Iframe Submission (Current)**
+- 🔄 Implemented iframe-based form submission
+- 🔄 Forms submit to hidden iframe to bypass popup security restrictions
+- 🔄 User immediately redirected to local thank you pages
+- **Status**: Technical implementation works, but Brevo still not receiving data
+
+#### **Root Cause Analysis:**
+After extensive debugging, the issue appears to be:
+1. **Form endpoint URLs** - Even with correct URLs from original HTML, submissions may be blocked
+2. **Security restrictions** - Browser security policies blocking cross-origin submissions from React apps
+3. **Brevo form validation** - Possible server-side validation differences between HTML forms and programmatic submissions
+4. **Field validation mismatch** - Brevo may have specific validation rules not matching our implementation
 
 **Common Issues:**
 1. **Forms not submitting**: Check endpoint URLs match exactly from `/docs/` directory
@@ -289,8 +327,49 @@ const handleInputChange = (e) => {
 - Test both success and error states
 - Verify SMS validation with different country codes
 - Confirm WhatsApp integration in success pages works correctly
-- **TODO**: Comprehensive testing of form submissions against live Brevo endpoint
-- **TODO**: Validation of all field mappings with current Brevo CRM configuration
+- **✅ RESOLVED**: Form submissions now properly redirect to local thank you pages
+- **✅ RESOLVED**: Thank you page "Explorer le Site" buttons now correctly redirect to Home page (`/`)
+- **❌ FAILED**: Multiple attempts to submit data to Brevo endpoint unsuccessful
+- **❌ PENDING**: Validation of all field mappings with current Brevo CRM configuration
+
+#### **Next Solution: Brevo API Integration**
+🔄 **Recommended approach: Replace form submissions with direct Brevo API calls**
+
+**Brevo API Benefits:**
+- Direct contact creation via REST API
+- Proper error handling and response validation
+- No cross-origin security restrictions
+- Better control over field mapping and validation
+- Real-time confirmation of successful submissions
+
+**Implementation Plan:**
+1. **API Setup**: Configure Brevo API credentials and endpoint
+2. **Contact Creation**: Use `/v3/contacts` endpoint to create contacts directly
+3. **List Assignment**: Automatically assign to appropriate email lists (student/teacher)
+4. **Error Handling**: Implement proper error responses and user feedback
+5. **Testing**: Verify contact creation in Brevo CRM dashboard
+
+**API Endpoint Structure:**
+```typescript
+// POST https://api.brevo.com/v3/contacts
+{
+  email: formData.EMAIL,
+  attributes: {
+    NOM: formData.NOM,
+    PRENOM: formData.PRENOM,
+    SMS: formData.SMS,
+    SMS__COUNTRY_CODE: countryCode
+  },
+  listIds: [studentListId], // or [teacherListId]
+  updateEnabled: true
+}
+```
+
+**Required for API Implementation:**
+- Brevo API key (from Brevo dashboard)
+- Student and Teacher list IDs
+- Proper CORS handling for API calls
+- Backend proxy or serverless function (due to API key security)
 
 ## Key Configuration Files
 
@@ -304,7 +383,7 @@ const handleInputChange = (e) => {
 ## Deployment to OVH
 
 ### Automated Git Deployment (Primary Method)
-**Repository**: https://github.com/your-username/u-smart-net.git
+**Repository**: https://github.com/jalelchniti/u-smart-net.git
 **Branch**: master
 **Target Domain**: www.smarthub.com.tn → `/smarthub/` folder
 
@@ -333,7 +412,7 @@ npm run build
 ```
 
 ### Git Integration Setup
-**GitHub Repository**: https://github.com/your-username/u-smart-net.git
+**GitHub Repository**: https://github.com/jalelchniti/u-smart-net.git
 **GitHub Webhook**: Configured with OVH-provided webhook URL
 **OVH Configuration**: www.smarthub.com.tn domain → smarthub folder
 
@@ -514,6 +593,8 @@ Teacher Contact:
 - **Git Deployment**: Use OVH Git integration for automatic deployment to production domains
 - **Form Field Names**: CRITICAL - Always use uppercase field names (NOM, PRENOM, SMS, EMAIL) for Brevo compatibility
 - **Email Personalization**: CRITICAL - Only use basic attributes (PRENOM, NOM, EMAIL, SMS) in first contact autoresponders
+- **Brevo Integration Status**: ONGOING ISSUE - Form submissions via HTML endpoints not working, API integration required
+- **Current Form Method**: Hidden iframe submission with immediate redirect to local thank you pages (user experience fixed, but data not reaching Brevo)
 
 ## DNS Configuration (Updated)
 

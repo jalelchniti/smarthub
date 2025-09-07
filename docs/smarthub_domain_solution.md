@@ -66,15 +66,15 @@ TTL: 300
 ```env
 # Updated .env configuration
 FRONTEND_URL="https://smarthub.com.tn"
-BUSINESS_EMAIL="contact@smarthub.com.tn"
+BUSINESS_EMAIL="admin@u-smart.net"
 EMAIL_FROM="noreply@smarthub.com.tn"
-ADMIN_EMAIL="admin@smarthub.com.tn"
+ADMIN_EMAIL="admin@u-smart.net"
 
 # Business Configuration
 BUSINESS_NAME="SmartHub"
 BUSINESS_ADDRESS="Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis"
 BUSINESS_PHONE="+216 99 730 144"
-BUSINESS_EMAIL="contact@smarthub.com.tn"
+BUSINESS_EMAIL="admin@u-smart.net"
 ```
 
 **Code Updates Required:**

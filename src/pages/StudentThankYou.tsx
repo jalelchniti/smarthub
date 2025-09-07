@@ -58,8 +58,7 @@ const StudentThankYou: React.FC = () => {
             
             {/* Secondary CTA - Explore Site */}
             <a
-              href="https://u-smart.net/"
-              target="_blank"
+              href="/"
               className="flex items-center justify-center space-x-2 bg-white border-2 border-blue-300 text-blue-600 hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 px-6 py-3 rounded-xl transition-all duration-200 font-medium"
             >
               <span>Explorer le Site</span>
@@ -75,7 +74,7 @@ const StudentThankYou: React.FC = () => {
           <div className="text-gray-500 text-sm">
             📍 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis<br />
             📞 <a href="tel:+21699730144" className="text-blue-600 hover:underline">+216 99 730 144</a> • 
-            📧 <a href="mailto:contact@smarthub.com.tn" className="text-blue-600 hover:underline">contact@smarthub.com.tn</a>
+            📧 <a href="mailto:admin@u-smart.net" className="text-blue-600 hover:underline">admin@u-smart.net</a>
           </div>
         </div>
       </div>

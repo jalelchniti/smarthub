@@ -20,7 +20,9 @@
       "Bash(git rm:*)",
       "Bash(npm run dev:*)",
       "Bash(taskkill:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(dir:*)",
+      "Bash(git config:*)"
     ],
     "deny": [],
     "ask": []

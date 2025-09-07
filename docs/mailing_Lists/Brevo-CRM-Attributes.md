@@ -2,45 +2,46 @@
 
 This document contains all CRM attributes configured in Brevo for SmartHub's email marketing system.
 
-## Normal Attributes
+## All Configured Attributes
 
 ### Personal Information
 | Attribute Name | Type | Description |
 |---|---|---|
-| **EMAIL** | Text | Contact's email address (primary identifier) |
-| **NOM** | Text | Last name / Surname |
-| **PRENOM** | Text | First name / Given name |
-| **SMS** | Text | Mobile phone number for SMS campaigns |
+| **EMAIL** | Texte | Contact's email address (primary identifier) |
+| **NOM** | Texte | Last name / Surname |
+| **PRENOM** | Texte | First name / Given name |
+| **SMS** | Texte | Mobile phone number for SMS campaigns |
 
 ### Contact Details
 | Attribute Name | Type | Description |
 |---|---|---|
-| **EXT_ID** | Text | External ID for system integration |
-| **LANDLINE_NUMBER** | Text | Landline/fixed phone number |
-| **CONTACT_TIMEZONE** | Text | Contact's timezone for scheduling |
+| **EXT_ID** | Texte | External ID for system integration |
+| **LANDLINE_NUMBER** | Texte | Landline/fixed phone number |
+| **CONTACT_TIMEZONE** | Texte | Contact's timezone for scheduling |
 
 ### Professional Information
 | Attribute Name | Type | Description |
 |---|---|---|
-| **JOB_TITLE** | Text | Professional job title/position |
-| **LINKEDIN** | Text | LinkedIn profile URL |
+| **JOB_TITLE** | Texte | Professional job title/position |
+| **LINKEDIN** | Texte | LinkedIn profile URL |
 
 ### Social Media & Communication
 | Attribute Name | Type | Description |
 |---|---|---|
-| **WHATSAPP** | Text | WhatsApp number (may differ from SMS) |
+| **WHATSAPP** | Texte | WhatsApp number (may differ from SMS) |
 
 ### Opt-in Management
 | Attribute Name | Type | Description |
 |---|---|---|
-| **DOUBLE_OPT_IN** | Category | Double opt-in confirmation status |
-| **OPT_IN** | Boolean | General opt-in consent status |
+| **DOUBLE_OPT_IN** | Catégorie | Double opt-in confirmation status |
+| **OPT_IN** | Booléen | General opt-in consent status |
 
 ### Educational Information (SmartHub Specific)
 | Attribute Name | Type | Description |
 |---|---|---|
-| **CLASS** | Number | Student's class level or grade |
-| **SECTION** | Multiple-choice | Student's section or specialization |
+| **CLASS** | Nombre | Student's class level or grade |
+| **SECTION** | Choix multiple | Student's section or specialization |
+| **MATIERES** | Choix multiple | Academic subjects (new field for subject targeting) |
 
 ## Field Mapping for SmartHub Forms
 
@@ -53,6 +54,7 @@ SMS → Mobile phone number
 SMS__COUNTRY_CODE → Country code (not stored as separate attribute)
 CLASS → Student's grade/class level (optional)
 SECTION → Academic section/specialization (optional)
+MATIERES → Academic subjects of interest (optional)
 ```
 
 ### Teacher Application Form
@@ -64,6 +66,7 @@ SMS → Mobile phone number
 SMS__COUNTRY_CODE → Country code (not stored as separate attribute)
 JOB_TITLE → Teaching position/specialization (optional)
 LINKEDIN → Professional LinkedIn profile (optional)
+MATIERES → Teaching subjects/specializations (optional)
 ```
 
 ## Usage Guidelines
@@ -81,13 +84,14 @@ LINKEDIN → Professional LinkedIn profile (optional)
 - **CONTACT_TIMEZONE**: For optimal send times
 - **CLASS**: Student's academic level for educational targeting
 - **SECTION**: Student's specialization for subject-specific campaigns
+- **MATIERES**: Academic subjects for targeted content delivery
 
 ### Data Types
-- **Text**: Free text fields (names, emails, URLs)
-- **Boolean**: True/false values (OPT_IN)
-- **Category**: Predefined options (DOUBLE_OPT_IN)
-- **Number**: Numeric values (CLASS level)
-- **Multiple-choice**: Select from predefined options (SECTION)
+- **Texte**: Free text fields (names, emails, URLs)
+- **Booléen**: True/false values (OPT_IN)
+- **Catégorie**: Predefined options (DOUBLE_OPT_IN)
+- **Nombre**: Numeric values (CLASS level)
+- **Choix multiple**: Select from predefined options (SECTION, MATIERES)
 
 ## Integration Notes
 
@@ -112,6 +116,7 @@ Available tokens in email templates:
 - **Professional**: Using JOB_TITLE (teachers)
 - **Academic Level**: Using CLASS (students) 
 - **Academic Specialization**: Using SECTION (students)
+- **Subject Interest**: Using MATIERES (both students and teachers)
 - **Communication preference**: Using SMS vs WHATSAPP
 - **Engagement**: Using OPT_IN status
 - **User Type**: Teachers vs Students (based on filled fields)
@@ -136,15 +141,16 @@ Available tokens in email templates:
 2. **Update job titles**: Standardize professional categories for teachers
 3. **Class levels**: Validate numeric ranges for CLASS field
 4. **Section options**: Maintain updated SECTION multiple-choice options
-5. **Timezone accuracy**: Keep updated for scheduling
-6. **LinkedIn profiles**: Verify active URLs
+5. **Subject options**: Maintain updated MATIERES multiple-choice options
+6. **Timezone accuracy**: Keep updated for scheduling
+7. **LinkedIn profiles**: Verify active URLs
 
 ### Monitoring
 - Track opt-in rates by source (student vs teacher forms)
 - Monitor data quality scores
 - Validate phone number formats
 - Check for duplicate contacts
-- Analyze CLASS and SECTION distribution for academic insights
+- Analyze CLASS, SECTION, and MATIERES distribution for academic insights
 
 ---
 **Last Updated**: September 2024

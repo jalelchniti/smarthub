@@ -7,7 +7,7 @@ const Footer = () => {
   };
 
   const handleEmailClick = () => {
-    window.location.href = 'mailto:contact@smarthub.com.tn';
+    window.location.href = 'mailto:admin@u-smart.net';
   };
 
   return (
@@ -45,7 +45,7 @@ const Footer = () => {
                 className="flex items-center text-gray-300 hover:text-blue-400 transition-colors group w-full text-left"
               >
                 <Mail className="w-5 h-5 mr-3 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span>contact@smarthub.com.tn</span>
+                <span>admin@u-smart.net</span>
               </button>
               <div className="flex items-start text-gray-300">
                 <MapPin className="w-5 h-5 mr-3 text-blue-400 mt-1 flex-shrink-0" />
