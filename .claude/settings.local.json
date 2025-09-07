@@ -10,8 +10,6 @@
       "Bash(git push:*)",
       "WebFetch(domain:smarthub.com.tn)",
       "WebFetch(domain:www.smarthub.com.tn)",
-      "WebFetch(domain:fohaixl.cluster100.hosting.ovh.net)",
-      "WebFetch(domain:cluster100.hosting.ovh.net)",
       "Bash(curl:*)",
       "WebFetch(domain:u-smart.tn)",
       "WebFetch(domain:www.u-smart.tn)",
@@ -25,7 +23,8 @@
       "Bash(git config:*)",
       "Bash(git pull:*)",
       "Bash(git remote get-url:*)",
-      "Bash(npm run preview:*)"
+      "Bash(npm run preview:*)",
+      "Bash(npm test)"
     ],
     "deny": [],
     "ask": []

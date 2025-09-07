@@ -69,24 +69,38 @@
     
     <!-- Brevo Forms Configuration -->
     <script>
-      window.REQUIRED_CODE_ERROR_MESSAGE = 'Veuillez choisir un code pays';
-      window.LOCALE = 'fr';
-      window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "Les informations que vous avez fournies ne sont pas valides. Veuillez vérifier le format du champ et réessayer.";
-      window.REQUIRED_ERROR_MESSAGE = "Vous devez renseigner ce champ. ";
-      window.GENERIC_INVALID_MESSAGE = "Les informations que vous avez fournies ne sont pas valides. Veuillez vérifier le format du champ et réessayer.";
-      
-      window.translation = {
-        common: {
-          selectedList: '{quantity} liste sélectionnée',
-          selectedLists: '{quantity} listes sélectionnées',
-          selectedOption: '{quantity} sélectionné',
-          selectedOptions: '{quantity} sélectionnés',
-        }
-      };
-      
-      var AUTOHIDE = Boolean(1);
+      // Wait for DOM to be ready before setting up Brevo
+      document.addEventListener('DOMContentLoaded', function() {
+        window.REQUIRED_CODE_ERROR_MESSAGE = 'Veuillez choisir un code pays';
+        window.LOCALE = 'fr';
+        window.EMAIL_INVALID_MESSAGE = window.SMS_INVALID_MESSAGE = "Les informations que vous avez fournies ne sont pas valides. Veuillez vérifier le format du champ et réessayer.";
+        window.REQUIRED_ERROR_MESSAGE = "Vous devez renseigner ce champ. ";
+        window.GENERIC_INVALID_MESSAGE = "Les informations que vous avez fournies ne sont pas valides. Veuillez vérifier le format du champ et réessayer.";
+        
+        window.translation = {
+          common: {
+            selectedList: '{quantity} liste sélectionnée',
+            selectedLists: '{quantity} listes sélectionnées',
+            selectedOption: '{quantity} sélectionné',
+            selectedOptions: '{quantity} sélectionnés',
+          }
+        };
+        
+        var AUTOHIDE = Boolean(1);
+        
+        // Load Brevo script after DOM is ready
+        var brevoScript = document.createElement('script');
+        brevoScript.defer = true;
+        brevoScript.src = 'https://sibforms.com/forms/end-form/build/main.js';
+        brevoScript.onload = function() {
+          console.log('Brevo script loaded successfully');
+        };
+        brevoScript.onerror = function() {
+          console.warn('Failed to load Brevo script');
+        };
+        document.head.appendChild(brevoScript);
+      });
     </script>
-    <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
     
     <script type="module" src="/src/main.tsx"></script>
   </body>

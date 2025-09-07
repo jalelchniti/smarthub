@@ -16,7 +16,7 @@ Visitez `http://localhost:5173`
 - **Styling**: Tailwind CSS 3.4 avec thème personnalisé
 - **Routage**: React Router DOM 7.8
 - **Icons**: Lucide React
-- **Déploiement**: Site statique sur hébergement OVH
+- **Déploiement**: Site statique prêt pour déploiement
 - **Intégrations**: Formulaires Brevo + Contact WhatsApp
 
 ## 📄 Pages Disponibles
@@ -60,17 +60,11 @@ npm run preview      # Aperçu du build de production
 
 ## 🌐 Déploiement
 
-### Déploiement Automatique Git (OVH)
+### Déploiement Statique
 - **Dépôt**: https://github.com/jalelchniti/u-smart-net.git
 - **Branche**: master
-- **Domaines**:
-  - https://smarthub.com.tn/
-  - https://www.smarthub.com.tn/
-  - https://u-smart.tn/
-  - https://www.u-smart.tn/
 
 ### Configuration Build
-- **Base Path**: `/smarthub/` (pour déploiement OVH)
 - **Output**: `dist/` directory
 - **Assets**: `assets/` subdirectory
 
@@ -129,7 +123,7 @@ Voir `CLAUDE.md` pour les directives complètes de développement, les règles c
 - 4 pages principales fonctionnelles
 - Intégration Brevo pour collecte de leads
 - Contact WhatsApp intégré
-- Déploiement OVH automatisé
+- Build de production optimisé
 - Design responsive premium
 
 ❌ **Fonctionnalités Futures** (non implémentées)

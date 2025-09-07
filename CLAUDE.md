@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ Static React SPA with 4 pages (Home, Rooms, Teachers, LearnMore)  
 - ✅ Brevo form integration for lead collection
 - ✅ WhatsApp contact integration (+216 99 730 144)
-- ✅ Static deployment to OVH hosting
+- ✅ Static deployment ready
 - ❌ NO backend server currently exists
 - ❌ NO authentication system implemented
 - ❌ NO dashboard system implemented
@@ -380,53 +380,19 @@ After extensive debugging, the issue appears to be:
 - `eslint.config.js` - ESLint with TypeScript, React hooks, and React refresh rules
 - `package.json` - Dependencies and build scripts for static site deployment
 
-## Deployment to OVH
+## Deployment
 
-### Automated Git Deployment (Primary Method)
+### Static Site Deployment
 **Repository**: https://github.com/jalelchniti/u-smart-net.git
 **Branch**: master
-**Target Domain**: www.smarthub.com.tn → `/smarthub/` folder
 
-**OVH Git Integration**:
-- **Webhook URL**: OVH-provided webhook endpoint
-- **Automatic Build**: Configured for `npm run build` if Node.js available
-- **Deploy Trigger**: Push to `master` branch
-- **Status**: DNS configured correctly, domains propagating
-
-### Manual Deployment (Backup Method)
-**FTP/SSH Credentials**:
-- **Host**: fohaixl.cluster100.hosting.ovh.net
-- **FTP Server**: ftp.cluster100.hosting.ovh.net
-- **SSH Server**: ssh.cluster100.hosting.ovh.net:22
-- **Username**: fohaixl
-- **Password**: [Reset via OVH Manager - documented passwords may be outdated]
-- **Deploy Directory**: `/www/smarthub/`
-
-**Static Site Deployment**:
+**Build Process**:
 ```bash
 # Build production version
 npm run build
 
-# Upload dist/ contents via FileZilla or SCP
-# Target: /www/smarthub/ directory
+# Deploy dist/ contents to hosting provider
 ```
-
-### Git Integration Setup
-**GitHub Repository**: https://github.com/jalelchniti/u-smart-net.git
-**GitHub Webhook**: Configured with OVH-provided webhook URL
-**OVH Configuration**: www.smarthub.com.tn domain → smarthub folder
-
-**Common Issues**:
-- **AttachedDomain not found**: Ensure domain is properly configured in Multisite
-- **404 webhook errors**: Wait for DNS propagation before activating Git
-- **Git status "Inactif"**: Domain configuration needs to propagate first
-
-### Live URLs After Deployment
-- **Primary URL**: https://smarthub.com.tn/ (DNS configured, propagating)
-- **Secondary URL**: https://www.smarthub.com.tn/ (DNS configured, propagating)
-- **Additional Domain**: https://u-smart.tn/ (DNS configured, propagating)
-- **Additional Domain**: https://www.u-smart.tn/ (DNS configured, propagating)
-- **Fallback URL**: http://fohaixl.cluster100.hosting.ovh.net/smarthub/
 
 ## Email Marketing and Follow-ups
 
@@ -590,28 +556,9 @@ Teacher Contact:
 - **Interactive Elements**: Location references clickable and open Google Maps popup
 - **Center Alignment**: Global center-alignment required except for interactive form elements
 - **Premium Design**: Gradient backgrounds and glassmorphism effects throughout website and emails
-- **Git Deployment**: Use OVH Git integration for automatic deployment to production domains
+- **Git Deployment**: Deploy via standard hosting providers with Git integration
 - **Form Field Names**: CRITICAL - Always use uppercase field names (NOM, PRENOM, SMS, EMAIL) for Brevo compatibility
 - **Email Personalization**: CRITICAL - Only use basic attributes (PRENOM, NOM, EMAIL, SMS) in first contact autoresponders
 - **Brevo Integration Status**: ONGOING ISSUE - Form submissions via HTML endpoints not working, API integration required
 - **Current Form Method**: Hidden iframe submission with immediate redirect to local thank you pages (user experience fixed, but data not reaching Brevo)
 
-## DNS Configuration (Updated)
-
-**Current Status**: Both domains correctly configured and propagating
-
-### Domain Setup
-- **smarthub.com.tn** → A record → `5.135.23.164` (OVH server)
-- **www.smarthub.com.tn** → A record → `5.135.23.164` (OVH server)
-- **u-smart.tn** → A record → `5.135.23.164` (OVH server)
-- **www.u-smart.tn** → A record → `5.135.23.164` (OVH server)
-
-### OVH Server Details
-- **Server IP**: `5.135.23.164`
-- **Hostname**: `fohaixl.cluster100.hosting.ovh.net`
-- **DNS Servers**: `dns1.tn.ovh.net`, `ns1.tn.ovh.net`
-
-### Propagation Timeline
-- **Local DNS**: 15-30 minutes
-- **Global DNS**: 24-48 hours maximum
-- **SSL Certificates**: Auto-issued after domain validation
