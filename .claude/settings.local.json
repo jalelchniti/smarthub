@@ -22,7 +22,8 @@
       "Bash(taskkill:*)",
       "Bash(tree:*)",
       "Bash(dir:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []

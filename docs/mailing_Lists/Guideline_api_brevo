@@ -1,0 +1,16 @@
+Can we use Brevo API to subscribe users  in mour mailing lists from our website?
+
+Yes, you can use Brevo's API to subscribe users to your mailing lists directly from your website. Here's how you can do it:
+
+Obtain Brevo API Key: First, you need your Brevo API v3 key to authenticate your requests. You can generate this key from the Brevo dashboard under the API & SMTP settings.
+
+Create a Subscription Form: You can create a sign-up form on your website that captures user information and sends it to Brevo. This form can be customized to match your website's design and branding.
+
+Use the API to Add Contacts: With the API, you can add the collected contact information directly to your Brevo lists. Make sure to handle consent appropriately to comply with GDPR regulations.
+
+For more detailed information, refer to Brevo's API documentation and consider integrating using plugins or tools like Zapier for easier setup.
+Useful documentation links:
+https://help.brevo.com/hc/fr/articles/208739189-Connecter-votre-site-web-ou-une-autre-plateforme-%C3%A0-Brevo
+https://developers.brevo.com/reference/getting-started-1
+https://developers.brevo.com/docs/how-it-works
+We must be sure that the solution we use is solely for connecting our Subscription data to Brevo mailing lists. No need to try another option. Stick to this aim
