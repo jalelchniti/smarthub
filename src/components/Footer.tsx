@@ -1,9 +1,6 @@
-import { MapPin, Phone, Mail, MessageCircle } from 'lucide-react';
+import { MapPin, Phone, Mail } from 'lucide-react';
 
 const Footer = () => {
-  const handleWhatsAppClick = () => {
-    window.open('https://wa.me/21699730144?text=Bonjour! Je suis intéressé(e) par vos services SmartHub.', '_blank');
-  };
 
   const handlePhoneClick = () => {
     window.location.href = 'tel:+21699730144';
