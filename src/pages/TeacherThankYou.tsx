@@ -47,7 +47,7 @@ const TeacherThankYou: React.FC = () => {
           <div className="flex flex-col gap-4 justify-center max-w-md mx-auto">
             {/* Primary CTA - WhatsApp Contact */}
             <a
-              href="https://wa.me/21699730144?text=Bonjour! Je viens de postuler comme enseignant et j'aimerais discuter des opportunités chez SmartHub."
+              href="https://wa.me/21699456059?text=Bonjour! Je viens de postuler comme enseignant et j'aimerais discuter des opportunités chez SmartHub."
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center space-x-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white px-8 py-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg text-lg font-semibold"
@@ -73,7 +73,7 @@ const TeacherThankYou: React.FC = () => {
           </p>
           <div className="text-gray-500 text-sm">
             📍 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis<br />
-            📞 <a href="tel:+21699730144" className="text-green-600 hover:underline">+216 99 730 144</a> • 
+            📞 <a href="tel:+21699456059" className="text-green-600 hover:underline">+216 99 730 144</a> • 
             📧 <a href="mailto:souad.dkhili@u-smart.net" className="text-green-600 hover:underline">souad.dkhili@u-smart.net</a>
           </div>
         </div>

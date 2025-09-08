@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Current Reality**:
 - ✅ Static React SPA with 4 pages (Home, Rooms, Teachers, LearnMore)  
 - ✅ Brevo form integration for lead collection
-- ✅ WhatsApp contact integration (+216 99 730 144)
+- ✅ WhatsApp contact integration (+216 99 456 059)
 - ✅ Static deployment ready
 - ❌ NO backend server currently exists
 - ❌ NO authentication system implemented
@@ -103,7 +103,7 @@ public/                  # Static assets
 ### Privacy Protection Policy
 **CRITICAL: No personal data shall be displayed in public pages**
 - **Public Pages**: NO personal teacher data, names, photos, or private information
-- **Contact Integration**: All contact buttons must use WhatsApp +216 99 730 144
+- **Contact Integration**: All contact buttons must use WhatsApp +216 99 456 059
 - **Data Protection**: Individual teachers' personal data secured in backend only
 - **Public Content**: Only facility information, subjects, and general statistics allowed
 
@@ -120,7 +120,7 @@ public/                  # Static assets
 - **Selection Process**: Highlight "sélection rigoureuse" (rigorous selection)
 - **Academic Coverage**: Comprehensive levels from primary through university plus adult professional development
 - **Location Integration**: "centre de Tunis" should be clickable and lead to location popup
-- **Contact Priority**: WhatsApp +216 99 730 144 as primary contact method
+- **Contact Priority**: WhatsApp +216 99 456 059 as primary contact method
 
 ### Styling Guidelines
 **CRITICAL: All content must be center-aligned**
@@ -190,7 +190,7 @@ The platform features **4 main pages** with consistent styling:
 - **LearnMore** (`/learn-more`) - Educational programs, subjects, and learning process
 
 ### Interactive Features
-- **WhatsApp Integration**: Primary contact method via +216 99 730 144
+- **WhatsApp Integration**: Primary contact method via +216 99 456 059
 - **Google Maps Integration**: Interactive location display for facility address
 - **Brevo Contact Forms**: Student and Teacher subscription forms with proper Brevo integration
 - **Form Success States**: Premium thank-you pages with WhatsApp call-to-action integration
@@ -199,7 +199,7 @@ The platform features **4 main pages** with consistent styling:
 
 **SmartHub Educational Facility - Tunis City Center**
 - **Address**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
-- **Contact**: +216 99 730 144 | souad.dkhili@u-smart.net
+- **Contact**: +216 99 456 059 | souad.dkhili@u-smart.net
 - **Hours**: Mon-Fri (8:00-20:00), Sat (9:00-13:00, 15:00-18:00)
 - **Services**: Teacher workspace rental (3 rooms), in-person educational services connecting competent teachers with serious students
 
@@ -606,7 +606,7 @@ Teacher Contact:
 
 ## Important Development Notes
 
-- **Contact Integration**: Dual integration - Brevo forms for lead collection + WhatsApp +216 99 730 144 for direct contact
+- **Contact Integration**: Dual integration - Brevo forms for lead collection + WhatsApp +216 99 456 059 for direct contact
 - **Brevo Forms**: Properly integrated subscription forms with correct endpoints and field mapping
 - **Email Marketing**: Comprehensive autoresponder system with personalization and premium design
 - **Static Architecture**: No backend - Brevo handles form submissions and email automation, WhatsApp handles direct contact

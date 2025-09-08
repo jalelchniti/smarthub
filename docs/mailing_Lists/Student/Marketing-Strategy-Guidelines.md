@@ -362,7 +362,7 @@ AWARENESS → INTEREST → CONSIDERATION → TRIAL → ENROLLMENT
 ### Primary Channels Integration
 
 #### WhatsApp Integration (Primary CTA)
-**Phone**: +216 99 730 144  
+**Phone**: +216 99 456 059  
 **Pre-filled Messages**:
 ```
 Welcome Series: "Bonjour! Je suis {{ contact.PRENOM }} {{ contact.NOM }} et je viens de m'inscrire à la newsletter SmartHub. J'aimerais en savoir plus sur vos programmes. Mon email est {{ contact.EMAIL }}."

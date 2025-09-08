@@ -271,7 +271,7 @@ export const Rooms: React.FC = () => {
             
             <div className="flex justify-center">
               <a 
-                href="https://wa.me/21699730144?text=Bonjour! Je suis intéressé par vos espaces d'apprentissage à SmartHub. Pourriez-vous me fournir plus d'informations sur la disponibilité et les tarifs?"
+                href="https://wa.me/21699456059?text=Bonjour! Je suis intéressé par vos espaces d'apprentissage à SmartHub. Pourriez-vous me fournir plus d'informations sur la disponibilité et les tarifs?"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block"

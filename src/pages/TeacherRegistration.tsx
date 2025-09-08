@@ -205,7 +205,7 @@ const TeacherRegistration: React.FC = () => {
                 Des questions sur notre processus de sélection ?
               </p>
               <a
-                href="https://wa.me/21699730144?text=Bonjour! Je souhaite enseigner chez SmartHub et j'aimerais connaître le processus de sélection."
+                href="https://wa.me/21699456059?text=Bonjour! Je souhaite enseigner chez SmartHub et j'aimerais connaître le processus de sélection."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl transition-colors"

@@ -15,7 +15,7 @@ const Teachers = () => {
 
   const handleWhatsAppContact = () => {
     const message = `Bonjour! Je suis intéressé(e) par les services SmartHub.`;
-    window.open(`https://wa.me/21699730144?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/21699456059?text=${encodeURIComponent(message)}`, '_blank');
   };
 
 

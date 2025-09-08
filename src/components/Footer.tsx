@@ -3,7 +3,7 @@ import { MapPin, Phone, Mail } from 'lucide-react';
 const Footer = () => {
 
   const handlePhoneClick = () => {
-    window.location.href = 'tel:+21699730144';
+    window.location.href = 'tel:+21699456059';
   };
 
   const handleEmailClick = () => {
@@ -38,7 +38,7 @@ const Footer = () => {
                 className="flex items-center text-gray-300 hover:text-blue-400 transition-colors group w-full text-left"
               >
                 <Phone className="w-5 h-5 mr-3 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span>+216 99 730 144</span>
+                <span>+216 99 456 059</span>
               </button>
               <button
                 onClick={handleEmailClick}

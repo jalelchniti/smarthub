@@ -200,7 +200,7 @@ const StudentRegistration: React.FC = () => {
                 Besoin d'aide ? Contactez-nous directement
               </p>
               <a
-                href="https://wa.me/21699730144?text=Bonjour! Je souhaite m'inscrire comme étudiant chez SmartHub."
+                href="https://wa.me/21699456059?text=Bonjour! Je souhaite m'inscrire comme étudiant chez SmartHub."
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center space-x-2 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl transition-colors"

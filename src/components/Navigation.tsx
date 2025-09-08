@@ -16,11 +16,11 @@ const Navigation = () => {
   const isActive = (path: string) => location.pathname === path;
 
   const handleWhatsAppClick = () => {
-    window.open('https://wa.me/21699730144?text=Bonjour! Je suis intéressé(e) par vos services SmartHub.', '_blank');
+    window.open('https://wa.me/21699456059?text=Bonjour! Je suis intéressé(e) par vos services SmartHub.', '_blank');
   };
 
   const handlePhoneClick = () => {
-    window.location.href = 'tel:+21699730144';
+    window.location.href = 'tel:+21699456059';
   };
 
   return (
