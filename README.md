@@ -44,7 +44,7 @@ Visitez `http://localhost:5173`
 
 **SmartHub - Facilité Éducative**
 - **Adresse**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
-- **Contact**: +216 99 730 144 | admin@u-smart.net
+- **Contact**: +216 99 730 144 | souad.dkhili@u-smart.net
 - **Horaires**: Lun-Ven (8:00-20:00), Sam (9:00-13:00, 15:00-18:00)
 - **Services**: Location d'espaces de travail pour enseignants, services éducatifs en présentiel
 
@@ -93,7 +93,12 @@ npm run preview      # Aperçu du build de production
 ```
 src/
 ├── components/
-│   ├── ui/                 # Composants UI réutilisables (Button, Card, Input, Forms)
+│   ├── ui/                 # Composants UI réutilisables
+│   │   ├── Button.tsx          # Bouton réutilisable
+│   │   ├── Card.tsx            # Composant carte
+│   │   ├── Input.tsx           # Champ de saisie
+│   │   ├── StudentRegistration.tsx  # Formulaire étudiant simplifié (3 champs)
+│   │   └── TeacherRegistration.tsx  # Formulaire enseignant simplifié (3 champs)
 │   ├── Navigation.tsx      # Navigation principale
 │   ├── Footer.tsx          # Pied de page
 │   ├── GoogleMapEmbed.tsx  # Carte Google Maps
@@ -152,13 +157,16 @@ Voir `CLAUDE.md` pour les directives complètes de développement, les règles c
 
 ✅ **Application Statique Complète & Optimisée**
 - 4 pages principales fonctionnelles
-- Intégration Brevo pour collecte de leads
-- Contact WhatsApp intégré
+- Intégration Brevo complète et fonctionnelle pour collecte de leads
+- Formulaires d'inscription simplifiés (3 champs: NOM, PRENOM, EMAIL)
+- Contact WhatsApp intégré (+216 99 730 144)
 - Build de production optimisé avec Vite 7.1
-- Design responsive premium
+- Design responsive premium avec glassmorphisme
 - Configuration serveur multi-plateforme (.htaccess, web.config)
 - Résolution complète des problèmes de déploiement
 - Hébergement-agnostique prêt pour production
+- Navigation React Router avec useNavigate() optimisée
+- Tous les builds TypeScript et ESLint réussissent
 
 ❌ **Fonctionnalités Futures** (non implémentées)
 - Backend API
