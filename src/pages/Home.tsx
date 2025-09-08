@@ -307,7 +307,7 @@ export const Home = () => {
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Button size="lg" className="flex items-center space-x-3 bg-white text-gray-900 hover:bg-gray-100 px-10 py-5 text-xl rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-200">
                 <Phone className="w-6 h-6" />
-                <span>Appelez +216 99 730 144</span>
+                <span>Appelez +216 99 456 059</span>
               </Button>
               <Button 
                 variant="outline" 

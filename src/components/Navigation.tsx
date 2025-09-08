@@ -65,7 +65,7 @@ const Navigation = () => {
               className="flex items-center px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors"
             >
               <Phone className="w-4 h-4 mr-2" />
-              <span className="hidden lg:inline">+216 99 730 144</span>
+              <span className="hidden lg:inline">+216 99 456 059</span>
             </button>
             <button
               onClick={handleWhatsAppClick}
@@ -117,7 +117,7 @@ const Navigation = () => {
                 className="flex items-center w-full px-3 py-2 text-base font-medium text-blue-600 hover:bg-blue-50 rounded-md"
               >
                 <Phone className="w-5 h-5 mr-3" />
-                +216 99 730 144
+                +216 99 456 059
               </button>
               <button
                 onClick={handleWhatsAppClick}

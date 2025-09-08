@@ -73,7 +73,7 @@ const TeacherThankYou: React.FC = () => {
           </p>
           <div className="text-gray-500 text-sm">
             📍 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis<br />
-            📞 <a href="tel:+21699456059" className="text-green-600 hover:underline">+216 99 730 144</a> • 
+            📞 <a href="tel:+21699456059" className="text-green-600 hover:underline">+216 99 456 059</a> • 
             📧 <a href="mailto:souad.dkhili@u-smart.net" className="text-green-600 hover:underline">souad.dkhili@u-smart.net</a>
           </div>
         </div>
