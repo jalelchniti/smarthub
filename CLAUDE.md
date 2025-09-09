@@ -7,11 +7,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **IMPORTANT**: This is a **static frontend-only** React application. The README.md describes some backend features that are **NOT YET IMPLEMENTED**.
 
 **Current Reality**:
-- ✅ Static React SPA with 6 routes (Home, Rooms, Teachers, LearnMore + thank you pages)
+- ✅ Static React SPA with 10 routes (Home, Rooms, Teachers, LearnMore, /subjects redirect + registration & thank you pages + private revenue simulator + **NEW: Booking System**)
 - ✅ Brevo form integration for lead collection
 - ✅ WhatsApp contact integration (+216 99 456 059)
+- ✅ Revenue Simulator for teachers (private route)
+- ✅ **NEW: Complete Date-Based Booking System** with Firebase Realtime Database
 - ✅ Static deployment ready for any hosting platform
-- ❌ NO backend server currently exists
+- ✅ Firebase hosting configuration included
+- 📝 **Email notifications** (will be implemented via Brevo integration)
 - ❌ NO authentication system implemented
 - ❌ NO dashboard system implemented
 
@@ -31,6 +34,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `npm run dev` - Start development server (http://localhost:5173)
 - `npm run preview` - Preview production build locally
 - `npm install` - Install dependencies (required on first setup)
+- Prettier 3.6.2 available for code formatting (not in scripts)
 
 ### Important Notes
 - **CRITICAL**: Always run `npm run build` and `npm run lint` before committing
@@ -45,15 +49,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Tailwind CSS 3.4** for styling with custom color palette and premium gradients
 - **React Router DOM 7.8** for client-side routing
 - **Lucide React** for icons and visual elements
+- **Firebase 10.7** for Realtime Database (booking system)
 - **ESLint 9.34** with TypeScript support and React hooks plugin
+- **Prettier 3.6.2** for code formatting (available, not in scripts)
 - **Static Architecture**: No backend - all content is static with form submissions via external services
 
 ### Application Architecture
 
 **Route Structure** (defined in `src/App.tsx`):
-- **Main Pages**: `/` (Home), `/rooms`, `/teachers`, `/learn-more` - Include Navigation + Footer
+- **Main Pages**: `/` (Home), `/rooms`, `/teachers`, `/learn-more`, `/subjects` (redirects to LearnMore), **`/booking`** (NEW: Room booking system) - Include Navigation + Footer
 - **Thank You Pages**: `/thank-you/student`, `/thank-you/teacher` - Standalone pages without nav/footer
 - **Registration Pages**: `/register/student`, `/register/teacher` - Full page forms with own nav/footer
+- **Private Pages**: `/simulation` - Revenue simulator for teachers (hidden from public navigation)
 
 **Component Architecture**:
 ```
@@ -76,23 +83,34 @@ src/
 │   ├── StudentThankYou.tsx    # Success page with WhatsApp CTA
 │   ├── TeacherThankYou.tsx    # Success page with WhatsApp CTA
 │   ├── StudentRegistration.tsx # Full page form (simplified 3-field)
-│   └── TeacherRegistration.tsx # Full page form (simplified 3-field)
+│   ├── TeacherRegistration.tsx # Full page form (simplified 3-field)
+│   ├── RevenueSimulator.tsx   # Private revenue calculator for teachers (/simulation)
+│   └── BookingSystem.tsx      # NEW: Date-based room booking system with Firebase
 ├── App.tsx                    # Route configuration and layout logic
 └── main.tsx                   # Application entry point
 ```
 
 ## Key Configuration Files
 
-- **`vite.config.ts`**: Build configuration with relative base path (`./`) for hosting-agnostic deployment
-- **`package.json`**: Dependencies and build scripts - React 19, TypeScript 5.8, Vite 7.1
+- **`vite.config.ts`**: Build configuration with relative base path (`./`) for hosting-agnostic deployment, optimized asset naming with hashes
+- **`package.json`**: Dependencies and build scripts - React 19, TypeScript 5.8, Vite 7.1, Firebase 10.7
 - **`tsconfig.json`**: TypeScript project references architecture (app + node configs)
 - **`tailwind.config.js`**: Custom design system (blue/purple gradients, Inter font)
-- **`eslint.config.js`**: Code quality rules with TypeScript and React hooks support
+- **`eslint.config.js`**: Modern ESLint config with TypeScript-ESLint 8.41, React hooks plugin
+- **`firebase.json`**: Firebase hosting and functions configuration with SPA routing support
 
 ## Environment Configuration
 
-**No `.env` file required** - this is a static site that works without environment variables.
-**Future environment variables** (when backend is implemented):
+**Firebase Environment Variables** (`.env` file required for booking system):
+- `VITE_FIREBASE_API_KEY` - Firebase project API key
+- `VITE_FIREBASE_AUTH_DOMAIN` - Firebase auth domain
+- `VITE_FIREBASE_DATABASE_URL` - Firebase Realtime Database URL
+- `VITE_FIREBASE_PROJECT_ID` - Firebase project ID
+- `VITE_FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
+- `VITE_FIREBASE_MESSAGING_SENDER_ID` - Firebase messaging sender ID
+- `VITE_FIREBASE_APP_ID` - Firebase app ID
+
+**Future environment variables**:
 - `VITE_USE_BACKEND=false` - Backend feature flag
 - `VITE_API_URL` - Backend API endpoint
 - `VITE_EMAIL_VERIFICATION=false` - Email verification feature flag
@@ -187,6 +205,112 @@ npm run build
 - ✅ Forms successfully submitting to Brevo with simplified 3-field structure
 - ✅ WhatsApp integration in email templates with personalized messaging
 
+## Revenue Simulator (Private Tool)
+
+### Purpose & Access
+- **Private Route**: `/simulation` - Hidden from public navigation and menus
+- **Target Audience**: Teachers only (shared via private marketing campaigns)
+- **Function**: Interactive calculator for monthly net revenue estimation
+
+### Technical Implementation
+- **Location**: `src/pages/RevenueSimulator.tsx`
+- **Route Type**: Standalone page without navigation/footer (like thank you pages)
+- **Data Source**: Room pricing synchronized with `Rooms.tsx` component
+- **State Management**: React hooks for real-time calculations
+
+### Calculation Logic
+- **Monthly Revenue**: Students × Fee per student
+- **Room Rental Cost HT**: Hourly rate × Weekly hours × 4.33 weeks/month (VAT excluded)
+- **VAT Application**: 19% tax on room rental cost only
+- **Room Rental Cost TTC**: HT + VAT (VAT included)
+- **Net Income**: Revenue - Room costs TTC
+
+### Form Parameters
+- **Room Selection**: Dropdown with capacity limits from actual room data
+- **Students per Group**: Number input with room capacity validation
+- **Session Duration**: Hours per session (0.5 - 8 hours)
+- **Weekly Sessions**: Number of sessions per week
+- **Student Fees**: TND per month (recommended: 120 TND)
+
+### Design Features
+- **Professional Styling**: Matches SmartHub design system (blue/purple gradients)
+- **Enhanced Visibility**: Large fonts, colorful icons, improved contrast
+- **Real-time Updates**: Instant calculation as parameters change
+- **Profitability Indicators**: Visual feedback for viable configurations
+- **Room Rate Display**: Shows current hourly rate based on group size
+- **Transparent Cost Breakdown**: Displays both HT and TTC room costs with VAT details
+
+### Business Rules
+- **Recommendation**: 120 TND/month per student (prominently displayed)
+- **VAT Rate**: 19% (Tunisia standard rate) applied to room rental only
+- **Room Pricing**: Exact rates from operational room data
+- **Cost Display**: Shows HT (VAT excluded), VAT amount, and TTC (VAT included) separately
+- **Final Calculation**: Net income = Teacher revenue - Room cost TTC
+- **Confidentiality**: Private tool for internal marketing only
+
+### VAT Implementation Details
+**CRITICAL**: VAT is applied to room rental costs, NOT teacher revenue
+- **Step 1**: Calculate monthly room cost HT (hourly rate × total hours)
+- **Step 2**: Calculate VAT amount (room cost HT × 19%)
+- **Step 3**: Calculate room cost TTC (HT + VAT)
+- **Step 4**: Calculate net income (teacher revenue - room cost TTC)
+- **Display**: Shows breakdown of HT, VAT, and TTC for transparency
+
+## SmartHub Booking System (NEW - September 2025)
+
+### Purpose & Features
+- **Multi-user room booking system** for SmartHub's 3 educational spaces
+- **Date-based bookings** starting September 15th, 2025
+- **Flexible booking periods**: 1 week, 2 weeks, 3 weeks, or 1 month
+- **Sunday availability**: 8:00 AM - 1:00 PM only
+- **Weekday availability**: 8:00 AM - 8:00 PM (with lunch break 1:00-3:00 PM)
+- **Real-time synchronization** across all devices via Firebase
+
+### Technical Implementation
+- **Location**: `src/pages/BookingSystem.tsx`
+- **Route**: `/booking` (accessible from main navigation)
+- **Database**: Firebase Realtime Database for centralized storage
+- **Real-time Updates**: Automatic synchronization across all users
+- **Conflict Detection**: Prevents double-booking with duration logic
+- **Firebase CDN**: No npm installation required, uses CDN scripts in `index.html`
+
+### Data Structure
+```typescript
+interface Booking {
+  id?: string;
+  roomId: string;
+  date: string; // YYYY-MM-DD format
+  timeSlot: string; // "08:00", "08:30", etc.
+  teacherName: string;
+  subject: string;
+  studentCount: number;
+  duration: number; // Hours (0.5, 1, 1.5, 2, 2.5, 3)
+  contactInfo: string;
+  bookingPeriod: 'week' | '2weeks' | '3weeks' | 'month';
+  endDate?: string; // For recurring bookings
+}
+```
+
+### UI/UX Features
+- **Week-view calendar** with navigation controls
+- **Room selection** (Salle 1: 15 capacity, Salle 2/3: 9 capacity each)
+- **Day-specific time slots** (Sunday vs weekdays)
+- **Booking form modal** with period selection
+- **Conflict visualization** with hover details
+- **Booking cancellation** for existing reservations
+
+### Firebase Configuration
+- **Database Rules**: Public read/write (temporary for development)
+- **Structure Update**: Automatic migration from old to new data format
+- **Backup**: `update-firebase.html` utility for manual structure updates
+
+### Business Rules
+- **Start Date**: September 15th, 2025 (configurable)
+- **Room Capacity**: Salle 1 (15), Salle 2 (9), Salle 3 (9)
+- **Subjects**: Same 9 standardized subjects as Teachers page
+- **Duration**: 30 minutes to 3 hours in 30-minute increments
+- **Contact Required**: Phone or email for all bookings
+
 ## Quick Development Workflow
 
 ### Starting Development
@@ -203,8 +327,9 @@ npm run lint                # Must pass without warnings
 
 ### Deployment Ready
 - Build creates `dist/` folder ready for static hosting
-- No environment variables or server setup required
-- All modern hosting platforms supported
+- Firebase hosting configuration included with SPA routing
+- Environment variables required only for booking system (.env file)
+- All modern hosting platforms supported (Netlify, Vercel, GitHub Pages, Firebase, Apache, IIS)
 
 ## Important Notes
 
@@ -214,3 +339,30 @@ npm run lint                # Must pass without warnings
 - **French Localization**: All content fully localized in French language
 - **Premium Design**: Gradient backgrounds and glassmorphism effects throughout
 - **Privacy Compliant**: Lead data via Brevo, no personal data storage on site
+- **Firebase Integration**: Booking system uses Firebase CDN approach (no npm install required)
+
+## NEXT STEPS (To Complete Email Notifications)
+
+### Brevo Email Notification Integration (Planned)
+**Status**: 📝 **PLANNED** - Will implement Brevo-based email notifications
+**Approach**: Frontend-only solution using Brevo's transactional email API
+**What it does**: Automatically sends booking confirmation emails via Brevo when new bookings are created
+
+### Planned Implementation:
+1. **Brevo API Setup** 📝 **TODO**: Configure Brevo transactional email templates
+2. **Frontend Integration** 📝 **TODO**: Add Brevo email service to booking system
+3. **Email Templates** 📝 **TODO**: Create professional booking confirmation templates
+4. **Error Handling** 📝 **TODO**: Implement proper email delivery error handling
+
+### Advantages of Brevo Approach:
+- ✅ **No Firebase Functions dependency** (stays on free tier)
+- ✅ **Frontend-only solution** (consistent with app architecture)
+- ✅ **Professional email templates** with SmartHub branding
+- ✅ **Reliable delivery** via established email service
+- ✅ **Easy maintenance** and template updates
+
+### Future Implementation:
+- **Booking confirmations** sent to customers
+- **Admin notifications** sent to `jalel.chniti@gmail.com`
+- **Professional HTML templates** matching SmartHub design
+- **Error handling** with user feedback

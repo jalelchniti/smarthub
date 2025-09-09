@@ -26,7 +26,14 @@
       "Bash(npm run preview:*)",
       "Bash(npm test)",
       "Bash(find:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(firebase deploy:*)",
+      "Bash(firebase login:*)",
+      "Bash(firebase projects:list:*)",
+      "Bash(firebase --version)",
+      "Bash(firebase:*)"
     ],
     "deny": [],
     "ask": []

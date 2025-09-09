@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Structure Updater</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+</head>
+<body>
+    <h1>Firebase Database Structure Updater</h1>
+    <button id="updateBtn" onclick="updateFirebaseStructure()">Update Firebase Structure</button>
+    <div id="status"></div>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "ATzqSVBnjZRrh67qmJqcZcJWO7FnMZLznNSk07k",
+            authDomain: "u-smart-booking.firebaseapp.com",
+            databaseURL: "https://u-smart-booking-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "u-smart-booking",
+            storageBucket: "u-smart-booking.firebasestorage.app",
+            messagingSenderId: "551291734885",
+            appId: "1:551291734885:web:77d83cc427db118f118443"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function updateStatus(message) {
+            document.getElementById('status').innerHTML += '<p>' + message + '</p>';
+            console.log(message);
+        }
+
+        async function updateFirebaseStructure() {
+            try {
+                updateStatus('Starting Firebase structure update...');
+                
+                const newStructure = {
+                    rooms: {
+                        "1": { name: "Salle 1", capacity: 15 },
+                        "2": { name: "Salle 2", capacity: 9 },
+                        "3": { name: "Salle 3", capacity: 9 }
+                    },
+                    bookings: {},
+                    timeSlots: {
+                        weekdays: [
+                            "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
+                            "11:00", "11:30", "12:00", "12:30", "15:00", "15:30", 
+                            "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", 
+                            "19:00", "19:30"
+                        ],
+                        sunday: [
+                            "08:00", "08:30", "09:00", "09:30", "10:00", "10:30", 
+                            "11:00", "11:30", "12:00", "12:30"
+                        ]
+                    },
+                    weekDays: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
+                    startDate: "2025-09-15",
+                    bookingPeriods: [
+                        { label: "1 Semaine", value: "week", weeks: 1 },
+                        { label: "2 Semaines", value: "2weeks", weeks: 2 },
+                        { label: "3 Semaines", value: "3weeks", weeks: 3 },
+                        { label: "1 Mois", value: "month", weeks: 4 }
+                    ],
+                    lastUpdated: new Date().toISOString()
+                };
+
+                updateStatus('Updating Firebase database...');
+                
+                const dbRef = database.ref('/');
+                await dbRef.set(newStructure);
+                
+                updateStatus('✅ Firebase structure updated successfully!');
+                updateStatus('✅ Sunday time slots added (8:00 AM - 1:00 PM)');
+                updateStatus('✅ Date-based booking system activated (starting Sept 15, 2025)');
+                updateStatus('✅ Flexible booking periods added');
+                updateStatus('');
+                updateStatus('You can now check the Firebase console - the database should show the new structure with Sunday slots.');
+                
+            } catch (error) {
+                updateStatus('❌ Error: ' + error.message);
+                console.error('Firebase update error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

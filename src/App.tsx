@@ -9,6 +9,8 @@ import StudentThankYou from './pages/StudentThankYou';
 import TeacherThankYou from './pages/TeacherThankYou';
 import StudentRegistration from './pages/StudentRegistration';
 import TeacherRegistration from './pages/TeacherRegistration';
+import { RevenueSimulator } from './pages/RevenueSimulator';
+import { BookingSystem } from './pages/BookingSystem';
 
 function App() {
   return (
@@ -17,6 +19,12 @@ function App() {
         {/* Thank You pages without navigation/footer */}
         <Route path="/thank-you/student" element={<StudentThankYou />} />
         <Route path="/thank-you/teacher" element={<TeacherThankYou />} />
+        
+        {/* Private Revenue Simulator page - hidden from public navigation */}
+        <Route path="/simulation" element={<RevenueSimulator />} />
+        
+        {/* Private Booking System page - hidden from public navigation */}
+        <Route path="/booking" element={<BookingSystem />} />
         
         {/* Registration pages with their own navigation/footer */}
         <Route path="/register/student" element={<StudentRegistration />} />
