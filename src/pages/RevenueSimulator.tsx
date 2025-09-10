@@ -62,10 +62,10 @@ const rooms: Room[] = [
 
 export const RevenueSimulator: React.FC = () => {
   const [selectedRoom, setSelectedRoom] = useState<string>('');
-  const [studentsPerGroup, setStudentsPerGroup] = useState<number>(1);
-  const [sessionHours, setSessionHours] = useState<number>(1);
-  const [sessionsPerWeek, setSessionsPerWeek] = useState<number>(1);
-  const [feePerStudent, setFeePerStudent] = useState<number>(120);
+  const [studentsPerGroup, setStudentsPerGroup] = useState<string>('1');
+  const [sessionHours, setSessionHours] = useState<string>('1');
+  const [sessionsPerWeek, setSessionsPerWeek] = useState<string>('1');
+  const [feePerStudent, setFeePerStudent] = useState<string>('120');
   const [result, setResult] = useState<SimulationResult | null>(null);
 
   // Calculate simulation results
@@ -89,9 +89,15 @@ export const RevenueSimulator: React.FC = () => {
       return room.pricing[room.pricing.length - 1].rate;
     };
 
-    if (selectedRoom && studentsPerGroup > 0 && sessionHours > 0 && sessionsPerWeek > 0 && feePerStudent > 0) {
-      const roomRate = getRoomRate(selectedRoom, studentsPerGroup);
-      const weeklyHours = sessionHours * sessionsPerWeek;
+    // Parse string inputs to numbers
+    const studentsNum = parseInt(studentsPerGroup) || 0;
+    const sessionHoursNum = parseFloat(sessionHours) || 0;
+    const sessionsPerWeekNum = parseInt(sessionsPerWeek) || 0;
+    const feePerStudentNum = parseInt(feePerStudent) || 0;
+
+    if (selectedRoom && studentsNum > 0 && sessionHoursNum > 0 && sessionsPerWeekNum > 0 && feePerStudentNum > 0) {
+      const roomRate = getRoomRate(selectedRoom, studentsNum);
+      const weeklyHours = sessionHoursNum * sessionsPerWeekNum;
       const monthlyHours = weeklyHours * 4.33; // Average weeks per month
       
       // Prevent division by zero
@@ -100,7 +106,7 @@ export const RevenueSimulator: React.FC = () => {
         return;
       }
       
-      const monthlyRevenue = feePerStudent * studentsPerGroup;
+      const monthlyRevenue = feePerStudentNum * studentsNum;
       const monthlyRoomCostHT = roomRate * monthlyHours; // HT = VAT excluded
       const vatAmount = monthlyRoomCostHT * 0.19; // VAT on room cost
       const monthlyRoomCostTTC = monthlyRoomCostHT + vatAmount; // TTC = VAT included
@@ -148,7 +154,7 @@ export const RevenueSimulator: React.FC = () => {
         vatAmount,
         netMonthlyIncome: finalNetIncome,
         weeklyHours,
-        totalStudents: studentsPerGroup,
+        totalStudents: studentsNum,
         hourlyIncome: finalNetIncome / monthlyHours,
         minimumHourlyIncome,
         roomDiscount,
@@ -183,7 +189,7 @@ export const RevenueSimulator: React.FC = () => {
     return room.pricing[room.pricing.length - 1].rate;
   };
   
-  const currentRoomRate = selectedRoom ? getCurrentRoomRate(selectedRoom, studentsPerGroup) : 0;
+  const currentRoomRate = selectedRoom ? getCurrentRoomRate(selectedRoom, parseInt(studentsPerGroup) || 1) : 0;
 
   return (
     <div className="text-center">
@@ -250,7 +256,8 @@ export const RevenueSimulator: React.FC = () => {
                     <select
                       value={selectedRoom}
                       onChange={(e) => setSelectedRoom(e.target.value)}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center bg-white text-lg font-medium"
+                      autoComplete="off"
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center bg-white text-lg font-medium touch-manipulation"
                     >
                       <option value="">Sélectionnez une salle</option>
                       {rooms.map((room) => (
@@ -269,11 +276,22 @@ export const RevenueSimulator: React.FC = () => {
                     </label>
                     <input
                       type="number"
+                      inputMode="numeric"
                       min="1"
                       max={selectedRoomData?.capacity || 15}
                       value={studentsPerGroup}
-                      onChange={(e) => setStudentsPerGroup(parseInt(e.target.value) || 1)}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium"
+                      onChange={(e) => setStudentsPerGroup(e.target.value)}
+                      onInput={(e) => setStudentsPerGroup((e.target as HTMLInputElement).value)}
+                      onBlur={(e) => {
+                        const value = parseInt(e.target.value) || 1;
+                        const max = selectedRoomData?.capacity || 15;
+                        setStudentsPerGroup(Math.min(Math.max(value, 1), max).toString());
+                      }}
+                      placeholder="1-15"
+                      autoComplete="off"
+                      enterKeyHint="next"
+                      spellCheck="false"
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium touch-manipulation"
                     />
                     {selectedRoomData && (
                       <p className="text-base text-gray-600 mt-3 text-center font-medium">
@@ -290,12 +308,22 @@ export const RevenueSimulator: React.FC = () => {
                     </label>
                     <input
                       type="number"
+                      inputMode="decimal"
                       min="0.5"
                       max="8"
                       step="0.5"
                       value={sessionHours}
-                      onChange={(e) => setSessionHours(parseFloat(e.target.value) || 1)}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium"
+                      onChange={(e) => setSessionHours(e.target.value)}
+                      onInput={(e) => setSessionHours((e.target as HTMLInputElement).value)}
+                      onBlur={(e) => {
+                        const value = parseFloat(e.target.value) || 1;
+                        setSessionHours(Math.min(Math.max(value, 0.5), 8).toString());
+                      }}
+                      placeholder="1.0"
+                      autoComplete="off"
+                      enterKeyHint="next"
+                      spellCheck="false"
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium touch-manipulation"
                     />
                   </div>
 
@@ -307,11 +335,21 @@ export const RevenueSimulator: React.FC = () => {
                     </label>
                     <input
                       type="number"
+                      inputMode="numeric"
                       min="1"
                       max="20"
                       value={sessionsPerWeek}
-                      onChange={(e) => setSessionsPerWeek(parseInt(e.target.value) || 1)}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium"
+                      onChange={(e) => setSessionsPerWeek(e.target.value)}
+                      onInput={(e) => setSessionsPerWeek((e.target as HTMLInputElement).value)}
+                      onBlur={(e) => {
+                        const value = parseInt(e.target.value) || 1;
+                        setSessionsPerWeek(Math.min(Math.max(value, 1), 20).toString());
+                      }}
+                      placeholder="1-20"
+                      autoComplete="off"
+                      enterKeyHint="next"
+                      spellCheck="false"
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium touch-manipulation"
                     />
                   </div>
 
@@ -323,10 +361,20 @@ export const RevenueSimulator: React.FC = () => {
                     </label>
                     <input
                       type="number"
+                      inputMode="numeric"
                       min="0"
                       value={feePerStudent}
-                      onChange={(e) => setFeePerStudent(parseInt(e.target.value) || 0)}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium"
+                      onChange={(e) => setFeePerStudent(e.target.value)}
+                      onInput={(e) => setFeePerStudent((e.target as HTMLInputElement).value)}
+                      onBlur={(e) => {
+                        const value = parseInt(e.target.value) || 0;
+                        setFeePerStudent(Math.max(value, 0).toString());
+                      }}
+                      placeholder="120"
+                      autoComplete="off"
+                      enterKeyHint="done"
+                      spellCheck="false"
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium touch-manipulation"
                     />
                     <div className="mt-3 text-center bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <p className="text-base text-blue-700 font-bold">
