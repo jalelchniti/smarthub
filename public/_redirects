@@ -1,2 +1,4 @@
-# Test redirect
-/*    /index.html   200
+# SPA redirect for React Router - exclude static assets
+# Static assets should be served directly, not redirected
+/assets/*    /assets/:splat    200
+/*           /index.html       200!

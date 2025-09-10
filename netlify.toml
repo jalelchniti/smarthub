@@ -5,11 +5,12 @@
 [build.environment]
   NODE_VERSION = "20"
 
-# SPA redirect rules for React Router
+# SPA redirect rules for React Router - properly exclude static assets
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
+  force = false
 
 # Headers for security and proper MIME types
 [[headers]]
