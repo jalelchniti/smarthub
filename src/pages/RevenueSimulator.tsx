@@ -95,7 +95,11 @@ export const RevenueSimulator: React.FC = () => {
     const sessionsPerWeekNum = parseInt(sessionsPerWeek) || 0;
     const feePerStudentNum = parseInt(feePerStudent) || 0;
 
-    if (selectedRoom && studentsNum > 0 && sessionHoursNum > 0 && sessionsPerWeekNum > 0 && feePerStudentNum > 0) {
+    // Check room capacity validation
+    const currentRoom = rooms.find(r => r.id === selectedRoom);
+    const isCapacityExceeded = currentRoom && studentsNum > currentRoom.capacity;
+
+    if (selectedRoom && studentsNum > 0 && sessionHoursNum > 0 && sessionsPerWeekNum > 0 && feePerStudentNum > 0 && !isCapacityExceeded) {
       const roomRate = getRoomRate(selectedRoom, studentsNum);
       const weeklyHours = sessionHoursNum * sessionsPerWeekNum;
       const monthlyHours = weeklyHours * 4.33; // Average weeks per month
@@ -291,12 +295,27 @@ export const RevenueSimulator: React.FC = () => {
                       autoComplete="off"
                       enterKeyHint="next"
                       spellCheck="false"
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium touch-manipulation"
+                      className={`w-full p-4 border rounded-xl focus:ring-2 focus:border-transparent text-center text-lg font-medium touch-manipulation ${
+                        selectedRoomData && parseInt(studentsPerGroup) > selectedRoomData.capacity 
+                          ? 'border-red-500 bg-red-50 focus:ring-red-500 text-red-700' 
+                          : 'border-gray-300 focus:ring-blue-500'
+                      }`}
                     />
                     {selectedRoomData && (
-                      <p className="text-base text-gray-600 mt-3 text-center font-medium">
-                        Maximum: {selectedRoomData.capacity} étudiants
-                      </p>
+                      <div className="mt-3 text-center">
+                        {parseInt(studentsPerGroup) > selectedRoomData.capacity ? (
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+                            <p className="text-base text-red-700 font-bold flex items-center justify-center space-x-2">
+                              <AlertCircle className="w-5 h-5" />
+                              <span>⚠️ Capacité dépassée! Maximum: {selectedRoomData.capacity} étudiants</span>
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-base text-gray-600 font-medium">
+                            Maximum: {selectedRoomData.capacity} étudiants
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
 
@@ -408,7 +427,28 @@ export const RevenueSimulator: React.FC = () => {
                   Résultats de la Simulation
                 </h2>
 
-                {result ? (
+                {/* Check for capacity exceeded first */}
+                {selectedRoom && parseInt(studentsPerGroup) > 0 && (rooms.find(r => r.id === selectedRoom)?.capacity || 0) < parseInt(studentsPerGroup) ? (
+                  <div className="text-center py-12">
+                    <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-8 mb-6">
+                      <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                      <h3 className="text-2xl font-bold text-red-700 mb-4">🚫 Capacité Dépassée</h3>
+                      <div className="space-y-3 text-red-600">
+                        <p className="text-lg font-medium">
+                          Le nombre d'étudiants ({parseInt(studentsPerGroup) || 0}) dépasse la capacité maximale de la salle sélectionnée.
+                        </p>
+                        <div className="bg-red-100 rounded-lg p-4">
+                          <p className="font-bold text-red-800">
+                            📋 {rooms.find(r => r.id === selectedRoom)?.name}: Maximum {rooms.find(r => r.id === selectedRoom)?.capacity} personnes
+                          </p>
+                        </div>
+                        <p className="text-sm text-red-500">
+                          Veuillez réduire le nombre d'étudiants ou choisir une salle plus grande.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ) : result ? (
                   <div className="space-y-6 text-center">
                     {/* Summary Stats */}
                     <div className="grid grid-cols-2 gap-4 mb-8">
@@ -422,14 +462,11 @@ export const RevenueSimulator: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Revenue Breakdown */}
+                    {/* Revenue Breakdown - Hidden per user request */}
                     <div className="space-y-4">
-                      <div className="flex justify-between items-center p-4 bg-green-50 rounded-xl">
-                        <span className="font-medium text-gray-700">Revenus Mensuels Bruts</span>
-                        <span className="text-xl font-bold text-green-600">+{result.monthlyRevenue.toFixed(0)} TND</span>
-                      </div>
+                      {/* Hidden: Revenus Mensuels Bruts, Coût Location Salle HT, TVA, Coût TTC, Revenu Net */}
                       
-                      {/* SmartHub Discount Section */}
+                      {/* SmartHub Discount Section - Keep visible */}
                       {result.discountApplied && (
                         <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-4">
                           <div className="text-center mb-3">
@@ -447,36 +484,6 @@ export const RevenueSimulator: React.FC = () => {
                           </div>
                         </div>
                       )}
-                      
-                      <div className="flex justify-between items-center p-4 bg-red-50 rounded-xl">
-                        <span className="font-medium text-gray-700">Coût Location Salle HT</span>
-                        <span className="text-xl font-bold text-red-600">
-                          -{(result.discountApplied ? result.discountedRoomCostHT : result.monthlyRoomCostHT).toFixed(0)} TND
-                        </span>
-                      </div>
-                      
-                      <div className="flex justify-between items-center p-4 bg-orange-50 rounded-xl">
-                        <span className="font-medium text-gray-700">TVA sur Location (19%)</span>
-                        <span className="text-xl font-bold text-orange-600">
-                          -{(result.discountApplied ? result.discountedVatAmount : result.vatAmount).toFixed(0)} TND
-                        </span>
-                      </div>
-
-                      <div className="flex justify-between items-center p-4 bg-red-100 rounded-xl border-2 border-red-200">
-                        <span className="font-bold text-gray-800">Coût Location Salle TTC</span>
-                        <span className="text-xl font-bold text-red-700">
-                          -{(result.discountApplied ? result.discountedRoomCostTTC : result.monthlyRoomCostTTC).toFixed(0)} TND
-                        </span>
-                      </div>
-                      
-                      <div className="border-t-2 border-gray-200 pt-4">
-                        <div className="flex justify-between items-center p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl border-2 border-blue-200">
-                          <span className="text-xl font-bold text-gray-900">Revenu Net Mensuel</span>
-                          <span className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                            {result.netMonthlyIncome.toFixed(0)} TND
-                          </span>
-                        </div>
-                      </div>
 
                       {/* Hourly Income Display */}
                       <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-xl p-4">
