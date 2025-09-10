@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, XCircle, MapPin, Building, Save, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, XCircle, MapPin, Building, Save, RotateCcw, ChevronLeft, ChevronRight, Calendar, Clock, AlertCircle, Calculator, TrendingUp } from 'lucide-react';
 import { FirebaseBookingService } from '../services/firebaseBookingService';
 
 interface Booking {
@@ -13,8 +13,6 @@ interface Booking {
   duration: number;
   contactInfo: string;
   bookingDate: string;
-  bookingPeriod?: 'week' | '2weeks' | '3weeks' | 'month';
-  endDate?: string;
 }
 
 interface BookingData {
@@ -33,11 +31,6 @@ interface BookingData {
   };
   weekDays: string[];
   startDate: string;
-  bookingPeriods: {
-    label: string;
-    value: string;
-    weeks: number;
-  }[];
   lastUpdated: string;
 }
 
@@ -47,7 +40,22 @@ interface BookingFormData {
   studentCount: number;
   duration: number;
   contactInfo: string;
-  bookingPeriod: 'week' | '2weeks' | '3weeks' | 'month';
+}
+
+interface RoomPricing {
+  roomId: string;
+  pricing: { capacity: string; rate: number; minStudents: number; maxStudents: number }[];
+}
+
+interface FeeCalculation {
+  subtotalHT: number;
+  vatAmount: number;
+  totalTTC: number;
+  hourlyRate: number;
+  totalHours: number;
+  studentCount: number;
+  roomName: string;
+  slotCount: number;
 }
 
 export const BookingSystem: React.FC = () => {
@@ -56,16 +64,99 @@ export const BookingSystem: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [currentWeekStart, setCurrentWeekStart] = useState<string>('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState<{ date: string; timeSlot: string; id: string }[]>([]);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [showTimeSlots, setShowTimeSlots] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showCalculator, setShowCalculator] = useState(false);
+  const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
+  const [currentMonth, setCurrentMonth] = useState<string>('');
+  const [availabilityCheck, setAvailabilityCheck] = useState<{
+    isAvailable: boolean;
+    message: string;
+    suggestedSlots?: { date: string; time: string }[];
+  } | null>(null);
   const [formData, setFormData] = useState<BookingFormData>({
     teacherName: '',
     subject: '',
     studentCount: 1,
     duration: 1,
-    contactInfo: '',
-    bookingPeriod: 'week'
+    contactInfo: ''
   });
   const [loading, setLoading] = useState(true);
+
+  // Room pricing data (synchronized with Rooms.tsx)
+  const roomPricing: RoomPricing[] = [
+    {
+      roomId: '1',
+      pricing: [
+        { capacity: 'Individuel (1 apprenant)', rate: 20, minStudents: 1, maxStudents: 1 },
+        { capacity: '2-6 personnes', rate: 25, minStudents: 2, maxStudents: 6 },
+        { capacity: '7-9 personnes', rate: 30, minStudents: 7, maxStudents: 9 },
+        { capacity: '10-15 personnes', rate: 35, minStudents: 10, maxStudents: 15 }
+      ]
+    },
+    {
+      roomId: '2',
+      pricing: [
+        { capacity: 'Individuel (1 apprenant)', rate: 15, minStudents: 1, maxStudents: 1 },
+        { capacity: '2-7 personnes', rate: 20, minStudents: 2, maxStudents: 7 },
+        { capacity: '8-9 personnes', rate: 25, minStudents: 8, maxStudents: 9 }
+      ]
+    },
+    {
+      roomId: '3',
+      pricing: [
+        { capacity: 'Individuel (1 apprenant)', rate: 15, minStudents: 1, maxStudents: 1 },
+        { capacity: '2-7 personnes', rate: 20, minStudents: 2, maxStudents: 7 },
+        { capacity: '8-9 personnes', rate: 25, minStudents: 8, maxStudents: 9 }
+      ]
+    }
+  ];
+
+  // VAT rate (Tunisia standard rate)
+  const VAT_RATE = 0.19;
+
+  // Calculate hourly rate based on room and student count
+  const getHourlyRate = (roomId: string, studentCount: number): number => {
+    const roomPricingData = roomPricing.find(room => room.roomId === roomId);
+    if (!roomPricingData) return 0;
+
+    // Find the appropriate pricing tier
+    const tier = roomPricingData.pricing.find(
+      p => studentCount >= p.minStudents && studentCount <= p.maxStudents
+    );
+
+    return tier ? tier.rate : roomPricingData.pricing[roomPricingData.pricing.length - 1].rate;
+  };
+
+  // Calculate total fees for bookings
+  const calculateFees = (): FeeCalculation | null => {
+    if (!bookingData || !selectedRoom) return null;
+
+    const bookingsToCalculate = selectedTimeSlots.length > 0 ? selectedTimeSlots : 
+      (selectedDate && selectedTimeSlot ? [{ date: selectedDate, timeSlot: selectedTimeSlot, id: `${selectedDate}-${selectedTimeSlot}` }] : []);
+
+    if (bookingsToCalculate.length === 0) return null;
+
+    const hourlyRate = getHourlyRate(selectedRoom, formData.studentCount);
+    const totalHours = bookingsToCalculate.length * formData.duration;
+    
+    const subtotalHT = hourlyRate * totalHours;
+    const vatAmount = subtotalHT * VAT_RATE;
+    const totalTTC = subtotalHT + vatAmount;
+
+    return {
+      subtotalHT,
+      vatAmount,
+      totalTTC,
+      hourlyRate,
+      totalHours,
+      studentCount: formData.studentCount,
+      roomName: bookingData.rooms[selectedRoom].name,
+      slotCount: bookingsToCalculate.length
+    };
+  };
 
   // Load booking data on component mount
   useEffect(() => {
@@ -95,6 +186,10 @@ export const BookingSystem: React.FC = () => {
           const monday = getWeekStart(startDate);
           setCurrentWeekStart(monday.toISOString().split('T')[0]);
           setSelectedDate(data.startDate);
+          
+          // Set current month for month view
+          const monthStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+          setCurrentMonth(monthStart.toISOString().split('T')[0]);
         }
         
         // Subscribe to real-time updates
@@ -125,12 +220,6 @@ export const BookingSystem: React.FC = () => {
           },
           weekDays: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
           startDate: "2025-09-15",
-          bookingPeriods: [
-            { label: "1 Semaine", value: "week", weeks: 1 },
-            { label: "2 Semaines", value: "2weeks", weeks: 2 },
-            { label: "3 Semaines", value: "3weeks", weeks: 3 },
-            { label: "1 Mois", value: "month", weeks: 4 }
-          ],
           lastUpdated: new Date().toISOString()
         };
         
@@ -140,6 +229,10 @@ export const BookingSystem: React.FC = () => {
           const monday = getWeekStart(startDate);
           setCurrentWeekStart(monday.toISOString().split('T')[0]);
           setSelectedDate(defaultData.startDate);
+          
+          // Set current month for month view
+          const monthStart = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+          setCurrentMonth(monthStart.toISOString().split('T')[0]);
         }
       } finally {
         setLoading(false);
@@ -179,6 +272,118 @@ export const BookingSystem: React.FC = () => {
     return affectedSlots;
   };
 
+  // Helper function to get month view dates
+  const getMonthDates = (): { date: string; dayName: string; dayOfWeek: number; inCurrentMonth: boolean }[] => {
+    if (!currentMonth) return [];
+    
+    const monthStart = new Date(currentMonth);
+    const monthEnd = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 0);
+    const calendarStart = new Date(monthStart);
+    const calendarEnd = new Date(monthEnd);
+    
+    // Start from Monday of the week containing the first day of the month
+    calendarStart.setDate(monthStart.getDate() - monthStart.getDay() + 1);
+    if (monthStart.getDay() === 0) calendarStart.setDate(monthStart.getDate() - 6);
+    
+    // End at Sunday of the week containing the last day of the month
+    calendarEnd.setDate(monthEnd.getDate() + (7 - monthEnd.getDay()));
+    if (monthEnd.getDay() === 0) calendarEnd.setDate(monthEnd.getDate());
+    
+    const dates = [];
+    const current = new Date(calendarStart);
+    
+    while (current <= calendarEnd) {
+      const dayNames = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+      dates.push({
+        date: current.toISOString().split('T')[0],
+        dayName: dayNames[current.getDay()],
+        dayOfWeek: current.getDay(),
+        inCurrentMonth: current.getMonth() === monthStart.getMonth()
+      });
+      current.setDate(current.getDate() + 1);
+    }
+    
+    return dates;
+  };
+
+  // Helper function to check availability for a specific time slot
+  const checkTimeSlotAvailability = (roomId: string, date: string, timeSlot: string, duration: number) => {
+    if (!bookingData) return { isAvailable: false, message: 'Données non chargées' };
+    
+    // Check if the requested time slots are available
+    const requiredSlots = getAffectedTimeSlots(timeSlot, duration, date);
+    const hasConflict = requiredSlots.some(slot => isTimeSlotBooked(roomId, date, slot));
+    
+    if (hasConflict) {
+      // Find alternative slots for the same day
+      const dayOfWeek = new Date(date).getDay();
+      const availableSlots = dayOfWeek === 0 ? bookingData.timeSlots.sunday : bookingData.timeSlots.weekdays;
+      
+      const alternatives = availableSlots
+        .filter(slot => {
+          const testSlots = getAffectedTimeSlots(slot, duration, date);
+          return testSlots.length === duration * 2 && 
+                 !testSlots.some(testSlot => isTimeSlotBooked(roomId, date, testSlot));
+        })
+        .slice(0, 3)
+        .map(slot => ({ date, time: slot }));
+      
+      return {
+        isAvailable: false,
+        message: `Ce créneau n'est pas disponible. Voici des alternatives pour le même jour:`,
+        suggestedSlots: alternatives
+      };
+    }
+    
+    return { isAvailable: true, message: 'Créneau disponible!' };
+  };
+
+  // Helper function to add a time slot to selections
+  const addTimeSlotSelection = (date: string, timeSlot: string) => {
+    const id = `${date}-${timeSlot}`;
+    if (!selectedTimeSlots.some(slot => slot.id === id)) {
+      setSelectedTimeSlots(prev => [...prev, { date, timeSlot, id }]);
+    }
+  };
+
+  // Helper function to remove a time slot from selections
+  const removeTimeSlotSelection = (id: string) => {
+    setSelectedTimeSlots(prev => prev.filter(slot => slot.id !== id));
+  };
+
+  // Helper function to clear all selections
+  const clearAllSelections = () => {
+    setSelectedTimeSlots([]);
+  };
+
+  // Helper function to check if a slot is selected
+  const isSlotSelected = (date: string, timeSlot: string) => {
+    const id = `${date}-${timeSlot}`;
+    return selectedTimeSlots.some(slot => slot.id === id);
+  };
+
+  // Helper function to batch check availability for all selected slots
+  const checkBatchAvailability = () => {
+    const conflicts: { date: string; timeSlot: string; message: string }[] = [];
+    
+    selectedTimeSlots.forEach(slot => {
+      const availability = checkTimeSlotAvailability(selectedRoom, slot.date, slot.timeSlot, formData.duration);
+      if (!availability.isAvailable) {
+        conflicts.push({
+          date: slot.date,
+          timeSlot: slot.timeSlot,
+          message: availability.message
+        });
+      }
+    });
+    
+    return {
+      hasConflicts: conflicts.length > 0,
+      conflicts,
+      availableCount: selectedTimeSlots.length - conflicts.length
+    };
+  };
+
   // Helper function to get dates for the current week
   const getCurrentWeekDates = (): { date: string; dayName: string; dayOfWeek: number }[] => {
     if (!currentWeekStart) return [];
@@ -215,112 +420,142 @@ export const BookingSystem: React.FC = () => {
     });
   };
 
-  const getBookingInfo = (roomId: string, date: string, timeSlot: string): Booking | null => {
-    if (!bookingData || !bookingData.bookings) return null;
-    
-    // Find booking that affects this time slot
-    const bookings = Object.values(bookingData.bookings);
-    return bookings.find(booking => {
-      if (!booking || booking.roomId !== roomId || booking.date !== date) return false;
-      
-      const affectedSlots = getAffectedTimeSlots(booking.timeSlot, booking.duration, date);
-      return affectedSlots.includes(timeSlot);
-    }) || null;
-  };
 
   const handleBookingSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!bookingData || !selectedRoom || !selectedDate || !selectedTimeSlot) return;
+    if (!bookingData || !selectedRoom) return;
 
-    // Check if any of the required time slots are already booked
-    const requiredSlots = getAffectedTimeSlots(selectedTimeSlot, formData.duration, selectedDate);
-    const hasConflict = requiredSlots.some(slot => 
-      isTimeSlotBooked(selectedRoom, selectedDate, slot)
-    );
-    
-    if (hasConflict) {
-      alert(`Conflit de réservation! Certains créneaux requis pour cette session de ${formData.duration}h sont déjà réservés.`);
-      return;
+    // Handle multiple bookings or single booking
+    const bookingsToCreate = selectedTimeSlots.length > 0 ? selectedTimeSlots : 
+      (selectedDate && selectedTimeSlot ? [{ date: selectedDate, timeSlot: selectedTimeSlot, id: `${selectedDate}-${selectedTimeSlot}` }] : []);
+
+    if (bookingsToCreate.length === 0) return;
+
+    // Final availability check for all slots (only for multiple selections)
+    if (selectedTimeSlots.length > 0) {
+      const finalCheck = checkBatchAvailability();
+      if (finalCheck.hasConflicts) {
+        alert(`Certains créneaux ne sont plus disponibles. Veuillez actualiser votre sélection.`);
+        return;
+      }
     }
-
-    const newBooking: Omit<Booking, 'id'> = {
-      roomId: selectedRoom,
-      date: selectedDate,
-      timeSlot: selectedTimeSlot,
-      teacherName: formData.teacherName,
-      subject: formData.subject,
-      studentCount: formData.studentCount,
-      duration: formData.duration,
-      contactInfo: formData.contactInfo,
-      bookingDate: new Date().toISOString(),
-      bookingPeriod: formData.bookingPeriod
-    };
 
     try {
-      // Create recurring booking if period is more than a week
-      if (formData.bookingPeriod !== 'week') {
-        const bookingIds = await FirebaseBookingService.createRecurringBooking(newBooking, formData.bookingPeriod);
-        console.log('Recurring bookings created:', bookingIds);
-        alert(`Réservations créées pour ${formData.bookingPeriod === '2weeks' ? '2 semaines' : formData.bookingPeriod === '3weeks' ? '3 semaines' : '1 mois'}!`);
-      } else {
-        // Save single booking to Firebase
-        const bookingId = await FirebaseBookingService.createBooking(newBooking);
-        if (bookingId) {
-          console.log('Booking saved to Firebase:', bookingId);
-          console.log('Affected time slots:', requiredSlots);
-        } else {
-          throw new Error('Failed to get booking ID');
+      let successCount = 0;
+      const results = [];
+
+      for (const slot of bookingsToCreate) {
+        const newBooking: Omit<Booking, 'id'> = {
+          roomId: selectedRoom,
+          date: slot.date,
+          timeSlot: slot.timeSlot,
+          teacherName: formData.teacherName,
+          subject: formData.subject,
+          studentCount: formData.studentCount,
+          duration: formData.duration,
+          contactInfo: formData.contactInfo,
+          bookingDate: new Date().toISOString()
+        };
+
+        try {
+          // Save booking to Firebase
+          const bookingId = await FirebaseBookingService.createBooking(newBooking);
+          if (bookingId) {
+            results.push({ success: true, slot, bookingId });
+            successCount++;
+          } else {
+            results.push({ success: false, slot, error: 'No booking ID returned' });
+          }
+        } catch (error) {
+          console.error(`Failed to save booking for ${slot.date} ${slot.timeSlot}:`, error);
+          results.push({ success: false, slot, error: error instanceof Error ? error.message : 'Unknown error' });
         }
       }
+
+      // Show success/error message
+      if (successCount === bookingsToCreate.length) {
+        alert(`✅ ${successCount} réservation(s) créée(s) avec succès!`);
+      } else {
+        alert(`⚠️ ${successCount}/${bookingsToCreate.length} réservations créées avec succès. Certaines réservations ont échoué.`);
+      }
+
+      console.log('Booking results:', results);
+
     } catch (error) {
-      console.error('Failed to save booking:', error);
-      alert('Erreur lors de la sauvegarde de la réservation. Veuillez réessayer.');
+      console.error('Failed to process bookings:', error);
+      alert('Erreur lors de la sauvegarde des réservations. Veuillez réessayer.');
       return;
     }
     
-    // Reset form and close modal
+    // Reset form and close all modals
     setFormData({
       teacherName: '',
       subject: '',
       studentCount: 1,
       duration: 1,
-      contactInfo: '',
-      bookingPeriod: 'week'
+      contactInfo: ''
     });
     setShowBookingForm(false);
+    setShowTimeSlots(false);
+    setShowConfirmation(false);
+    setAvailabilityCheck(null);
     setSelectedTimeSlot('');
+    setSelectedTimeSlots([]);
   };
 
-  const handleTimeSlotClick = (timeSlot: string) => {
-    if (!isTimeSlotBooked(selectedRoom, selectedDate, timeSlot)) {
-      setSelectedTimeSlot(timeSlot);
-      setShowBookingForm(true);
-    }
+  const handleDateSelection = (date: string) => {
+    setSelectedDate(date);
+    setShowTimeSlots(true);
+    setAvailabilityCheck(null);
   };
 
-  const cancelBooking = async (roomId: string, date: string, timeSlot: string) => {
-    if (!bookingData) return;
+  const handleTimeSlotSelection = (timeSlot: string) => {
+    if (!selectedDate || !formData.duration) return;
     
-    // Find the booking that affects this time slot
-    const booking = getBookingInfo(roomId, date, timeSlot);
-    if (!booking || !booking.id) {
-      console.error('Booking not found or missing ID');
-      return;
-    }
+    const id = `${selectedDate}-${timeSlot}`;
+    const isSelected = isSlotSelected(selectedDate, timeSlot);
     
-    try {
-      const success = await FirebaseBookingService.cancelBooking(booking.id);
-      if (success) {
-        console.log('Booking cancelled from Firebase:', booking.id);
+    if (isSelected) {
+      // Remove from selection
+      removeTimeSlotSelection(id);
+    } else {
+      // Check availability before adding
+      const availability = checkTimeSlotAvailability(selectedRoom, selectedDate, timeSlot, formData.duration);
+      
+      if (availability.isAvailable) {
+        addTimeSlotSelection(selectedDate, timeSlot);
       } else {
-        throw new Error('Failed to cancel booking');
+        setAvailabilityCheck(availability);
       }
-    } catch (error) {
-      console.error('Failed to cancel booking:', error);
-      alert('Erreur lors de l\'annulation de la réservation.');
     }
   };
+
+  const handleConfirmSelections = () => {
+    if (selectedTimeSlots.length === 0) return;
+    
+    const batchCheck = checkBatchAvailability();
+    
+    if (batchCheck.hasConflicts) {
+      setAvailabilityCheck({
+        isAvailable: false,
+        message: `${batchCheck.conflicts.length} créneaux ne sont plus disponibles. ${batchCheck.availableCount} créneaux restent disponibles.`,
+        suggestedSlots: []
+      });
+    } else {
+      setShowTimeSlots(false);
+      setShowConfirmation(true);
+    }
+  };
+
+  const handleAlternativeSlotSelection = (date: string, timeSlot: string) => {
+    setSelectedDate(date);
+    setSelectedTimeSlot(timeSlot);
+    setAvailabilityCheck(null);
+    setShowBookingForm(true);
+    setShowTimeSlots(false);
+  };
+
 
   const navigateWeek = (direction: 'prev' | 'next') => {
     if (!currentWeekStart) return;
@@ -336,6 +571,21 @@ export const BookingSystem: React.FC = () => {
     if (weekDates.length > 1) { // Skip Sunday, select Monday
       setSelectedDate(weekDates[1].date);
     }
+  };
+
+  const navigateMonth = (direction: 'prev' | 'next') => {
+    if (!currentMonth) return;
+    
+    const current = new Date(currentMonth);
+    const newDate = new Date(current.getFullYear(), current.getMonth() + (direction === 'next' ? 1 : -1), 1);
+    
+    setCurrentMonth(newDate.toISOString().split('T')[0]);
+  };
+
+  const toggleViewMode = () => {
+    setViewMode(viewMode === 'week' ? 'month' : 'week');
+    setShowTimeSlots(false);
+    setAvailabilityCheck(null);
   };
 
   if (loading) {
@@ -361,6 +611,7 @@ export const BookingSystem: React.FC = () => {
   }
 
   const weekDates = getCurrentWeekDates();
+  const monthDates = getMonthDates();
   const currentDate = selectedDate ? new Date(selectedDate) : new Date();
   const dayOfWeek = currentDate.getDay();
   const availableTimeSlots = dayOfWeek === 0 ? bookingData.timeSlots.sunday : bookingData.timeSlots.weekdays;
@@ -404,7 +655,7 @@ export const BookingSystem: React.FC = () => {
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="max-w-6xl mx-auto">
             <div className="bg-white rounded-3xl shadow-2xl p-8 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Sélectionnez Salle et Semaine</h2>
+              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Configuration de Réservation</h2>
               
               {/* Room Selection */}
               <div className="mb-8">
@@ -435,153 +686,664 @@ export const BookingSystem: React.FC = () => {
                 </div>
               </div>
 
-              {/* Week Navigation */}
+              {/* Duration Selection */}
               <div className="mb-8">
-                <label className="block text-lg font-semibold text-gray-700 mb-4 text-center">Navigation Semaine</label>
-                <div className="flex items-center justify-center space-x-4">
+                <label className="block text-lg font-semibold text-gray-700 mb-4 text-center">Durée de Session</label>
+                <div className="flex justify-center">
+                  <select
+                    value={formData.duration}
+                    onChange={(e) => setFormData({...formData, duration: parseFloat(e.target.value)})}
+                    className="p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                  >
+                    <option value={0.5}>30 minutes</option>
+                    <option value={1}>1 heure</option>
+                    <option value={1.5}>1h30</option>
+                    <option value={2}>2 heures</option>
+                    <option value={2.5}>2h30</option>
+                    <option value={3}>3 heures</option>
+                  </select>
+                </div>
+                <p className="text-center text-sm text-gray-500 mt-2">
+                  Sélectionnez la durée avant de choisir votre créneau
+                </p>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <button
+                  onClick={toggleViewMode}
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-xl font-semibold transition-all duration-200"
+                >
+                  <Calendar className="w-5 h-5 mr-2" />
+                  Vue {viewMode === 'week' ? 'Mensuelle' : 'Hebdomadaire'}
+                </button>
+                
+                <button
+                  onClick={() => setShowCalculator(true)}
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700 text-white rounded-xl font-semibold transition-all duration-200"
+                >
+                  <Calculator className="w-5 h-5 mr-2" />
+                  Calculateur de Frais
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Calendar View */}
+      <section className="pb-20">
+        <div className="w-full px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="bg-white rounded-3xl shadow-2xl p-8">
+              
+              {/* Calendar Header */}
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-bold text-gray-900">
+                  Calendrier - {bookingData.rooms[selectedRoom].name}
+                </h2>
+                <div className="flex items-center space-x-4">
                   <button
-                    onClick={() => navigateWeek('prev')}
+                    onClick={() => viewMode === 'week' ? navigateWeek('prev') : navigateMonth('prev')}
                     className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                   >
                     <ChevronLeft className="w-6 h-6 text-gray-600" />
                   </button>
                   
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-gray-900">
-                      Semaine du {currentWeekStart && new Date(currentWeekStart).toLocaleDateString('fr-FR')}
-                    </div>
+                  <div className="text-center min-w-48">
+                    {viewMode === 'week' ? (
+                      <div className="text-lg font-semibold text-gray-900">
+                        Semaine du {currentWeekStart && new Date(currentWeekStart).toLocaleDateString('fr-FR')}
+                      </div>
+                    ) : (
+                      <div className="text-lg font-semibold text-gray-900">
+                        {currentMonth && new Date(currentMonth).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+                      </div>
+                    )}
                   </div>
                   
                   <button
-                    onClick={() => navigateWeek('next')}
+                    onClick={() => viewMode === 'week' ? navigateWeek('next') : navigateMonth('next')}
                     className="p-3 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
                   >
                     <ChevronRight className="w-6 h-6 text-gray-600" />
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Week View with Days and Time Slots */}
-      <section className="pb-20">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="bg-white rounded-3xl shadow-2xl p-8">
-              <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-                Planning de la Semaine - {bookingData.rooms[selectedRoom].name}
-              </h2>
-              
-              {/* Legend */}
-              <div className="flex justify-center space-x-8 mb-8">
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-green-100 border-2 border-green-400 rounded-lg"></div>
-                  <span className="text-sm font-medium text-gray-700">Disponible</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-6 h-6 bg-red-100 border-2 border-red-400 rounded-lg"></div>
-                  <span className="text-sm font-medium text-gray-700">Réservé</span>
-                </div>
-              </div>
-
-              {/* Days of Week Header */}
-              <div className="grid grid-cols-8 gap-2 mb-4">
-                <div className="p-2 text-center font-bold text-gray-600">Heure</div>
-                {weekDates.map((dayInfo) => (
-                  <button
-                    key={dayInfo.date}
-                    onClick={() => setSelectedDate(dayInfo.date)}
-                    className={`p-3 rounded-lg text-center transition-all duration-200 ${
-                      selectedDate === dayInfo.date
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <div className="font-bold text-sm">{dayInfo.dayName}</div>
-                    <div className="text-xs">{new Date(dayInfo.date).getDate()}/{new Date(dayInfo.date).getMonth() + 1}</div>
-                  </button>
-                ))}
-              </div>
-
-              {/* Time Slots Grid */}
-              <div className="space-y-2">
-                {availableTimeSlots.map((timeSlot) => (
-                  <div key={timeSlot} className="grid grid-cols-8 gap-2">
-                    <div className="p-3 text-center font-bold text-gray-600 bg-gray-50 rounded-lg">
-                      {timeSlot}
-                    </div>
+              {/* Week View */}
+              {viewMode === 'week' && (
+                <div>
+                  <div className="grid grid-cols-7 gap-2 mb-2">
+                    {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
+                      <div key={day} className="p-2 text-center font-bold text-gray-600 bg-gray-50 rounded-lg">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-2">
                     {weekDates.map((dayInfo) => {
-                      const isBooked = isTimeSlotBooked(selectedRoom, dayInfo.date, timeSlot);
-                      const bookingInfo = getBookingInfo(selectedRoom, dayInfo.date, timeSlot);
-                      
-                      // Check if this day has any time slots available (skip Sunday after 13:00)
-                      const dayTimeSlots = dayInfo.dayOfWeek === 0 ? bookingData.timeSlots.sunday : bookingData.timeSlots.weekdays;
-                      const isTimeSlotAvailable = dayTimeSlots.includes(timeSlot);
-                      
-                      if (!isTimeSlotAvailable) {
-                        return (
-                          <div key={dayInfo.date} className="p-3 bg-gray-200 rounded-lg">
-                            <div className="text-center text-gray-400 text-xs">Non disponible</div>
-                          </div>
-                        );
-                      }
+                      const hasBookings = Object.values(bookingData.bookings || {}).some(
+                        booking => booking && booking.roomId === selectedRoom && booking.date === dayInfo.date
+                      );
                       
                       return (
-                        <div
+                        <button
                           key={dayInfo.date}
-                          className={`relative group p-3 rounded-lg border-2 transition-all duration-300 cursor-pointer ${
-                            isBooked
-                              ? 'border-red-400 bg-red-50 text-red-700'
-                              : 'border-green-400 bg-green-50 text-green-700 hover:bg-green-100 hover:scale-105 transform'
+                          onClick={() => handleDateSelection(dayInfo.date)}
+                          className={`p-6 rounded-xl text-center transition-all duration-200 border-2 ${
+                            selectedDate === dayInfo.date
+                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              : hasBookings
+                              ? 'border-orange-300 bg-orange-50 text-orange-700 hover:border-orange-400'
+                              : 'border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:bg-blue-25'
                           }`}
-                          onClick={() => !isBooked && dayInfo.date === selectedDate && handleTimeSlotClick(timeSlot)}
                         >
-                          <div className="text-center">
-                            <div className={`text-xs ${isBooked ? 'text-red-600' : 'text-green-600'}`}>
-                              {isBooked ? 'Réservé' : 'Libre'}
-                            </div>
-                            
-                            {/* Booking Info Tooltip */}
-                            {isBooked && bookingInfo && (
-                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                                <div className="bg-gray-900 text-white text-xs rounded-lg p-3 shadow-xl min-w-64">
-                                  <div className="font-bold mb-1">{bookingInfo.teacherName}</div>
-                                  <div>Matière: {bookingInfo.subject}</div>
-                                  <div>Étudiants: {bookingInfo.studentCount}</div>
-                                  <div>Durée: {bookingInfo.duration}h</div>
-                                  <div className="text-yellow-300 text-xs mt-1">
-                                    {bookingInfo.timeSlot === timeSlot 
-                                      ? `Début de session (${bookingInfo.timeSlot} - ${getAffectedTimeSlots(bookingInfo.timeSlot, bookingInfo.duration, dayInfo.date).pop()})` 
-                                      : `Partie de la session commencée à ${bookingInfo.timeSlot}`
-                                    }
-                                  </div>
-                                  {bookingInfo.timeSlot === timeSlot && (
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        cancelBooking(selectedRoom, dayInfo.date, timeSlot);
-                                      }}
-                                      className="mt-2 px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
-                                    >
-                                      Annuler toute la session
-                                    </button>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </div>
+                          <div className="font-bold text-lg">{new Date(dayInfo.date).getDate()}</div>
+                          <div className="text-xs mt-1">{dayInfo.dayName}</div>
+                          {hasBookings && (
+                            <div className="w-2 h-2 bg-orange-400 rounded-full mx-auto mt-1"></div>
+                          )}
+                        </button>
                       );
                     })}
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
+
+              {/* Month View */}
+              {viewMode === 'month' && (
+                <div>
+                  <div className="grid grid-cols-7 gap-2 mb-2">
+                    {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((day) => (
+                      <div key={day} className="p-2 text-center font-bold text-gray-600 bg-gray-50 rounded-lg">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="grid grid-cols-7 gap-2">
+                    {monthDates.map((dayInfo) => {
+                      const hasBookings = Object.values(bookingData.bookings || {}).some(
+                        booking => booking && booking.roomId === selectedRoom && booking.date === dayInfo.date
+                      );
+                      
+                      return (
+                        <button
+                          key={dayInfo.date}
+                          onClick={() => dayInfo.inCurrentMonth && handleDateSelection(dayInfo.date)}
+                          disabled={!dayInfo.inCurrentMonth}
+                          className={`p-4 rounded-xl text-center transition-all duration-200 border-2 min-h-16 ${
+                            !dayInfo.inCurrentMonth
+                              ? 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
+                              : selectedDate === dayInfo.date
+                              ? 'border-blue-500 bg-blue-50 text-blue-700'
+                              : hasBookings
+                              ? 'border-orange-300 bg-orange-50 text-orange-700 hover:border-orange-400'
+                              : 'border-gray-200 bg-white text-gray-600 hover:border-blue-300 hover:bg-blue-25'
+                          }`}
+                        >
+                          <div className="font-bold">{new Date(dayInfo.date).getDate()}</div>
+                          {hasBookings && dayInfo.inCurrentMonth && (
+                            <div className="w-2 h-2 bg-orange-400 rounded-full mx-auto mt-1"></div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
+
+      {/* Time Slot Selection Modal */}
+      {showTimeSlots && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Sélectionnez vos Créneaux</h3>
+                  <p className="text-gray-600">
+                    {selectedDate && new Date(selectedDate).toLocaleDateString('fr-FR', { 
+                      weekday: 'long', 
+                      year: 'numeric', 
+                      month: 'long', 
+                      day: 'numeric' 
+                    })} - Durée: {formData.duration}h
+                  </p>
+                  <p className="text-sm text-blue-600 mt-2">
+                    {selectedTimeSlots.length} créneau(x) sélectionné(s) - Cliquez pour ajouter/retirer
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowTimeSlots(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <XCircle className="w-6 h-6 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Selected Slots Summary */}
+              {selectedTimeSlots.length > 0 && (
+                <div className="mb-6 p-4 bg-blue-50 rounded-xl">
+                  <h4 className="font-semibold text-blue-900 mb-2">Créneaux Sélectionnés:</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTimeSlots.map((slot) => (
+                      <span
+                        key={slot.id}
+                        className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                      >
+                        {new Date(slot.date).toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })} - {slot.timeSlot}
+                        <button
+                          onClick={() => removeTimeSlotSelection(slot.id)}
+                          className="ml-2 w-4 h-4 text-blue-600 hover:text-blue-800"
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
+                {availableTimeSlots.map((timeSlot) => {
+                  const isSelected = isSlotSelected(selectedDate, timeSlot);
+                  return (
+                    <button
+                      key={timeSlot}
+                      onClick={() => handleTimeSlotSelection(timeSlot)}
+                      className={`p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-center font-semibold ${
+                        isSelected
+                          ? 'border-green-400 bg-green-50 text-green-700'
+                          : 'border-blue-200 bg-blue-50 text-blue-700 hover:border-blue-400 hover:bg-blue-100'
+                      }`}
+                    >
+                      <Clock className="w-4 h-4 mr-2" />
+                      {timeSlot}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-between items-center pt-4 border-t">
+                <button
+                  onClick={clearAllSelections}
+                  disabled={selectedTimeSlots.length === 0}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 disabled:text-gray-400"
+                >
+                  Tout Effacer
+                </button>
+                
+                <div className="space-x-4">
+                  <button
+                    onClick={() => setShowTimeSlots(false)}
+                    className="px-6 py-3 text-lg bg-transparent text-blue-600 border border-blue-600 hover:bg-blue-50 rounded-lg font-semibold transition-all duration-200"
+                  >
+                    Fermer
+                  </button>
+                  <button
+                    onClick={handleConfirmSelections}
+                    disabled={selectedTimeSlots.length === 0}
+                    className="px-6 py-3 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Confirmer {selectedTimeSlots.length} Créneau(x)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Availability Check Modal */}
+      {availabilityCheck && !availabilityCheck.isAvailable && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full">
+            <div className="p-8">
+              <div className="flex items-center mb-6">
+                <AlertCircle className="w-8 h-8 text-orange-500 mr-3" />
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Créneau Non Disponible</h3>
+                  <p className="text-gray-600">{availabilityCheck.message}</p>
+                </div>
+              </div>
+
+              {availabilityCheck.suggestedSlots && availabilityCheck.suggestedSlots.length > 0 && (
+                <div className="mb-6">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Créneaux Alternatifs</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    {availabilityCheck.suggestedSlots.map((slot, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAlternativeSlotSelection(slot.date, slot.time)}
+                        className="p-4 rounded-xl border-2 border-green-200 bg-green-50 text-green-700 hover:border-green-400 hover:bg-green-100 transition-all duration-200"
+                      >
+                        <div className="flex items-center justify-center">
+                          <Clock className="w-4 h-4 mr-2" />
+                          {slot.time}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end space-x-4">
+                <button
+                  onClick={() => {
+                    setAvailabilityCheck(null);
+                    setShowTimeSlots(true);
+                  }}
+                  className="px-6 py-3 text-lg bg-transparent text-blue-600 border border-blue-600 hover:bg-blue-50 rounded-lg font-semibold transition-all duration-200"
+                >
+                  Choisir un Autre Créneau
+                </button>
+                <button
+                  onClick={() => setAvailabilityCheck(null)}
+                  className="px-6 py-3 text-lg bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-semibold transition-all duration-200"
+                >
+                  Fermer
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal for Multiple Bookings */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">Confirmer vos Réservations</h3>
+                  <p className="text-gray-600">
+                    {selectedTimeSlots.length} créneaux sélectionnés dans {bookingData.rooms[selectedRoom].name}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowConfirmation(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <XCircle className="w-6 h-6 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Selected Slots Summary with Fees */}
+              <div className="mb-6 p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
+                <div className="flex justify-between items-center mb-4">
+                  <h4 className="font-bold text-lg text-gray-900">Récapitulatif des Créneaux</h4>
+                  <button
+                    onClick={() => setShowCalculator(true)}
+                    className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-semibold transition-colors flex items-center"
+                  >
+                    <Calculator className="w-4 h-4 mr-1" />
+                    Calculateur
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {selectedTimeSlots.map((slot, index) => (
+                    <div key={slot.id} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                      <div>
+                        <div className="font-semibold text-gray-900">
+                          Créneau #{index + 1}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {new Date(slot.date).toLocaleDateString('fr-FR', { 
+                            weekday: 'long', 
+                            day: 'numeric', 
+                            month: 'long' 
+                          })}
+                        </div>
+                        <div className="text-sm font-medium text-blue-600">
+                          {slot.timeSlot} - {formData.duration}h
+                        </div>
+                      </div>
+                      <Clock className="w-5 h-5 text-blue-500" />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Fees Preview */}
+                {(() => {
+                  const calculation = calculateFees();
+                  if (calculation) {
+                    return (
+                      <div className="p-4 bg-white rounded-lg border border-green-200 shadow-sm">
+                        <h5 className="font-bold text-green-800 mb-3 flex items-center">
+                          <TrendingUp className="w-4 h-4 mr-2" />
+                          Estimation des Frais
+                        </h5>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                          <div className="text-center">
+                            <div className="text-gray-600">Tarif</div>
+                            <div className="font-bold text-blue-600">{calculation.hourlyRate} TND/h</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-gray-600">Total Heures</div>
+                            <div className="font-bold text-purple-600">{calculation.totalHours}h</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-gray-600">Sous-total HT</div>
+                            <div className="font-bold text-gray-800">{calculation.subtotalHT.toFixed(0)} TND</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-gray-600">Total TTC</div>
+                            <div className="font-bold text-green-600">{calculation.totalTTC.toFixed(0)} TND</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
+
+              {/* Teacher Information Form */}
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleBookingSubmit(e);
+              }} className="space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Nom de l'Enseignant *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.teacherName}
+                    onChange={(e) => setFormData({...formData, teacherName: e.target.value})}
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                    placeholder="Entrez le nom de l'enseignant"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Matière Enseignée *</label>
+                  <select
+                    required
+                    value={formData.subject}
+                    onChange={(e) => setFormData({...formData, subject: e.target.value})}
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                  >
+                    <option value="">Sélectionnez une matière</option>
+                    <option value="Mathématiques">Mathématiques</option>
+                    <option value="Physique">Physique</option>
+                    <option value="Français">Français</option>
+                    <option value="Anglais">Anglais</option>
+                    <option value="Sciences Naturelles">Sciences Naturelles</option>
+                    <option value="Arabe">Arabe</option>
+                    <option value="Informatique">Informatique</option>
+                    <option value="Économie & Gestion">Économie & Gestion</option>
+                    <option value="ESP">ESP</option>
+                    <option value="Autre">Autre</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre d'Étudiants *</label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    max={bookingData.rooms[selectedRoom].capacity}
+                    value={formData.studentCount}
+                    onChange={(e) => setFormData({...formData, studentCount: parseInt(e.target.value)})}
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Maximum: {bookingData.rooms[selectedRoom].capacity} étudiants</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Contact (Téléphone/Email) *</label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.contactInfo}
+                    onChange={(e) => setFormData({...formData, contactInfo: e.target.value})}
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                    placeholder="Numéro de téléphone ou email"
+                  />
+                </div>
+
+                <div className="flex justify-end space-x-4 pt-6">
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmation(false)}
+                    className="px-6 py-3 text-lg bg-transparent text-blue-600 border border-blue-600 hover:bg-blue-50 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 flex items-center"
+                  >
+                    <RotateCcw className="w-5 h-5 mr-2" />
+                    Modifier Sélection
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-6 py-3 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 flex items-center"
+                  >
+                    <Save className="w-5 h-5 mr-2" />
+                    Confirmer {selectedTimeSlots.length} Réservation(s)
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rental Fees Calculator Modal */}
+      {showCalculator && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-8">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-3xl font-bold text-gray-900 flex items-center">
+                    <Calculator className="w-8 h-8 text-green-600 mr-3" />
+                    Calculateur de Frais de Location
+                  </h3>
+                  <p className="text-gray-600 mt-2">
+                    Estimez vos coûts de location avec TVA incluse
+                  </p>
+                </div>
+                <button
+                  onClick={() => setShowCalculator(false)}
+                  className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <XCircle className="w-6 h-6 text-gray-400" />
+                </button>
+              </div>
+
+              {/* Current Configuration */}
+              <div className="mb-8 p-6 bg-gradient-to-br from-blue-50 to-green-50 rounded-xl border border-blue-200">
+                <h4 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
+                  <Building className="w-6 h-6 text-blue-600 mr-2" />
+                  Configuration Actuelle
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <div className="text-sm text-gray-600 mb-1">Salle Sélectionnée</div>
+                    <div className="text-lg font-bold text-blue-600">
+                      {bookingData?.rooms[selectedRoom]?.name || 'Aucune'}
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <div className="text-sm text-gray-600 mb-1">Durée de Session</div>
+                    <div className="text-lg font-bold text-purple-600">
+                      {formData.duration}h
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <div className="text-sm text-gray-600 mb-1">Nombre d'Étudiants</div>
+                    <div className="text-lg font-bold text-green-600">
+                      {formData.studentCount}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Calculator Form */}
+              <div className="mb-8">
+                <h4 className="text-xl font-bold text-gray-900 mb-4">Paramètres de Calcul</h4>
+                <div className="flex justify-center">
+                  <div className="w-full max-w-md">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Nombre d'Étudiants (affecte le tarif)
+                    </label>
+                    <input
+                      type="number"
+                      min="1"
+                      max={bookingData?.rooms[selectedRoom]?.capacity || 15}
+                      value={formData.studentCount}
+                      onChange={(e) => setFormData({...formData, studentCount: parseInt(e.target.value) || 1})}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Fee Calculation Results */}
+              {(() => {
+                const calculation = calculateFees();
+                if (!calculation) {
+                  return (
+                    <div className="p-6 bg-gray-50 rounded-xl text-center">
+                      <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                      <p className="text-gray-600">
+                        Sélectionnez des créneaux ou configurez votre réservation pour voir le calcul des frais
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="p-6 bg-gradient-to-br from-green-50 to-blue-50 rounded-xl border border-green-200">
+                    <h4 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                      <TrendingUp className="w-6 h-6 text-green-600 mr-2" />
+                      Estimation des Frais
+                    </h4>
+                    
+                    {/* Calculation Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                          <span className="text-gray-700">Tarif Horaire:</span>
+                          <span className="font-bold text-blue-600">{calculation.hourlyRate} TND/h</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                          <span className="text-gray-700">Total Heures:</span>
+                          <span className="font-bold text-purple-600">{calculation.totalHours}h</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                          <span className="text-gray-700">Créneaux Sélectionnés:</span>
+                          <span className="font-bold text-orange-600">{calculation.slotCount}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                          <span className="text-gray-700">Sous-total (HT):</span>
+                          <span className="font-bold text-gray-800">{calculation.subtotalHT.toFixed(3)} TND</span>
+                        </div>
+                        <div className="flex justify-between items-center p-3 bg-white rounded-lg">
+                          <span className="text-gray-700">TVA (19%):</span>
+                          <span className="font-bold text-orange-600">+{calculation.vatAmount.toFixed(3)} TND</span>
+                        </div>
+                        <div className="flex justify-between items-center p-4 bg-gradient-to-r from-green-500 to-teal-500 text-white rounded-lg">
+                          <span className="font-bold text-lg">Total (TTC):</span>
+                          <span className="font-bold text-2xl">{calculation.totalTTC.toFixed(3)} TND</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Pricing Tier Information */}
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                      <h5 className="font-semibold text-blue-900 mb-2">Tarification par Capacité</h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                        {roomPricing.find(room => room.roomId === selectedRoom)?.pricing.map((tier, index) => (
+                          <div 
+                            key={index}
+                            className={`p-2 rounded ${
+                              formData.studentCount >= tier.minStudents && formData.studentCount <= tier.maxStudents
+                                ? 'bg-blue-200 border border-blue-400 font-bold'
+                                : 'bg-white border border-blue-100'
+                            }`}
+                          >
+                            <div className="text-xs text-blue-700">{tier.capacity}</div>
+                            <div className="font-semibold text-blue-800">{tier.rate} TND/h</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Booking Form Modal */}
       {showBookingForm && (
@@ -636,58 +1398,18 @@ export const BookingSystem: React.FC = () => {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre d'Étudiants *</label>
-                    <input
-                      type="number"
-                      required
-                      min="1"
-                      max={bookingData.rooms[selectedRoom].capacity}
-                      value={formData.studentCount}
-                      onChange={(e) => setFormData({...formData, studentCount: parseInt(e.target.value)})}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">Maximum: {bookingData.rooms[selectedRoom].capacity} étudiants</p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Durée (heures) *</label>
-                    <select
-                      required
-                      value={formData.duration}
-                      onChange={(e) => setFormData({...formData, duration: parseFloat(e.target.value)})}
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
-                    >
-                      <option value={0.5}>30 minutes</option>
-                      <option value={1}>1 heure</option>
-                      <option value={1.5}>1h30</option>
-                      <option value={2}>2 heures</option>
-                      <option value={2.5}>2h30</option>
-                      <option value={3}>3 heures</option>
-                    </select>
-                  </div>
-                </div>
-
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Période de Réservation *</label>
-                  <select
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Nombre d'Étudiants *</label>
+                  <input
+                    type="number"
                     required
-                    value={formData.bookingPeriod}
-                    onChange={(e) => setFormData({...formData, bookingPeriod: e.target.value as 'week' | '2weeks' | '3weeks' | 'month'})}
+                    min="1"
+                    max={bookingData.rooms[selectedRoom].capacity}
+                    value={formData.studentCount}
+                    onChange={(e) => setFormData({...formData, studentCount: parseInt(e.target.value)})}
                     className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
-                  >
-                    {bookingData.bookingPeriods.map((period) => (
-                      <option key={period.value} value={period.value}>
-                        {period.label}
-                      </option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Cette réservation sera créée pour {formData.bookingPeriod === 'week' ? '1 semaine' : 
-                    formData.bookingPeriod === '2weeks' ? '2 semaines' : 
-                    formData.bookingPeriod === '3weeks' ? '3 semaines' : '1 mois'} à partir de la date sélectionnée
-                  </p>
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Maximum: {bookingData.rooms[selectedRoom].capacity} étudiants</p>
                 </div>
 
                 <div>

@@ -17,8 +17,6 @@ interface Booking {
   contactInfo: string;
   bookingDate: string;
   createdBy?: string; // Teacher identifier
-  bookingPeriod?: 'week' | '2weeks' | '3weeks' | 'month'; // New: booking period
-  endDate?: string; // YYYY-MM-DD format for recurring bookings
 }
 
 interface BookingData {
@@ -37,11 +35,6 @@ interface BookingData {
   };
   weekDays: string[];
   startDate: string;
-  bookingPeriods: {
-    label: string;
-    value: string;
-    weeks: number;
-  }[];
   lastUpdated: string;
 }
 
@@ -66,12 +59,6 @@ const getDefaultBookingData = (): BookingData => ({
   },
   weekDays: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
   startDate: "2025-09-15", // September 15th, 2025
-  bookingPeriods: [
-    { label: "1 Semaine", value: "week", weeks: 1 },
-    { label: "2 Semaines", value: "2weeks", weeks: 2 },
-    { label: "3 Semaines", value: "3weeks", weeks: 3 },
-    { label: "1 Mois", value: "month", weeks: 4 }
-  ],
   lastUpdated: new Date().toISOString()
 });
 
@@ -186,27 +173,6 @@ export class FirebaseBookingService {
     }
   }
 
-  // Helper function to generate dates based on booking period
-  static generateBookingDates(startDate: string, bookingPeriod: 'week' | '2weeks' | '3weeks' | 'month'): string[] {
-    const dates: string[] = [];
-    const start = new Date(startDate);
-    
-    let weeks = 1;
-    switch (bookingPeriod) {
-      case 'week': weeks = 1; break;
-      case '2weeks': weeks = 2; break;
-      case '3weeks': weeks = 3; break;
-      case 'month': weeks = 4; break;
-    }
-    
-    for (let week = 0; week < weeks; week++) {
-      const currentDate = new Date(start);
-      currentDate.setDate(start.getDate() + (week * 7));
-      dates.push(currentDate.toISOString().split('T')[0]);
-    }
-    
-    return dates;
-  }
 
   // Check for booking conflicts (updated for date-based system)
   static async checkBookingConflict(roomId: string, date: string, timeSlot: string): Promise<boolean> {
@@ -263,45 +229,6 @@ export class FirebaseBookingService {
     }
   }
 
-  // Create multiple bookings for recurring schedule
-  static async createRecurringBooking(booking: Omit<Booking, 'id'>, bookingPeriod: 'week' | '2weeks' | '3weeks' | 'month'): Promise<string[]> {
-    if (!initializeFirebase() || !database) {
-      throw new Error('Firebase not available');
-    }
-
-    const bookingIds: string[] = [];
-    const dates = this.generateBookingDates(booking.date, bookingPeriod);
-
-    try {
-      for (const date of dates) {
-        // Check for conflicts on each date
-        const hasConflict = await this.checkBookingConflict(booking.roomId, date, booking.timeSlot);
-        if (hasConflict) {
-          throw new Error(`Conflit de réservation détecté le ${date} à ${booking.timeSlot}`);
-        }
-      }
-
-      // Create bookings for each date
-      for (const date of dates) {
-        const dateBooking = {
-          ...booking,
-          date,
-          bookingPeriod,
-          endDate: dates[dates.length - 1]
-        };
-
-        const bookingId = await this.createBooking(dateBooking);
-        if (bookingId) {
-          bookingIds.push(bookingId);
-        }
-      }
-
-      return bookingIds;
-    } catch (error) {
-      console.error('Failed to create recurring booking:', error);
-      throw error;
-    }
-  }
 
   // Subscribe to real-time updates
   static subscribeToBookingUpdates(callback: (data: BookingData) => void): () => void {

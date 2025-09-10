@@ -58,12 +58,6 @@
                     },
                     weekDays: ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"],
                     startDate: "2025-09-15",
-                    bookingPeriods: [
-                        { label: "1 Semaine", value: "week", weeks: 1 },
-                        { label: "2 Semaines", value: "2weeks", weeks: 2 },
-                        { label: "3 Semaines", value: "3weeks", weeks: 3 },
-                        { label: "1 Mois", value: "month", weeks: 4 }
-                    ],
                     lastUpdated: new Date().toISOString()
                 };
 
@@ -75,7 +69,7 @@
                 updateStatus('✅ Firebase structure updated successfully!');
                 updateStatus('✅ Sunday time slots added (8:00 AM - 1:00 PM)');
                 updateStatus('✅ Date-based booking system activated (starting Sept 15, 2025)');
-                updateStatus('✅ Flexible booking periods added');
+                updateStatus('✅ Simplified booking structure implemented');
                 updateStatus('');
                 updateStatus('You can now check the Firebase console - the database should show the new structure with Sunday slots.');
                 

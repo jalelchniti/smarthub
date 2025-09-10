@@ -49,7 +49,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Tailwind CSS 3.4** for styling with custom color palette and premium gradients
 - **React Router DOM 7.8** for client-side routing
 - **Lucide React** for icons and visual elements
-- **Firebase 10.7** for Realtime Database (booking system)
+- **Firebase 10.7.1** for Realtime Database (booking system)
 - **ESLint 9.34** with TypeScript support and React hooks plugin
 - **Prettier 3.6.2** for code formatting (available, not in scripts)
 - **Static Architecture**: No backend - all content is static with form submissions via external services
@@ -93,7 +93,7 @@ src/
 ## Key Configuration Files
 
 - **`vite.config.ts`**: Build configuration with relative base path (`./`) for hosting-agnostic deployment, optimized asset naming with hashes
-- **`package.json`**: Dependencies and build scripts - React 19, TypeScript 5.8, Vite 7.1, Firebase 10.7
+- **`package.json`**: Dependencies and build scripts - React 19, TypeScript 5.8, Vite 7.1, Firebase 10.7.1
 - **`tsconfig.json`**: TypeScript project references architecture (app + node configs)
 - **`tailwind.config.js`**: Custom design system (blue/purple gradients, Inter font)
 - **`eslint.config.js`**: Modern ESLint config with TypeScript-ESLint 8.41, React hooks plugin
