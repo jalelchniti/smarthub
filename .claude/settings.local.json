@@ -33,7 +33,9 @@
       "Bash(firebase login:*)",
       "Bash(firebase projects:list:*)",
       "Bash(firebase --version)",
-      "Bash(firebase:*)"
+      "Bash(firebase:*)",
+      "Bash(copy:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []

@@ -204,6 +204,7 @@ npm run build
 - ✅ Brevo CRM attribute mapping documented
 - ✅ Forms successfully submitting to Brevo with simplified 3-field structure
 - ✅ WhatsApp integration in email templates with personalized messaging
+- ✅ **NEW: Teacher income protection demo email** (`/docs/mailing_Lists/Teacher/SmartHub_Income_Protection_Demo.html`)
 
 ## Revenue Simulator (Private Tool)
 
@@ -248,13 +249,31 @@ npm run build
 - **Final Calculation**: Net income = Teacher revenue - Room cost TTC
 - **Confidentiality**: Private tool for internal marketing only
 
+### SmartHub Income Protection Policy (NEW - December 2025)
+- **Minimum Hourly Income**: 12 TND/hour guaranteed (average teacher wage in Tunisia)
+- **Automatic Discount**: Up to 35% reduction on room rental when teacher earns below minimum
+- **Smart Calculation**: Accounts for VAT impact (discount HT by X saves teacher X × 1.19 total)
+- **Real-time Application**: Automatic detection and application without paperwork
+- **Transparent Display**: Shows original costs, discount applied, and final savings
+- **Business Philosophy**: Ensures teacher financial security to build long-term partnerships
+- **Financial Capacity**: Based on 8,000 TND monthly target with 2,800 TND discount budget
+
 ### VAT Implementation Details
 **CRITICAL**: VAT is applied to room rental costs, NOT teacher revenue
 - **Step 1**: Calculate monthly room cost HT (hourly rate × total hours)
 - **Step 2**: Calculate VAT amount (room cost HT × 19%)
 - **Step 3**: Calculate room cost TTC (HT + VAT)
 - **Step 4**: Calculate net income (teacher revenue - room cost TTC)
-- **Display**: Shows breakdown of HT, VAT, and TTC for transparency
+- **Step 5**: **NEW - Apply SmartHub protection if hourly income < 12 TND**
+- **Display**: Shows breakdown of HT, VAT, TTC, and any discounts applied for transparency
+
+### Income Protection Calculation Logic
+**CRITICAL**: Discount calculation must account for VAT impact
+- **Detection**: If `netIncome / monthlyHours < 12`, apply discount
+- **Required discount**: `(12 - currentHourlyRate) × monthlyHours ÷ 1.19` (VAT factor)
+- **Discount cap**: Maximum 35% of room cost HT
+- **Final calculation**: New TTC cost = (OriginalHT - Discount) × 1.19
+- **UI display**: Shows original vs discounted costs with percentage saved
 
 ## SmartHub Booking System (NEW - September 2025)
 
@@ -340,6 +359,8 @@ npm run lint                # Must pass without warnings
 - **Premium Design**: Gradient backgrounds and glassmorphism effects throughout
 - **Privacy Compliant**: Lead data via Brevo, no personal data storage on site
 - **Firebase Integration**: Booking system uses Firebase CDN approach (no npm install required)
+- **Income Protection**: CRITICAL - 12 TND/hour minimum guaranteed with automatic up to 35% room discount
+- **Teacher Marketing**: Use income protection as key value proposition in teacher recruitment campaigns
 
 ## NEXT STEPS (To Complete Email Notifications)
 

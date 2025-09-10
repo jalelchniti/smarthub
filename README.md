@@ -16,8 +16,9 @@ Visitez `http://localhost:5173`
 - **Styling**: Tailwind CSS 3.4 avec thème personnalisé
 - **Routage**: React Router DOM 7.8
 - **Icons**: Lucide React
+- **Base de données**: Firebase 10.7 Realtime Database (système de réservation)
 - **Déploiement**: Site statique prêt pour tout hébergeur avec configurations serveur incluses
-- **Intégrations**: Formulaires Brevo + Contact WhatsApp
+- **Intégrations**: Formulaires Brevo + Contact WhatsApp + Firebase
 
 ## 📄 Pages Disponibles
 
@@ -26,19 +27,32 @@ Visitez `http://localhost:5173`
 - **Espaces** (`/rooms`) - Location d'espaces de travail (3 salles)
 - **Enseignants** (`/teachers`) - Services et matières enseignées
 - **Apprendre Plus** (`/learn-more`) - Programmes éducatifs détaillés
+- **Système de Réservation** (`/booking`) - Réservation en temps réel des salles avec Firebase
+
+### Pages Privées
+- **Simulateur de Revenus** (`/simulation`) - Outil exclusif enseignants avec garantie de revenu minimum
+- **Inscription Étudiant** (`/register/student`) - Formulaire complet d'inscription
+- **Inscription Enseignant** (`/register/teacher`) - Formulaire complet d'inscription
 
 ### Pages de Remerciement
-- **Étudiant** (`/thank-you/student`) - Confirmation d'inscription étudiant avec navigation React Router
-- **Enseignant** (`/thank-you/teacher`) - Confirmation d'inscription enseignant avec navigation React Router
+- **Étudiant** (`/thank-you/student`) - Confirmation d'inscription étudiant
+- **Enseignant** (`/thank-you/teacher`) - Confirmation d'inscription enseignant
 
 ## 🎯 Fonctionnalités
 
+### Fonctionnalités Principales
 - **Localisation Française**: Contenu entièrement en français
 - **Design Responsive**: Mobile-first avec effets premium glassmorphisme
 - **Intégration WhatsApp**: Contact direct via +216 99 456 059
 - **Formulaires Brevo**: Collecte de leads avec autorépondeurs email
 - **Carte Interactive**: Localisation Google Maps intégrée
 - **9 Matières**: Mathématiques, Physique, Français, Anglais, Sciences Naturelles, Arabe, Informatique, Économie & Gestion, ESP
+
+### 🆕 Nouvelles Fonctionnalités (Décembre 2025)
+- **🛡️ Garantie de Revenu**: 12 TND/heure minimum pour enseignants avec remise automatique jusqu'à 30%
+- **📊 Simulateur Intelligent**: Calcul en temps réel des revenus nets avec protection SmartHub
+- **📅 Système de Réservation**: Réservation multi-utilisateur en temps réel via Firebase
+- **📧 Email de Protection**: Template démonstration de la politique de protection des revenus
 
 ## 🏢 Contexte Professionnel
 
@@ -88,6 +102,11 @@ npm run preview      # Aperçu du build de production
 - **Integration**: Boutons d'appel à l'action sur toutes les pages
 - **Messages Pré-remplis**: Contexte personnalisé selon la page
 
+### Firebase Integration
+- **Système de Réservation**: Base de données temps réel pour réservations de salles
+- **Configuration CDN**: Utilisation des scripts CDN Firebase (pas d'installation npm requise)
+- **Variables d'Environnement**: Configuration via fichier `.env` pour clés API
+
 ## 📁 Structure du Projet
 
 ```
@@ -109,6 +128,10 @@ src/
 │   ├── Rooms.tsx          # Espaces de travail
 │   ├── Teachers.tsx       # Services enseignants
 │   ├── LearnMore.tsx      # Programmes éducatifs
+│   ├── BookingSystem.tsx  # Système de réservation Firebase
+│   ├── RevenueSimulator.tsx # Simulateur de revenus avec protection
+│   ├── StudentRegistration.tsx # Formulaire d'inscription étudiant
+│   ├── TeacherRegistration.tsx # Formulaire d'inscription enseignant
 │   ├── StudentThankYou.tsx # Page de remerciement étudiant
 │   └── TeacherThankYou.tsx # Page de remerciement enseignant
 ├── App.tsx                # Composant principal
@@ -116,7 +139,12 @@ src/
 
 public/
 ├── images/               # Assets d'images
-└── index.html           # Template HTML
+└── index.html           # Template HTML avec scripts Firebase CDN
+
+docs/
+└── mailing_Lists/        # Templates d'emails
+    ├── Student/          # Autorépondeurs étudiants
+    └── Teacher/          # Emails de protection revenus
 ```
 
 ## 🎨 Design System
@@ -127,7 +155,14 @@ public/
 - **Effets**: Gradients, glassmorphisme, animations hover
 - **Alignement**: Centré par défaut (text-center global)
 
-## 🚀 Améliorations Récentes (Sept 2025)
+## 🚀 Améliorations Récentes (Décembre 2025)
+
+### 🆕 Nouvelles Fonctionnalités Majeures
+- **✅ Politique de Protection Revenus**: Garantie 12 TND/heure minimum pour enseignants
+- **✅ Simulateur Avancé**: Calcul automatique avec remises SmartHub jusqu'à 30%
+- **✅ Système de Réservation**: Firebase Realtime Database avec synchronisation temps réel
+- **✅ Email Marketing Enseignants**: Templates démonstration politique de protection
+- **✅ Détection Intelligente**: Application automatique des remises selon revenus horaires
 
 ### Résolution Complète des Problèmes de Déploiement
 - **✅ Types MIME**: Configuration correcte pour tous fichiers (.js, .css, .svg, .mjs)
@@ -155,24 +190,31 @@ Voir `CLAUDE.md` pour les directives complètes de développement, les règles c
 
 ## 🚦 Status Actuel
 
-✅ **Application Statique Complète & Optimisée**
-- 4 pages principales fonctionnelles
-- Intégration Brevo complète et fonctionnelle pour collecte de leads
-- Formulaires d'inscription simplifiés (3 champs: NOM, PRENOM, EMAIL)
-- Contact WhatsApp intégré (+216 99 456 059)
-- Build de production optimisé avec Vite 7.1
-- Design responsive premium avec glassmorphisme
-- Configuration serveur multi-plateforme (.htaccess, web.config)
-- Résolution complète des problèmes de déploiement
-- Hébergement-agnostique prêt pour production
-- Navigation React Router avec useNavigate() optimisée
-- Tous les builds TypeScript et ESLint réussissent
+✅ **Application Complète avec Fonctionnalités Avancées**
+- **10 pages fonctionnelles** (incluant réservation et simulation)
+- **Politique unique de protection**: 12 TND/heure minimum garanti
+- **Système de réservation temps réel** via Firebase
+- **Simulateur de revenus intelligent** avec remises automatiques
+- **Email marketing avancé** avec templates de protection revenus
+- **Intégration Brevo complète** pour collecte de leads
+- **Contact WhatsApp intégré** (+216 99 456 059)
+- **Build de production optimisé** avec Vite 7.1
+- **Design responsive premium** avec glassmorphisme
+- **Configuration serveur multi-plateforme** (.htaccess, web.config)
+- **Navigation React Router optimisée** avec useNavigate()
+- **Tous les builds TypeScript et ESLint réussissent**
+
+🎯 **Avantages Concurrentiels SmartHub**
+- **Protection financière automatique** des enseignants
+- **Transparence totale** des coûts et remises
+- **Réservation en temps réel** multi-utilisateur
+- **Calculs intelligents** tenant compte de la TVA tunisienne
 
 ❌ **Fonctionnalités Futures** (non implémentées)
-- Backend API
-- Système d'authentification
-- Dashboards administrateur
-- Fonctionnalités temps réel
+- Backend API avec authentification
+- Dashboards administrateur avancés
+- Notifications email automatiques via Brevo
+- Système de paiement intégré
 
 ---
 

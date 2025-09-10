@@ -16,6 +16,13 @@ interface SimulationResult {
   netMonthlyIncome: number;
   weeklyHours: number;
   totalStudents: number;
+  hourlyIncome: number;
+  minimumHourlyIncome: number;
+  roomDiscount: number;
+  discountedRoomCostHT: number;
+  discountedRoomCostTTC: number;
+  discountedVatAmount: number;
+  discountApplied: boolean;
 }
 
 // Room data from Rooms.tsx
@@ -87,20 +94,68 @@ export const RevenueSimulator: React.FC = () => {
       const weeklyHours = sessionHours * sessionsPerWeek;
       const monthlyHours = weeklyHours * 4.33; // Average weeks per month
       
+      // Prevent division by zero
+      if (monthlyHours <= 0) {
+        setResult(null);
+        return;
+      }
+      
       const monthlyRevenue = feePerStudent * studentsPerGroup;
       const monthlyRoomCostHT = roomRate * monthlyHours; // HT = VAT excluded
       const vatAmount = monthlyRoomCostHT * 0.19; // VAT on room cost
       const monthlyRoomCostTTC = monthlyRoomCostHT + vatAmount; // TTC = VAT included
       const netMonthlyIncome = monthlyRevenue - monthlyRoomCostTTC; // Revenue minus TTC room cost
+      
+      // Calculate teacher's net hourly income (after room costs)
+      // This is what the teacher actually takes home per hour worked
+      const teacherNetHourlyIncome = netMonthlyIncome / monthlyHours;
+      const minimumHourlyIncome = 12; // TND per hour - SmartHub policy (net take-home)
+      
+      let roomDiscount = 0;
+      let discountedRoomCostHT = monthlyRoomCostHT;
+      let discountedVatAmount = vatAmount;
+      let discountedRoomCostTTC = monthlyRoomCostTTC;
+      let finalNetIncome = netMonthlyIncome;
+      let discountApplied = false;
+      
+      // If teacher's net hourly income is below minimum, apply discount up to 35%
+      if (teacherNetHourlyIncome < minimumHourlyIncome) {
+        const requiredAdditionalIncome = (minimumHourlyIncome - teacherNetHourlyIncome) * monthlyHours;
+        const maxDiscountAmountHT = monthlyRoomCostHT * 0.35; // Maximum 35% discount on HT cost
+        
+        // Calculate the required HT discount to achieve the target additional income
+        // Since VAT is 19%, reducing HT by X saves teacher X * 1.19 total
+        const requiredHTDiscount = requiredAdditionalIncome / 1.19; // Account for VAT savings
+        
+        // Apply discount (limited to maximum 35% of HT cost)
+        const discountAmountHT = Math.min(requiredHTDiscount, maxDiscountAmountHT);
+        
+        // Only apply discount if it's meaningful (> 0.01 TND)
+        if (discountAmountHT > 0.01 && monthlyRoomCostHT > 0) {
+          roomDiscount = (discountAmountHT / monthlyRoomCostHT) * 100; // Percentage
+          discountedRoomCostHT = monthlyRoomCostHT - discountAmountHT;
+          discountedVatAmount = discountedRoomCostHT * 0.19;
+          discountedRoomCostTTC = discountedRoomCostHT + discountedVatAmount;
+          finalNetIncome = monthlyRevenue - discountedRoomCostTTC;
+          discountApplied = true;
+        }
+      }
 
       setResult({
         monthlyRevenue,
         monthlyRoomCostHT,
         monthlyRoomCostTTC,
         vatAmount,
-        netMonthlyIncome,
+        netMonthlyIncome: finalNetIncome,
         weeklyHours,
-        totalStudents: studentsPerGroup
+        totalStudents: studentsPerGroup,
+        hourlyIncome: finalNetIncome / monthlyHours,
+        minimumHourlyIncome,
+        roomDiscount,
+        discountedRoomCostHT,
+        discountedRoomCostTTC,
+        discountedVatAmount,
+        discountApplied
       });
     } else {
       setResult(null);
@@ -326,19 +381,44 @@ export const RevenueSimulator: React.FC = () => {
                         <span className="text-xl font-bold text-green-600">+{result.monthlyRevenue.toFixed(0)} TND</span>
                       </div>
                       
+                      {/* SmartHub Discount Section */}
+                      {result.discountApplied && (
+                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-4">
+                          <div className="text-center mb-3">
+                            <span className="text-lg font-bold text-blue-700">🎁 Remise SmartHub Appliquée</span>
+                          </div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-600">Tarif salle original HT:</span>
+                              <span className="line-through text-gray-500">{result.monthlyRoomCostHT.toFixed(0)} TND</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-blue-700 font-medium">Remise appliquée ({result.roomDiscount.toFixed(1)}%):</span>
+                              <span className="text-blue-700 font-bold">-{(result.monthlyRoomCostHT - result.discountedRoomCostHT).toFixed(0)} TND</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
                       <div className="flex justify-between items-center p-4 bg-red-50 rounded-xl">
                         <span className="font-medium text-gray-700">Coût Location Salle HT</span>
-                        <span className="text-xl font-bold text-red-600">-{result.monthlyRoomCostHT.toFixed(0)} TND</span>
+                        <span className="text-xl font-bold text-red-600">
+                          -{(result.discountApplied ? result.discountedRoomCostHT : result.monthlyRoomCostHT).toFixed(0)} TND
+                        </span>
                       </div>
                       
                       <div className="flex justify-between items-center p-4 bg-orange-50 rounded-xl">
                         <span className="font-medium text-gray-700">TVA sur Location (19%)</span>
-                        <span className="text-xl font-bold text-orange-600">-{result.vatAmount.toFixed(0)} TND</span>
+                        <span className="text-xl font-bold text-orange-600">
+                          -{(result.discountApplied ? result.discountedVatAmount : result.vatAmount).toFixed(0)} TND
+                        </span>
                       </div>
 
                       <div className="flex justify-between items-center p-4 bg-red-100 rounded-xl border-2 border-red-200">
                         <span className="font-bold text-gray-800">Coût Location Salle TTC</span>
-                        <span className="text-xl font-bold text-red-700">-{result.monthlyRoomCostTTC.toFixed(0)} TND</span>
+                        <span className="text-xl font-bold text-red-700">
+                          -{(result.discountApplied ? result.discountedRoomCostTTC : result.monthlyRoomCostTTC).toFixed(0)} TND
+                        </span>
                       </div>
                       
                       <div className="border-t-2 border-gray-200 pt-4">
@@ -349,14 +429,47 @@ export const RevenueSimulator: React.FC = () => {
                           </span>
                         </div>
                       </div>
+
+                      {/* Hourly Income Display */}
+                      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-xl p-4">
+                        <div className="flex justify-between items-center">
+                          <span className="text-lg font-bold text-gray-800">Revenu Horaire</span>
+                          <span className="text-2xl font-bold text-orange-600">
+                            {result.hourlyIncome.toFixed(1)} TND/h
+                          </span>
+                        </div>
+                        <div className="text-center mt-2">
+                          <span className="text-sm text-gray-600">
+                            Minimum garanti SmartHub: {result.minimumHourlyIncome} TND/h
+                          </span>
+                        </div>
+                      </div>
                     </div>
 
                     {/* Profitability Indicator */}
                     <div className="mt-6">
                       {result.netMonthlyIncome > 0 ? (
-                        <div className="flex items-center justify-center space-x-2 text-green-600 bg-green-50 rounded-xl p-4">
-                          <CheckCircle className="w-6 h-6" />
-                          <span className="font-semibold">Configuration Profitable</span>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-center space-x-2 text-green-600 bg-green-50 rounded-xl p-4">
+                            <CheckCircle className="w-6 h-6" />
+                            <span className="font-semibold">Configuration Profitable</span>
+                          </div>
+                          {result.hourlyIncome >= result.minimumHourlyIncome ? (
+                            <div className="flex items-center justify-center space-x-2 text-blue-600 bg-blue-50 rounded-xl p-3">
+                              <CheckCircle className="w-5 h-5" />
+                              <span className="font-medium">Revenu horaire optimal atteint</span>
+                            </div>
+                          ) : result.discountApplied ? (
+                            <div className="flex items-center justify-center space-x-2 text-purple-600 bg-purple-50 rounded-xl p-3">
+                              <CheckCircle className="w-5 h-5" />
+                              <span className="font-medium">SmartHub vous soutient avec une remise</span>
+                            </div>
+                          ) : (
+                            <div className="flex items-center justify-center space-x-2 text-orange-600 bg-orange-50 rounded-xl p-3">
+                              <AlertCircle className="w-5 h-5" />
+                              <span className="font-medium">Revenu horaire en dessous du minimum</span>
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <div className="flex items-center justify-center space-x-2 text-red-600 bg-red-50 rounded-xl p-4">
@@ -394,14 +507,16 @@ export const RevenueSimulator: React.FC = () => {
                   <li>• TVA = 19% sur coût location salle</li>
                   <li>• Coût final = Location TTC (HT + TVA)</li>
                   <li>• Tarifs salles selon capacité</li>
+                  <li>• Remise SmartHub jusqu'à 35% si nécessaire</li>
                 </ul>
               </div>
               <div className="bg-white bg-opacity-10 rounded-2xl p-6 backdrop-blur-sm">
-                <h4 className="font-bold text-xl mb-4 text-center text-green-300">Recommandations</h4>
+                <h4 className="font-bold text-xl mb-4 text-center text-green-300">Politique SmartHub</h4>
                 <ul className="text-sm text-gray-200 space-y-2 text-center">
-                  <li>• Frais étudiants: 120 TND/mois</li>
+                  <li>• Revenu minimum garanti: 12 TND/heure</li>
+                  <li>• Remise automatique si revenu insuffisant</li>
+                  <li>• Frais étudiants recommandés: 120 TND/mois</li>
                   <li>• Groupes 6-8 étudiants optimal</li>
-                  <li>• Planifiez 2-3 séances/semaine</li>
                   <li>• Contactez-nous pour réserver</li>
                 </ul>
               </div>

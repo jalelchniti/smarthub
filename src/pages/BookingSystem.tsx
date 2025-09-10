@@ -82,12 +82,6 @@ export const BookingSystem: React.FC = () => {
           throw new Error('Firebase initialization failed');
         }
         
-        // Force update Firebase structure to new format
-        const structureUpdated = await FirebaseBookingService.forceUpdateStructure();
-        if (!structureUpdated) {
-          console.warn('Failed to update Firebase structure, proceeding with existing data');
-        }
-        
         console.log('Firebase initialized, loading booking data...');
         
         // Load booking data
