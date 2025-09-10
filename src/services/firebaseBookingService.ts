@@ -4,6 +4,15 @@
 
 import { database, initializeFirebase } from '../config/firebase';
 
+// Fee calculation interface
+interface FeeCalculation {
+  subtotalHT: number; // Amount before VAT
+  vatAmount: number; // 19% VAT amount
+  totalTTC: number; // Total with VAT included
+  hourlyRate: number; // Rate per hour for this booking
+  vatRate: number; // VAT rate used (0.19)
+}
+
 // Booking interfaces
 interface Booking {
   id?: string;
@@ -17,6 +26,8 @@ interface Booking {
   contactInfo: string;
   bookingDate: string;
   createdBy?: string; // Teacher identifier
+  feeCalculation?: FeeCalculation; // Fee breakdown
+  paymentStatus?: 'pending' | 'paid' | 'cancelled'; // Payment tracking
 }
 
 interface BookingData {
@@ -62,8 +73,72 @@ const getDefaultBookingData = (): BookingData => ({
   lastUpdated: new Date().toISOString()
 });
 
+// Export interfaces for use in components
+export type { Booking, BookingData, FeeCalculation };
+
 export class FirebaseBookingService {
   private static initialized = false;
+
+  // Room pricing data (synchronized with Rooms.tsx)
+  private static roomPricing = [
+    {
+      roomId: '1',
+      pricing: [
+        { capacity: 'Individuel (1 apprenant)', rate: 20, minStudents: 1, maxStudents: 1 },
+        { capacity: '2-6 personnes', rate: 25, minStudents: 2, maxStudents: 6 },
+        { capacity: '7-9 personnes', rate: 30, minStudents: 7, maxStudents: 9 },
+        { capacity: '10-15 personnes', rate: 35, minStudents: 10, maxStudents: 15 }
+      ]
+    },
+    {
+      roomId: '2',
+      pricing: [
+        { capacity: 'Individuel (1 apprenant)', rate: 15, minStudents: 1, maxStudents: 1 },
+        { capacity: '2-7 personnes', rate: 20, minStudents: 2, maxStudents: 7 },
+        { capacity: '8-9 personnes', rate: 25, minStudents: 8, maxStudents: 9 }
+      ]
+    },
+    {
+      roomId: '3',
+      pricing: [
+        { capacity: 'Individuel (1 apprenant)', rate: 15, minStudents: 1, maxStudents: 1 },
+        { capacity: '2-7 personnes', rate: 20, minStudents: 2, maxStudents: 7 },
+        { capacity: '8-9 personnes', rate: 25, minStudents: 8, maxStudents: 9 }
+      ]
+    }
+  ];
+
+  // VAT rate (Tunisia standard rate)
+  private static VAT_RATE = 0.19;
+
+  // Calculate hourly rate based on room and student count
+  static getHourlyRate(roomId: string, studentCount: number): number {
+    const roomPricingData = this.roomPricing.find(room => room.roomId === roomId);
+    if (!roomPricingData) return 0;
+
+    // Find the appropriate pricing tier
+    const tier = roomPricingData.pricing.find(
+      p => studentCount >= p.minStudents && studentCount <= p.maxStudents
+    );
+
+    return tier ? tier.rate : roomPricingData.pricing[roomPricingData.pricing.length - 1].rate;
+  }
+
+  // Calculate fee breakdown for a booking
+  static calculateBookingFees(roomId: string, studentCount: number, duration: number): FeeCalculation {
+    const hourlyRate = this.getHourlyRate(roomId, studentCount);
+    const subtotalHT = hourlyRate * duration;
+    const vatAmount = subtotalHT * this.VAT_RATE;
+    const totalTTC = subtotalHT + vatAmount;
+
+    return {
+      subtotalHT,
+      vatAmount,
+      totalTTC,
+      hourlyRate,
+      vatRate: this.VAT_RATE
+    };
+  }
 
   // Initialize Firebase database with default data if needed
   static async initialize(): Promise<boolean> {
@@ -134,11 +209,16 @@ export class FirebaseBookingService {
       const bookingsRef = database.ref('bookings');
       const newBookingRef = bookingsRef.push();
       
+      // Calculate fees for this booking
+      const feeCalculation = this.calculateBookingFees(booking.roomId, booking.studentCount, booking.duration);
+
       const bookingWithId: Booking = {
         ...booking,
         id: newBookingRef.key!,
         bookingDate: new Date().toISOString(),
-        createdBy: booking.teacherName // Simple teacher identification
+        createdBy: booking.teacherName, // Simple teacher identification
+        feeCalculation, // Store fee breakdown
+        paymentStatus: 'pending' // Default payment status
       };
       
       await newBookingRef.set(bookingWithId);
@@ -278,6 +358,88 @@ export class FirebaseBookingService {
     } catch (error) {
       console.error('Failed to clear bookings:', error);
       return false;
+    }
+  }
+
+  // Bulk delete multiple bookings (admin function)
+  static async bulkDeleteBookings(bookingIds: string[]): Promise<{ success: boolean; deletedCount: number; errors: string[] }> {
+    if (!initializeFirebase() || !database) {
+      return { success: false, deletedCount: 0, errors: ['Firebase not available'] };
+    }
+
+    const errors: string[] = [];
+    let deletedCount = 0;
+
+    try {
+      const bookingsRef = database.ref('bookings');
+      
+      // Create batch updates object
+      const updates: Record<string, null> = {};
+      
+      for (const bookingId of bookingIds) {
+        updates[bookingId] = null; // Setting to null deletes the key
+      }
+      
+      // Execute batch delete
+      await bookingsRef.update(updates);
+      deletedCount = bookingIds.length;
+      
+      // Update last modified timestamp
+      await database.ref('lastUpdated').set(new Date().toISOString());
+      
+      return { success: true, deletedCount, errors };
+    } catch (error) {
+      console.error('Failed to bulk delete bookings:', error);
+      errors.push(error instanceof Error ? error.message : 'Unknown error occurred');
+      return { success: false, deletedCount, errors };
+    }
+  }
+
+  // Update booking payment status (admin function)
+  static async updatePaymentStatus(bookingId: string, status: 'pending' | 'paid' | 'cancelled'): Promise<boolean> {
+    if (!initializeFirebase() || !database) {
+      return false;
+    }
+
+    try {
+      const bookingRef = database.ref(`bookings/${bookingId}/paymentStatus`);
+      await bookingRef.set(status);
+      
+      // Update last modified timestamp
+      await database.ref('lastUpdated').set(new Date().toISOString());
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to update payment status:', error);
+      return false;
+    }
+  }
+
+  // Get bookings by payment status (admin function)
+  static async getBookingsByStatus(status: 'pending' | 'paid' | 'cancelled'): Promise<Booking[]> {
+    if (!initializeFirebase() || !database) {
+      return [];
+    }
+
+    try {
+      const bookingsRef = database.ref('bookings');
+      const snapshot = await bookingsRef.once('value');
+      
+      if (snapshot.exists()) {
+        const bookings = snapshot.val();
+        
+        const bookingsArray = Object.entries(bookings as Record<string, Booking>)
+          .map(([id, booking]) => ({ ...booking, id }));
+        
+        return bookingsArray.filter((booking: Booking) => 
+          (booking.paymentStatus || 'pending') === status
+        );
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Failed to get bookings by status:', error);
+      return [];
     }
   }
 

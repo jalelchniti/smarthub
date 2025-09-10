@@ -11,6 +11,11 @@ import StudentRegistration from './pages/StudentRegistration';
 import TeacherRegistration from './pages/TeacherRegistration';
 import { RevenueSimulator } from './pages/RevenueSimulator';
 import { BookingSystem } from './pages/BookingSystem';
+import { AdminBookings } from './pages/AdminBookings';
+import { AdminLogin } from './pages/AdminLogin';
+import { SecureAdminBookings } from './pages/SecureAdminBookings';
+import { FirebaseAdminLogin } from './pages/FirebaseAdminLogin';
+import { FirebaseAdminBookings } from './pages/FirebaseAdminBookings';
 
 function App() {
   return (
@@ -25,6 +30,17 @@ function App() {
         
         {/* Private Booking System page - hidden from public navigation */}
         <Route path="/booking" element={<BookingSystem />} />
+        
+        {/* Admin Login pages - secure authentication */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/firebase-login" element={<FirebaseAdminLogin />} />
+        
+        {/* Secure Admin Bookings Management pages - protected routes */}
+        <Route path="/admin/bookings" element={<SecureAdminBookings />} />
+        <Route path="/admin/firebase-bookings" element={<FirebaseAdminBookings />} />
+        
+        {/* Legacy Admin Bookings page - for reference */}
+        <Route path="/admin/legacy" element={<AdminBookings />} />
         
         {/* Registration pages with their own navigation/footer */}
         <Route path="/register/student" element={<StudentRegistration />} />

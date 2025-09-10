@@ -16,11 +16,35 @@ declare global {
         ref: (path?: string) => {
           once: (eventType: string) => Promise<{ exists: () => boolean; val: () => unknown }>;
           set: (value: unknown) => Promise<void>;
+          update: (updates: Record<string, unknown>) => Promise<void>;
           push: () => { key: string; set: (value: unknown) => Promise<void> };
           remove: () => Promise<void>;
           on: (eventType: string, callback: (snapshot: { exists: () => boolean; val: () => unknown }) => void) => unknown;
           off: (eventType: string, callback: unknown) => void;
         };
+      };
+      auth: () => {
+        signInWithEmailAndPassword: (email: string, password: string) => Promise<{
+          user: {
+            uid: string;
+            email: string;
+            displayName?: string;
+            customClaims?: Record<string, unknown>;
+          };
+        }>;
+        signOut: () => Promise<void>;
+        onAuthStateChanged: (callback: (user: {
+          uid: string;
+          email: string;
+          displayName?: string;
+          customClaims?: Record<string, unknown>;
+        } | null) => void) => () => void;
+        currentUser: {
+          uid: string;
+          email: string;
+          displayName?: string;
+          customClaims?: Record<string, unknown>;
+        } | null;
       };
     };
   }
@@ -40,6 +64,7 @@ const firebaseConfig = {
 // Initialize Firebase using CDN
 let app: unknown;
 let database: ReturnType<Window['firebase']['database']> | null = null;
+let auth: ReturnType<Window['firebase']['auth']> | null = null;
 
 const initializeFirebase = () => {
   if (typeof window !== 'undefined' && window.firebase) {
@@ -50,6 +75,9 @@ const initializeFirebase = () => {
       }
       if (!database) {
         database = window.firebase.database();
+      }
+      if (!auth) {
+        auth = window.firebase.auth();
       }
       return true;
     } catch (error) {
@@ -63,5 +91,5 @@ const initializeFirebase = () => {
 // Initialize on module load
 const isFirebaseAvailable = initializeFirebase();
 
-export { database, initializeFirebase, isFirebaseAvailable };
+export { database, auth, initializeFirebase, isFirebaseAvailable };
 export default app;

@@ -1,38 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Users, XCircle, MapPin, Building, Save, RotateCcw, ChevronLeft, ChevronRight, Calendar, Clock, AlertCircle, Calculator, TrendingUp } from 'lucide-react';
-import { FirebaseBookingService } from '../services/firebaseBookingService';
-
-interface Booking {
-  id?: string;
-  roomId: string;
-  date: string; // YYYY-MM-DD format
-  timeSlot: string;
-  teacherName: string;
-  subject: string;
-  studentCount: number;
-  duration: number;
-  contactInfo: string;
-  bookingDate: string;
-}
-
-interface BookingData {
-  rooms: {
-    [roomId: string]: {
-      name: string;
-      capacity: number;
-    };
-  };
-  bookings: {
-    [bookingId: string]: Booking;
-  };
-  timeSlots: {
-    weekdays: string[];
-    sunday: string[];
-  };
-  weekDays: string[];
-  startDate: string;
-  lastUpdated: string;
-}
+import { FirebaseBookingService, type Booking, type BookingData, type FeeCalculation } from '../services/firebaseBookingService';
 
 interface BookingFormData {
   teacherName: string;
@@ -42,16 +10,7 @@ interface BookingFormData {
   contactInfo: string;
 }
 
-interface RoomPricing {
-  roomId: string;
-  pricing: { capacity: string; rate: number; minStudents: number; maxStudents: number }[];
-}
-
-interface FeeCalculation {
-  subtotalHT: number;
-  vatAmount: number;
-  totalTTC: number;
-  hourlyRate: number;
+interface ExtendedFeeCalculation extends FeeCalculation {
   totalHours: number;
   studentCount: number;
   roomName: string;
@@ -85,53 +44,9 @@ export const BookingSystem: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  // Room pricing data (synchronized with Rooms.tsx)
-  const roomPricing: RoomPricing[] = [
-    {
-      roomId: '1',
-      pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 20, minStudents: 1, maxStudents: 1 },
-        { capacity: '2-6 personnes', rate: 25, minStudents: 2, maxStudents: 6 },
-        { capacity: '7-9 personnes', rate: 30, minStudents: 7, maxStudents: 9 },
-        { capacity: '10-15 personnes', rate: 35, minStudents: 10, maxStudents: 15 }
-      ]
-    },
-    {
-      roomId: '2',
-      pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 15, minStudents: 1, maxStudents: 1 },
-        { capacity: '2-7 personnes', rate: 20, minStudents: 2, maxStudents: 7 },
-        { capacity: '8-9 personnes', rate: 25, minStudents: 8, maxStudents: 9 }
-      ]
-    },
-    {
-      roomId: '3',
-      pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 15, minStudents: 1, maxStudents: 1 },
-        { capacity: '2-7 personnes', rate: 20, minStudents: 2, maxStudents: 7 },
-        { capacity: '8-9 personnes', rate: 25, minStudents: 8, maxStudents: 9 }
-      ]
-    }
-  ];
 
-  // VAT rate (Tunisia standard rate)
-  const VAT_RATE = 0.19;
-
-  // Calculate hourly rate based on room and student count
-  const getHourlyRate = (roomId: string, studentCount: number): number => {
-    const roomPricingData = roomPricing.find(room => room.roomId === roomId);
-    if (!roomPricingData) return 0;
-
-    // Find the appropriate pricing tier
-    const tier = roomPricingData.pricing.find(
-      p => studentCount >= p.minStudents && studentCount <= p.maxStudents
-    );
-
-    return tier ? tier.rate : roomPricingData.pricing[roomPricingData.pricing.length - 1].rate;
-  };
-
-  // Calculate total fees for bookings
-  const calculateFees = (): FeeCalculation | null => {
+  // Calculate total fees for bookings using Firebase service
+  const calculateFees = (): ExtendedFeeCalculation | null => {
     if (!bookingData || !selectedRoom) return null;
 
     const bookingsToCalculate = selectedTimeSlots.length > 0 ? selectedTimeSlots : 
@@ -139,18 +54,23 @@ export const BookingSystem: React.FC = () => {
 
     if (bookingsToCalculate.length === 0) return null;
 
-    const hourlyRate = getHourlyRate(selectedRoom, formData.studentCount);
+    // Use Firebase service for consistent fee calculation
+    const baseFeeCalculation = FirebaseBookingService.calculateBookingFees(
+      selectedRoom, 
+      formData.studentCount, 
+      formData.duration
+    );
+
     const totalHours = bookingsToCalculate.length * formData.duration;
-    
-    const subtotalHT = hourlyRate * totalHours;
-    const vatAmount = subtotalHT * VAT_RATE;
-    const totalTTC = subtotalHT + vatAmount;
+    const totalSubtotalHT = baseFeeCalculation.subtotalHT * bookingsToCalculate.length;
+    const totalVatAmount = baseFeeCalculation.vatAmount * bookingsToCalculate.length;
+    const totalTTC = baseFeeCalculation.totalTTC * bookingsToCalculate.length;
 
     return {
-      subtotalHT,
-      vatAmount,
+      ...baseFeeCalculation,
+      subtotalHT: totalSubtotalHT,
+      vatAmount: totalVatAmount,
       totalTTC,
-      hourlyRate,
       totalHours,
       studentCount: formData.studentCount,
       roomName: bookingData.rooms[selectedRoom].name,
@@ -1318,23 +1238,16 @@ export const BookingSystem: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Pricing Tier Information */}
+                    {/* Current Rate Information */}
                     <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                      <h5 className="font-semibold text-blue-900 mb-2">Tarification par Capacité</h5>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                        {roomPricing.find(room => room.roomId === selectedRoom)?.pricing.map((tier, index) => (
-                          <div 
-                            key={index}
-                            className={`p-2 rounded ${
-                              formData.studentCount >= tier.minStudents && formData.studentCount <= tier.maxStudents
-                                ? 'bg-blue-200 border border-blue-400 font-bold'
-                                : 'bg-white border border-blue-100'
-                            }`}
-                          >
-                            <div className="text-xs text-blue-700">{tier.capacity}</div>
-                            <div className="font-semibold text-blue-800">{tier.rate} TND/h</div>
-                          </div>
-                        ))}
+                      <h5 className="font-semibold text-blue-900 mb-2">Tarif Actuel</h5>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-blue-800">
+                          {FirebaseBookingService.getHourlyRate(selectedRoom, formData.studentCount)} TND/h
+                        </div>
+                        <div className="text-sm text-blue-600">
+                          Pour {formData.studentCount} étudiant{formData.studentCount > 1 ? 's' : ''}
+                        </div>
                       </div>
                     </div>
                   </div>

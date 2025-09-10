@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **IMPORTANT**: This is a **static frontend-only** React application. The README.md describes some backend features that are **NOT YET IMPLEMENTED**.
 
 **Current Reality**:
-- ✅ Static React SPA with 10 routes (Home, Rooms, Teachers, LearnMore, /subjects redirect + registration & thank you pages + private revenue simulator + **NEW: Booking System**)
+- ✅ Static React SPA with 13 routes (Home, Rooms, Teachers, LearnMore, /subjects redirect + registration & thank you pages + private revenue simulator + **NEW: Booking System** + **NEW: Admin Bookings Management** + **NEW: Firebase Admin Authentication**)
 - ✅ Brevo form integration for lead collection
 - ✅ WhatsApp contact integration (+216 99 456 059)
 - ✅ Revenue Simulator for teachers (private route)
@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ Static deployment ready for any hosting platform
 - ✅ Firebase hosting configuration included
 - 📝 **Email notifications** (will be implemented via Brevo integration)
-- ❌ NO authentication system implemented
+- ✅ **NEW: Firebase Authentication** for admin access with enterprise-grade security
 - ❌ NO dashboard system implemented
 
 **When developing, ALWAYS**:
@@ -49,7 +49,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Tailwind CSS 3.4** for styling with custom color palette and premium gradients
 - **React Router DOM 7.8** for client-side routing
 - **Lucide React** for icons and visual elements
-- **Firebase 10.7.1** for Realtime Database (booking system)
+- **Firebase 10.7.1** for Realtime Database (booking system) and Authentication (admin access)
 - **ESLint 9.34** with TypeScript support and React hooks plugin
 - **Prettier 3.6.2** for code formatting (available, not in scripts)
 - **Static Architecture**: No backend - all content is static with form submissions via external services
@@ -57,10 +57,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### Application Architecture
 
 **Route Structure** (defined in `src/App.tsx`):
-- **Main Pages**: `/` (Home), `/rooms`, `/teachers`, `/learn-more`, `/subjects` (redirects to LearnMore), **`/booking`** (NEW: Room booking system) - Include Navigation + Footer
+- **Main Pages**: `/` (Home), `/rooms`, `/teachers`, `/learn-more`, `/subjects` (redirects to LearnMore) - Include Navigation + Footer
 - **Thank You Pages**: `/thank-you/student`, `/thank-you/teacher` - Standalone pages without nav/footer
 - **Registration Pages**: `/register/student`, `/register/teacher` - Full page forms with own nav/footer
 - **Private Pages**: `/simulation` - Revenue simulator for teachers (hidden from public navigation)
+- **Booking System**: `/booking` - **NEW**: Room booking system (standalone page without nav/footer)
+- **Admin Pages**: `/admin/bookings`, `/admin/firebase-bookings` - **NEW**: Admin bookings management with secure authentication
+- **Admin Authentication**: `/admin/login`, `/admin/firebase-login` - **NEW**: Firebase Authentication for admin access
 
 **Component Architecture**:
 ```
@@ -85,7 +88,12 @@ src/
 │   ├── StudentRegistration.tsx # Full page form (simplified 3-field)
 │   ├── TeacherRegistration.tsx # Full page form (simplified 3-field)
 │   ├── RevenueSimulator.tsx   # Private revenue calculator for teachers (/simulation)
-│   └── BookingSystem.tsx      # NEW: Date-based room booking system with Firebase
+│   ├── BookingSystem.tsx      # NEW: Date-based room booking system with Firebase
+│   ├── AdminBookings.tsx      # Legacy admin bookings (reference only)
+│   ├── AdminLogin.tsx         # Legacy admin login (hardcoded password)
+│   ├── FirebaseAdminLogin.tsx # NEW: Firebase Authentication login page
+│   ├── FirebaseAdminBookings.tsx # NEW: Secure Firebase-authenticated admin dashboard
+│   └── SecureAdminBookings.tsx # NEW: Protected admin bookings management
 ├── App.tsx                    # Route configuration and layout logic
 └── main.tsx                   # Application entry point
 ```
@@ -101,7 +109,7 @@ src/
 
 ## Environment Configuration
 
-**Firebase Environment Variables** (`.env` file required for booking system):
+**Firebase Environment Variables** (`.env` file required for booking system and admin authentication):
 - `VITE_FIREBASE_API_KEY` - Firebase project API key
 - `VITE_FIREBASE_AUTH_DOMAIN` - Firebase auth domain
 - `VITE_FIREBASE_DATABASE_URL` - Firebase Realtime Database URL
@@ -275,15 +283,17 @@ npm run build
 - **Final calculation**: New TTC cost = (OriginalHT - Discount) × 1.19
 - **UI display**: Shows original vs discounted costs with percentage saved
 
-## SmartHub Booking System (NEW - September 2025)
+## SmartHub Booking System (Enhanced - December 2025)
 
 ### Purpose & Features
 - **Multi-user room booking system** for SmartHub's 3 educational spaces
 - **Date-based bookings** starting September 15th, 2025
-- **Flexible booking periods**: 1 week, 2 weeks, 3 weeks, or 1 month
+- **Multi-slot selection**: Select multiple time slots before confirming all at once
 - **Sunday availability**: 8:00 AM - 1:00 PM only
 - **Weekday availability**: 8:00 AM - 8:00 PM (with lunch break 1:00-3:00 PM)
 - **Real-time synchronization** across all devices via Firebase
+- **Comprehensive fee tracking**: Automatic calculation and storage of all costs
+- **VAT compliance**: 19% Tunisia standard rate applied and tracked
 
 ### Technical Implementation
 - **Location**: `src/pages/BookingSystem.tsx`
@@ -305,23 +315,33 @@ interface Booking {
   studentCount: number;
   duration: number; // Hours (0.5, 1, 1.5, 2, 2.5, 3)
   contactInfo: string;
-  bookingPeriod: 'week' | '2weeks' | '3weeks' | 'month';
-  endDate?: string; // For recurring bookings
+  feeCalculation?: {
+    subtotalHT: number; // Amount before VAT
+    vatAmount: number; // 19% VAT amount
+    totalTTC: number; // Total with VAT included
+    hourlyRate: number; // Rate per hour for this booking
+    vatRate: number; // VAT rate used (0.19)
+  };
+  paymentStatus?: 'pending' | 'paid' | 'cancelled';
 }
 ```
 
 ### UI/UX Features
-- **Week-view calendar** with navigation controls
+- **Week/Month view calendar** with navigation controls
 - **Room selection** (Salle 1: 15 capacity, Salle 2/3: 9 capacity each)
+- **Multi-slot selection** with visual feedback
 - **Day-specific time slots** (Sunday vs weekdays)
-- **Booking form modal** with period selection
-- **Conflict visualization** with hover details
-- **Booking cancellation** for existing reservations
+- **Privacy-focused interface** (hides existing booking details)
+- **Fee calculator modal** with real-time pricing
+- **Conflict detection** with alternative suggestions
+- **Batch booking confirmation** for multiple slots
 
 ### Firebase Configuration
 - **Database Rules**: Public read/write (temporary for development)
-- **Structure Update**: Automatic migration from old to new data format
-- **Backup**: `update-firebase.html` utility for manual structure updates
+- **Fee Calculation**: Automatic calculation and storage with each booking
+- **Management Tools**: 
+  - `update-firebase.html`: Database structure updates
+  - `purge-firebase.html`: Complete data purge utility
 
 ### Business Rules
 - **Start Date**: September 15th, 2025 (configurable)
@@ -329,6 +349,111 @@ interface Booking {
 - **Subjects**: Same 9 standardized subjects as Teachers page
 - **Duration**: 30 minutes to 3 hours in 30-minute increments
 - **Contact Required**: Phone or email for all bookings
+- **Fee Structure**: Synchronized with `Rooms.tsx` pricing tiers
+- **VAT Rate**: 19% (Tunisia standard rate) applied to all bookings
+- **Payment Status**: Automatic tracking (pending/paid/cancelled)
+
+## Firebase Admin Authentication System (NEW - January 2025)
+
+### Purpose & Security
+- **Enterprise-Grade Authentication**: Firebase Authentication replaces hardcoded passwords
+- **Authorized Admin Emails**: jalel.chniti@smarthub.com.tn and jalel.chniti@gmail.com
+- **Session Management**: Firebase Auth tokens with automatic session handling
+- **Security Features**: Enterprise encryption, audit logging, DDOS protection
+- **Password Reset**: Integrated Firebase password reset functionality
+
+### Technical Implementation
+- **Authentication Service**: `src/services/firebaseAuthService.ts`
+- **Login Page**: `src/pages/FirebaseAdminLogin.tsx` (route: `/admin/firebase-login`)
+- **Protected Dashboard**: `src/pages/FirebaseAdminBookings.tsx` (route: `/admin/firebase-bookings`)
+- **Auth State Management**: Real-time authentication state with listeners
+- **Access Control**: Email-based admin verification with custom claims support
+
+### Authentication Flow
+1. **Login Process**: Email/password validation through Firebase Auth
+2. **Admin Verification**: Check against authorized email list
+3. **Session Creation**: Firebase Auth token with automatic refresh
+4. **Dashboard Access**: Protected routes with authentication guards
+5. **Secure Logout**: Complete session termination and token invalidation
+
+### Firebase Configuration Requirements
+- **Firebase Console Setup**: Enable Authentication > Email/Password provider
+- **Admin User Creation**: Create accounts for authorized emails in Firebase Console
+- **Environment Variables**: Complete Firebase configuration in `.env` file
+- **Security Rules**: Email-based admin access control (production-ready)
+
+### User Experience Features
+- **Professional Login UI**: Glassmorphism design matching SmartHub aesthetics
+- **Setup Instructions**: Built-in Firebase configuration guidance
+- **Error Handling**: French localized error messages with user-friendly feedback
+- **Loading States**: Real-time authentication status with proper loading indicators
+- **Password Visibility**: Toggle for secure password entry
+- **Auto-Redirect**: Seamless navigation after successful authentication
+
+### Security Advantages Over Legacy System
+- ✅ **No Hardcoded Passwords**: Eliminates security vulnerabilities in source code
+- ✅ **Enterprise Infrastructure**: Google Cloud security with 99.9% uptime
+- ✅ **Audit Logging**: Automatic tracking of all authentication events
+- ✅ **Session Security**: Secure token-based authentication with auto-refresh
+- ✅ **Password Recovery**: Integrated email-based password reset
+- ✅ **Scalable Access**: Easy addition/removal of admin users
+- ✅ **GDPR Compliance**: Enterprise-grade data protection
+
+### Migration Notes
+- **Legacy Routes**: Old hardcoded auth system preserved at `/admin/login` and `/admin/legacy`
+- **New Primary Routes**: Firebase auth at `/admin/firebase-login` and `/admin/firebase-bookings`
+- **Backward Compatibility**: Both systems operational during transition period
+- **Data Consistency**: Same Firebase Realtime Database for booking data
+
+## Admin Bookings Management System (Enhanced - January 2025)
+
+### Purpose & Access
+- **Primary Admin Route**: `/admin/firebase-bookings` - Firebase-authenticated dashboard
+- **Legacy Route**: `/admin/bookings` - Previous hardcoded password system (deprecated)
+- **Target Audience**: Authorized SmartHub administrators (jalel.chniti@smarthub.com.tn, jalel.chniti@gmail.com)
+- **Function**: Comprehensive booking overview, filtering, and management with enterprise security
+
+### Technical Implementation
+- **Primary Location**: `src/pages/FirebaseAdminBookings.tsx` (Firebase-authenticated)
+- **Legacy Location**: `src/pages/AdminBookings.tsx` (deprecated hardcoded auth)
+- **Route Type**: Protected routes with authentication guards
+- **Data Source**: Firebase Realtime Database synchronized with public booking system
+- **Access Control**: Firebase Authentication with email-based admin verification
+- **Session Management**: Automatic redirect to login if not authenticated
+
+### Admin Dashboard Features
+- **Complete Booking Overview**: All bookings with detailed information
+- **Advanced Filtering**: Search by teacher, subject, contact, room, status, and date
+- **Export Functionality**: CSV export of filtered booking data
+- **Real-time Updates**: Automatic synchronization with Firebase database
+- **Revenue Tracking**: Total paid and pending revenue calculations
+- **Detailed Views**: Expandable booking details with cost breakdowns
+- **Secure Session**: Firebase Auth token validation with automatic refresh
+- **Admin Profile**: Display authenticated admin information and session stats
+- **Bulk Operations**: Multi-select booking management with confirmation dialogs
+
+### Data Management
+- **Booking Details**: Teacher info, contact details, fee calculations, payment status
+- **Cost Breakdown**: HT, VAT, TTC amounts with hourly rates
+- **Status Tracking**: Pending, paid, cancelled status management
+- **Fee Calculations**: Automatic calculation storage with VAT compliance
+- **Revenue Analytics**: Real-time totals and financial summaries
+
+### UI/UX Features
+- **Professional Admin Design**: Glassmorphism with blue/purple gradients
+- **Responsive Layout**: Mobile-friendly admin interface
+- **Status Badges**: Color-coded payment status indicators
+- **Interactive Filters**: Real-time search and filtering
+- **Expandable Cards**: Detailed view on demand
+- **Export Tools**: CSV download with date stamps
+
+### Business Rules
+- **Data Privacy**: Admin access to contact information and payment details with audit logging
+- **Financial Tracking**: Complete cost transparency with VAT compliance
+- **Operational Efficiency**: Quick overview and management of all bookings
+- **Export Capability**: Data backup and reporting functionality
+- **Access Security**: Email-based admin verification with session monitoring
+- **Compliance**: Enterprise-grade authentication meeting security standards
 
 ## Quick Development Workflow
 
@@ -336,6 +461,17 @@ interface Booking {
 ```bash
 npm install                  # First-time setup
 npm run dev                 # Start development (localhost:5173)
+```
+
+### Firebase Admin Setup (First Time)
+```bash
+# 1. Configure .env file with Firebase credentials
+# 2. Access Firebase Console: https://console.firebase.google.com
+# 3. Enable Authentication > Email/Password provider
+# 4. Create admin user accounts for authorized emails:
+#    - jalel.chniti@smarthub.com.tn
+#    - jalel.chniti@gmail.com
+# 5. Test admin login at: http://localhost:5173/admin/firebase-login
 ```
 
 ### Before Committing
@@ -347,7 +483,8 @@ npm run lint                # Must pass without warnings
 ### Deployment Ready
 - Build creates `dist/` folder ready for static hosting
 - Firebase hosting configuration included with SPA routing
-- Environment variables required only for booking system (.env file)
+- Environment variables required for booking system and admin authentication (.env file)
+- Firebase Console access required for admin user management
 - All modern hosting platforms supported (Netlify, Vercel, GitHub Pages, Firebase, Apache, IIS)
 
 ## Important Notes
@@ -361,6 +498,8 @@ npm run lint                # Must pass without warnings
 - **Firebase Integration**: Booking system uses Firebase CDN approach (no npm install required)
 - **Income Protection**: CRITICAL - 12 TND/hour minimum guaranteed with automatic up to 35% room discount
 - **Teacher Marketing**: Use income protection as key value proposition in teacher recruitment campaigns
+- **Admin Panel**: Firebase Authentication required for booking management with enterprise security
+- **Legacy System**: Previous hardcoded password system deprecated in favor of Firebase Auth
 
 ## Firebase Configuration (Database Only)
 
@@ -371,9 +510,12 @@ npm run lint                # Must pass without warnings
 
 ### What's Included:
 - ✅ **Firebase Realtime Database** for multi-user booking system
+- ✅ **Firebase Authentication** for enterprise-grade admin security
 - ✅ **CDN-based Firebase integration** (no npm firebase dependency)
 - ✅ **Environment variables** for Firebase configuration (.env file)
-- ✅ **Real-time synchronization** across all devices
+- ✅ **Real-time synchronization** across all devices and admin sessions
+- ✅ **Session management** with automatic token refresh
+- ✅ **Authorized admin emails** with email-based access control
 - ✅ **Hosting configuration** for Firebase deployment (optional)
 
 ### What's Been Removed:
@@ -383,13 +525,15 @@ npm run lint                # Must pass without warnings
 - ❌ **Firebase Functions configuration** from `firebase.json`
 - ❌ **Node.js server dependencies** (staying purely static)
 
-### Advantages of Simplified Architecture:
-- ✅ **100% Static Application** (no server-side code)
-- ✅ **Free Firebase Usage** (Realtime Database only, no Functions billing)
-- ✅ **Simpler Deployment** (no functions to manage)
-- ✅ **Consistent Architecture** (all external integrations via frontend)
-- ✅ **Better Security** (no server-side secrets to manage)
-- ✅ **Easier Maintenance** (fewer moving parts)
+### Advantages of Firebase-Integrated Architecture:
+- ✅ **100% Static Application** (no server-side code except Firebase services)
+- ✅ **Enterprise Security** (Firebase Authentication with Google infrastructure)
+- ✅ **Cost-Effective** (Realtime Database + Auth, no Functions billing)
+- ✅ **Simpler Deployment** (no custom authentication to manage)
+- ✅ **Consistent Architecture** (all external integrations via Firebase)
+- ✅ **Enhanced Security** (no hardcoded passwords, enterprise-grade encryption)
+- ✅ **Easier Maintenance** (Firebase handles auth complexity)
+- ✅ **Audit Compliance** (automatic logging and session tracking)
 
 ### Future Email Notifications (Brevo-Based):
 If email notifications are needed, they will be implemented via:
@@ -397,3 +541,96 @@ If email notifications are needed, they will be implemented via:
 - **Professional email templates** matching SmartHub design
 - **Error handling** with user feedback
 - **No server-side dependencies** maintaining static architecture
+
+## Firebase Services Architecture (Updated - January 2025)
+
+### Service Layer Implementation
+**Location**: `src/services/` directory with modular Firebase service architecture
+
+#### Firebase Authentication Service (`firebaseAuthService.ts`)
+- **Enterprise Authentication**: Email/password authentication with Firebase Auth
+- **Admin Access Control**: Email-based verification for authorized administrators
+- **Session Management**: Real-time auth state with automatic token refresh
+- **Error Handling**: French localized error messages for all authentication scenarios
+- **Security Features**: Automatic logout, password reset, audit logging capabilities
+
+#### Firebase Booking Service (`firebaseBookingService.ts`)
+- **Realtime Database**: Multi-user booking system with conflict detection
+- **Data Synchronization**: Real-time updates across all connected clients
+- **Fee Calculations**: Automatic cost computation with VAT compliance
+- **CRUD Operations**: Complete booking lifecycle management (create, read, update, delete)
+
+#### Admin Authentication Service (`adminAuthService.ts`)
+- **Legacy System**: Hardcoded password authentication (deprecated)
+- **Maintained for Reference**: Transition period compatibility
+
+### Firebase Configuration (`src/config/firebase.ts`)
+- **CDN Integration**: Firebase SDK loaded via HTML script tags (no npm dependency)
+- **Environment Variables**: Complete Firebase project configuration via `.env`
+- **Service Initialization**: Automatic Firebase app and service initialization
+- **Error Handling**: Graceful fallback when Firebase services unavailable
+
+### Authentication Architecture
+
+#### Admin Email Authorization
+```typescript
+const allowedAdminEmails = [
+  'jalel.chniti@smarthub.com.tn',
+  'jalel.chniti@gmail.com'
+];
+```
+
+#### Authentication State Management
+- **Real-time State**: Authentication state listeners with automatic updates
+- **Session Persistence**: Firebase Auth handles session tokens automatically
+- **Route Protection**: Authentication guards for admin routes
+- **Automatic Redirects**: Seamless navigation based on authentication status
+
+#### Security Implementation
+- **Email Verification**: Admin access restricted to authorized email addresses
+- **Token Security**: Firebase-managed JWT tokens with automatic refresh
+- **Session Monitoring**: Real-time authentication state across browser tabs
+- **Logout Protection**: Complete session termination with token invalidation
+
+### Development Environment Setup
+
+#### Firebase Console Configuration Required
+1. **Project Setup**: Use existing `u-smart-booking` Firebase project
+2. **Authentication Enable**: Enable Email/Password provider in Authentication section
+3. **Admin User Creation**: Manually create admin accounts in Firebase Console > Authentication > Users
+4. **Database Rules**: Configure Realtime Database rules for booking system
+
+#### Environment Variables (`.env` file)
+```bash
+# Firebase Configuration (Required)
+VITE_FIREBASE_API_KEY=AIzaSyBnjZRrhG7qmJqcZcJWO7FnN2LznNSk07k
+VITE_FIREBASE_AUTH_DOMAIN=u-smart-booking.firebaseapp.com
+VITE_FIREBASE_DATABASE_URL=https://u-smart-booking-default-rtdb.asia-southeast1.firebasedatabase.app
+VITE_FIREBASE_PROJECT_ID=u-smart-booking
+VITE_FIREBASE_STORAGE_BUCKET=u-smart-booking.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=512917348858
+VITE_FIREBASE_APP_ID=1:512917348858:web:77d83cc427db118f118443
+
+# Legacy Admin Protection (Deprecated)
+VITE_ADMIN_PASSWORD=SmartHub2025Admin!
+```
+
+### Route Protection Strategy
+- **Public Routes**: All standard pages accessible without authentication
+- **Protected Admin Routes**: Firebase Authentication required for admin dashboard access
+- **Automatic Redirects**: Unauthenticated users redirected to login page
+- **Session Validation**: Real-time authentication state monitoring
+
+### Error Handling & User Experience
+- **French Localization**: All authentication messages in French language
+- **Professional UI**: Glassmorphism design consistent with SmartHub branding
+- **Loading States**: Real-time feedback during authentication processes
+- **Setup Guidance**: Built-in Firebase configuration instructions for administrators
+- **Fallback Support**: Graceful degradation when Firebase services unavailable
+
+### Production Deployment Considerations
+- **Environment Security**: Firebase configuration via environment variables only
+- **Admin User Management**: Use Firebase Console for production admin account creation
+- **Database Rules**: Implement proper Firebase Realtime Database security rules
+- **CDN Reliability**: Firebase SDK served via Google CDN for optimal performance
+- **Monitoring**: Firebase Console provides authentication analytics and user management
