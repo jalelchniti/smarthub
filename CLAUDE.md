@@ -43,8 +43,37 @@ npm run preview # Preview production build
 - `.htaccess` - Apache server configuration with MIME types and SPA routing
 - `web.config` - IIS server configuration with URL rewrite rules  
 - `netlify.toml` - Netlify hosting configuration with redirects and headers
+- `public/_redirects` - Netlify-specific redirects (takes precedence over netlify.toml)
 
-**Common deployment issue**: MIME type errors (`Expected a JavaScript module script but server responded with text/html`) - fixed by proper server configuration for SPA routing.
+### Known Deployment Issues
+
+#### Persistent MIME Type Error on Netlify
+**Issue**: Assets served as HTML instead of correct MIME types:
+```
+Refused to apply style from '/admin/assets/index-B5ytOgF7.css' 
+because its MIME type ('text/html') is not a supported stylesheet MIME type
+```
+
+**Root Cause**: Netlify SPA redirect rules are too broad and catching asset requests.
+
+**Current Configuration** (`public/_redirects`):
+```
+# Static assets served directly (should have highest priority)
+/assets/*    /assets/:splat    200
+/*           /index.html       200!
+```
+
+**Attempted Solutions**:
+- ✅ Added explicit `/assets/*` rule before catch-all
+- ✅ Used `200!` status to force rule precedence  
+- ✅ Updated `netlify.toml` with `force=false`
+- ❌ **Still not working** - Netlify continues serving HTML for asset requests
+
+**Next Troubleshooting Steps**:
+1. Try alternative Netlify redirect syntax
+2. Consider using `_headers` file for explicit MIME types
+3. Test with different asset path patterns
+4. Contact Netlify support for SPA + asset serving configuration
 
 ## Critical Development Rules
 
