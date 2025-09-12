@@ -290,15 +290,14 @@ export const Home = () => {
                   <h3 className="text-2xl font-bold text-white mb-4">Adresse</h3>
                   <p className="text-blue-100 text-lg leading-relaxed">
                     13, Rue de Belgique, Immeuble MAE<br/>
-                    1er étage, Bureau 1.1<br/>
-                    1000 Tunis
+                    1er étage, Bureau 1.1, 1000 Tunis
                   </p>
                 </div>
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-white mb-4">Horaires</h3>
                   <p className="text-blue-100 text-lg leading-relaxed">
-                    Lundi - Vendredi : 8h00 - 20h00<br/>
-                    Samedi - Dimanche : 9h00 - 18h00
+                    Lundi - Samedi : 9h00 - 13h00, 15h00 - 18h00<br/>
+                    Dimanche : 10h00 - 13h00
                   </p>
                 </div>
               </div>

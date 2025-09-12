@@ -63,14 +63,13 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-6 text-white">Horaires</h3>
             <div className="space-y-3">
               <div className="text-gray-300">
-                <div className="font-medium text-white mb-2">Lundi - Vendredi</div>
-                <div className="text-sm">8:00 - 13:00</div>
-                <div className="text-sm">15:00 - 20:00</div>
-              </div>
-              <div className="text-gray-300">
-                <div className="font-medium text-white mb-2">Samedi</div>
+                <div className="font-medium text-white mb-2">Lundi - Samedi</div>
                 <div className="text-sm">9:00 - 13:00</div>
                 <div className="text-sm">15:00 - 18:00</div>
+              </div>
+              <div className="text-gray-300">
+                <div className="font-medium text-white mb-2">Dimanche</div>
+                <div className="text-sm">10:00 - 13:00</div>
               </div>
             </div>
           </div>
@@ -91,23 +90,9 @@ const Footer = () => {
 
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-gray-400 text-sm mb-4 md:mb-0">
+          <div className="text-center">
+            <div className="text-gray-400 text-sm">
               © 2025 SmartHub - ELMAOUIA ET.CO. Tous droits réservés.
-            </div>
-            <div className="flex items-center space-x-6">
-              <button
-                onClick={handlePhoneClick}
-                className="text-gray-400 hover:text-blue-400 transition-colors"
-              >
-                <Phone className="w-5 h-5" />
-              </button>
-              <button
-                onClick={handleEmailClick}
-                className="text-gray-400 hover:text-blue-400 transition-colors"
-              >
-                <Mail className="w-5 h-5" />
-              </button>
             </div>
           </div>
         </div>

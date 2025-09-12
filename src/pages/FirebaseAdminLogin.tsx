@@ -34,11 +34,8 @@ export const FirebaseAdminLogin: React.FC = () => {
     const initAuth = async () => {
       await FirebaseAuthService.initialize();
       
-      // Check if demo setup is needed
-      const setupNeeded = !(await FirebaseAuthService.checkDemoSetup());
-      if (setupNeeded) {
-        setShowSetupInstructions(true);
-      }
+      // Check if demo setup is needed (removed automatic popup - user can manually access setup instructions)
+      await FirebaseAuthService.checkDemoSetup();
     };
 
     initAuth();
@@ -101,7 +98,7 @@ export const FirebaseAdminLogin: React.FC = () => {
         // Navigation will be handled by auth state change
         
       } else if (result.requireSetup) {
-        setShowSetupInstructions(true);
+        // Don't auto-show popup, just show error message
         setError(result.message);
       } else {
         setError(result.message);

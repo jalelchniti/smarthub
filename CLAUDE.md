@@ -7,36 +7,56 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Static Frontend-Only React Application** - No backend services except Firebase Realtime Database and Authentication.
 
 **Key Features**:
-- ✅ 13 React SPA routes with TypeScript + Vite
+- ✅ 17 React SPA routes with TypeScript + Vite
 - ✅ Firebase Realtime Database (booking system) + Authentication (admin access)  
 - ✅ Brevo form integration for lead collection
 - ✅ WhatsApp contact integration (+216 99 456 059)
 - ✅ Revenue Simulator with SmartHub income protection policy (private route)
 - ✅ Multi-user room booking system with real-time synchronization
 - ✅ Enterprise-grade admin authentication (Firebase Auth)
+- ✅ Payment choice modal system with offline/online options
 - ✅ Static deployment ready for any hosting platform
 
 **Development Constraints**:
 - No backend endpoints - use external services only (Brevo, WhatsApp, Firebase)
 - Focus on frontend-only features and integrations
 - All dynamic functionality via Firebase services or external APIs
+- Firebase integration uses CDN scripts (no npm package) - see index.html
 
 ## Essential Development Commands
 
-**CRITICAL - Pre-commit requirements**:
-```bash
-npm run build  # TypeScript + Vite build (must pass)
-npm run lint   # ESLint checks (must pass)
-```
-
-**Development workflow**:
+**Daily Development Workflow**:
 ```bash
 npm install    # First-time setup
 npm run dev    # Development server (localhost:5173)
-npm run preview # Preview production build
 ```
 
-**Testing**: Manual testing only (no test framework configured)
+**CRITICAL - Pre-commit requirements (MUST pass before committing)**:
+```bash
+npm run build  # TypeScript + Vite build - catches TypeScript errors
+npm run lint   # ESLint checks - catches code quality issues
+```
+
+**Production Build & Preview**:
+```bash
+npm run build   # Creates dist/ folder for deployment
+npm run preview # Preview the production build locally
+```
+
+**Testing**: Manual testing only (no automated test framework configured)
+
+**Key npm Scripts**:
+- `npm run dev` - Start Vite development server with HMR
+- `npm run build` - TypeScript compilation + Vite production build  
+- `npm run lint` - ESLint with TypeScript and React rules
+- `npm run preview` - Preview production build locally
+
+**Common Development Tasks**:
+- **Add new page**: Create component in `src/pages/`, add route in `src/App.tsx`
+- **Add new UI component**: Create in `src/components/ui/`, follow existing patterns
+- **Update Firebase rules**: Use `update-firebase.html` utility or Firebase Console
+- **Add new form field**: Remember uppercase names for Brevo compatibility
+- **Debug Firebase**: Check browser console and Firebase Console for auth/database errors
 
 ### Deployment Configuration
 **Server configuration files** (CRITICAL for SPA routing):
@@ -45,35 +65,36 @@ npm run preview # Preview production build
 - `netlify.toml` - Netlify hosting configuration with redirects and headers
 - `public/_redirects` - Netlify-specific redirects (takes precedence over netlify.toml)
 
-### Known Deployment Issues
+### Resolved Deployment Issues (September 2025)
 
-#### Persistent MIME Type Error on Netlify
-**Issue**: Assets served as HTML instead of correct MIME types:
+#### MIME Type Error - RESOLVED ✅
+**Previous Issue**: Assets served as HTML instead of correct MIME types on production server.
+
+**Root Cause Identified**: 
+1. **Vite Configuration**: `base: './'` created relative asset paths that broke on nested routes
+2. **Apache Rewrite Rules**: SPA redirect rules were catching asset requests
+
+**Solutions Applied**:
+- ✅ **Fixed Vite Config**: Changed `base: './'` to `base: '/'` for absolute asset paths
+- ✅ **Enhanced .htaccess**: Added explicit asset protection rules before SPA routing
+- ✅ **Rebuilt Application**: All assets now use absolute `/assets/` paths
+
+**Current Working Configuration** (`.htaccess`):
+```apache
+# Explicitly serve static files with correct MIME types
+RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ [NC]
+RewriteRule ^.*$ - [L]
+
+# Protect assets directory specifically
+RewriteRule ^assets/ - [L]
+
+# Then handle SPA routing for everything else
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
 ```
-Refused to apply style from '/admin/assets/index-B5ytOgF7.css' 
-because its MIME type ('text/html') is not a supported stylesheet MIME type
-```
 
-**Root Cause**: Netlify SPA redirect rules are too broad and catching asset requests.
-
-**Current Configuration** (`public/_redirects`):
-```
-# Static assets served directly (should have highest priority)
-/assets/*    /assets/:splat    200
-/*           /index.html       200!
-```
-
-**Attempted Solutions**:
-- ✅ Added explicit `/assets/*` rule before catch-all
-- ✅ Used `200!` status to force rule precedence  
-- ✅ Updated `netlify.toml` with `force=false`
-- ❌ **Still not working** - Netlify continues serving HTML for asset requests
-
-**Next Troubleshooting Steps**:
-1. Try alternative Netlify redirect syntax
-2. Consider using `_headers` file for explicit MIME types
-3. Test with different asset path patterns
-4. Contact Netlify support for SPA + asset serving configuration
+**Result**: All production routes including `/admin/firebase-login` now load correctly with proper MIME types.
 
 ## Critical Development Rules
 
@@ -83,7 +104,8 @@ because its MIME type ('text/html') is not a supported stylesheet MIME type
 - **Form Redirects**: Use local thank you pages with React Router navigation
 
 ### Firebase Integration  
-- **CDN-Based**: Firebase loaded via HTML script tags (no npm dependency)
+- **Hybrid Architecture**: Firebase npm package installed for TypeScript support + CDN scripts in HTML for runtime
+- **CDN Scripts**: Firebase 10.7.1 compat versions loaded via HTML `<script>` tags in `index.html`
 - **Environment Variables**: All Firebase config via `.env` file (required for booking/admin)
 - **Admin Access**: Email-based verification (jalel.chniti@smarthub.com.tn, jalel.chniti@gmail.com)
 - **Service Pattern**: Use `FirebaseBookingService` and `FirebaseAuthService` classes
@@ -97,48 +119,58 @@ because its MIME type ('text/html') is not a supported stylesheet MIME type
 ## Architecture & Tech Stack
 
 **Core Stack**:
-- React 19 + TypeScript 5.8 + Vite 7.1
+- React 19.1 + TypeScript 5.8 + Vite 7.1
 - Tailwind CSS 3.4 (custom blue/purple gradients, glassmorphism effects)
 - React Router DOM 7.8 (client-side routing)
-- Firebase 10.7.1 (Realtime Database + Authentication)
-- Lucide React (icons), ESLint 9.34, Prettier 3.6.2
+- Firebase 10.7.1 (Realtime Database + Authentication via CDN)
+- Lucide React (icons), ESLint 9.33, Prettier 3.6.2
 
 ### Application Architecture
 
 **Route Structure** (`src/App.tsx`):
-- **Public**: `/` (Home), `/rooms`, `/teachers`, `/learn-more` - with Navigation + Footer
-- **Registration**: `/register/student`, `/register/teacher` - full page forms
-- **Thank You**: `/thank-you/student`, `/thank-you/teacher` - standalone pages
-- **Private**: `/simulation` - revenue simulator (hidden from navigation)
-- **Booking**: `/booking` - room booking system (real-time Firebase)
-- **Admin**: `/admin/firebase-login`, `/admin/firebase-bookings` - protected routes
+- **Public with Navigation**: `/` (Home), `/rooms`, `/teachers`, `/learn-more`, `/revenue-simulator`, `/booking-system` - with Navigation + Footer
+- **Registration Pages**: `/register/student`, `/register/teacher` - standalone pages with custom navigation
+- **Thank You Pages**: `/thank-you/student`, `/thank-you/teacher` - standalone without navigation/footer
+- **Payment Pages**: `/booking/thank-you`, `/payment/online-coming-soon` - standalone without navigation/footer
+- **Legacy Private Routes**: `/simulation`, `/booking` - hidden routes for backward compatibility
+- **Admin Authentication**: `/admin/login` (legacy), `/admin/firebase-login` (current)
+- **Admin Dashboard**: `/admin/bookings` (deprecated), `/admin/firebase-bookings` (current), `/admin/legacy` (reference)
 
 **Key Service Architecture**:
 ```
 src/
-├── services/                  # Firebase service layer
-│   ├── firebaseAuthService.ts      # Admin authentication
+├── services/                    # Firebase service layer (3 services)
+│   ├── firebaseAuthService.ts      # Admin authentication (current)
 │   ├── firebaseBookingService.ts   # Booking CRUD + fee calculations
 │   └── adminAuthService.ts         # Legacy auth (deprecated)
-├── config/
-│   └── firebase.ts                 # Firebase configuration (CDN-based)
-├── components/ui/               # Reusable components  
-│   ├── *SubscriptionForm.tsx       # Brevo form integrations
-│   ├── Button.tsx, Card.tsx, Input.tsx # UI primitives
-├── pages/                       # Page components
-│   ├── RevenueSimulator.tsx        # Income protection calculator
-│   ├── BookingSystem.tsx           # Real-time room booking
-│   ├── FirebaseAdmin*.tsx          # Secure admin dashboard
+├── components/
+│   ├── ui/                      # Reusable UI components
+│   │   ├── Button.tsx, Card.tsx, Input.tsx  # UI primitives
+│   │   ├── StudentSubscriptionForm.tsx      # Brevo student forms
+│   │   ├── TeacherSubscriptionForm.tsx      # Brevo teacher forms
+│   │   └── PaymentChoiceModal.tsx           # Payment method selection
+│   ├── Navigation.tsx           # Main navigation with responsive design
+│   ├── Footer.tsx              # Site footer with business info
+│   └── GoogleMapEmbed.tsx      # Embedded Google Maps component
+├── pages/                       # 17 page components
+│   ├── Home.tsx, Rooms.tsx, Teachers.tsx, LearnMore.tsx    # Public pages
+│   ├── RevenueSimulator.tsx                               # Income calculator
+│   ├── BookingSystem.tsx                                 # Room booking system
+│   ├── FirebaseAdminLogin.tsx, FirebaseAdminBookings.tsx # Admin system
+│   ├── StudentRegistration.tsx, TeacherRegistration.tsx  # Registration
+│   ├── BookingThankYou.tsx, PaymentOnlineComingSoon.tsx  # Payment flow
+│   └── [Other admin and thank you pages]
 ```
 
 ## Key Configuration Files
 
-- **`vite.config.ts`**: Build configuration with relative base path (`./`) for hosting-agnostic deployment, optimized asset naming with hashes
-- **`package.json`**: Dependencies and build scripts - React 19, TypeScript 5.8, Vite 7.1, Firebase 10.7.1
-- **`tsconfig.json`**: TypeScript project references architecture (app + node configs)
-- **`tailwind.config.js`**: Custom design system (blue/purple gradients, Inter font)
-- **`eslint.config.js`**: Modern ESLint config with TypeScript-ESLint 8.41, React hooks plugin
-- **`firebase.json`**: Firebase hosting and functions configuration with SPA routing support
+- **`vite.config.ts`**: Build configuration with absolute base path (`/`) for proper asset serving, asset file naming with hashes, CORS headers for dev server
+- **`package.json`**: Dependencies - React 19.1, TypeScript 5.8, Vite 7.1, Firebase 10.7.1 (npm + CDN hybrid), Tailwind CSS 3.4, React Router DOM 7.8
+- **`tsconfig.json`**: Project references architecture with separate app/node configs
+- **`tailwind.config.js`**: Custom design system with primary/secondary colors (blue/purple gradients), Inter font family
+- **`eslint.config.js`**: TypeScript-ESLint flat config with React hooks and refresh plugins
+- **`firebase.json`**: Firebase hosting config with SPA rewrites (all routes → /index.html)
+- **`index.html`**: Firebase CDN scripts (10.7.1), Brevo forms CSS/JS, meta tags for SEO
 
 ## Environment Configuration
 
@@ -150,6 +182,17 @@ src/
 - `VITE_FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
 - `VITE_FIREBASE_MESSAGING_SENDER_ID` - Firebase messaging sender ID
 - `VITE_FIREBASE_APP_ID` - Firebase app ID
+
+**OVH Hosting Configuration** (production deployment):
+- `OVH_FTP_Login` - OVH FTP username for file uploads
+- `OVH_FTP_Folder` - Target folder on OVH server (./smarthub)
+- `OVH_FTP_Password` - FTP access password
+- `OVH_FTP_URL` - FTP server URL for file transfers
+- `OVH_SSH_URL` - SSH access for server management
+- `OVH_MAILING_LIST_NEWSLETTER` - Newsletter mailing list address
+- `OVH_MAILING_LIST_OWNER` - Admin email for mailing list management
+- `OVH_MAILING_LIST_SUBSCRIBE` - Subscription endpoint
+- `OVH_MAILING_LIST_UNSUBSCRIBE` - Unsubscription endpoint
 
 **Future environment variables**:
 - `VITE_USE_BACKEND=false` - Backend feature flag
@@ -178,11 +221,13 @@ src/
 - **React Router**: Always use `useNavigate()` hook, never `window.location.href`
 - **Form Redirects**: Local thank you pages (`/thank-you/student`, `/thank-you/teacher`)
 
-### Common Build Issues to Avoid
-- Unclosed JSX elements (most common TypeScript error)
-- Unused imports (ESLint warnings become build errors)
-- Missing dependencies in useEffect hooks
-- Invalid React Router navigation patterns
+### Common Development Pitfalls to Avoid
+- **TypeScript Build Errors**: Unclosed JSX elements, unused imports (ESLint fails build)
+- **Navigation Issues**: Never use `window.location.href`, always `useNavigate()` from React Router
+- **Firebase CDN Issues**: Firebase scripts are in index.html (CDN), not npm packages
+- **Form Field Names**: MUST be uppercase for Brevo (`NOM`, `PRENOM`, `EMAIL`)
+- **Route Confusion**: Use public routes `/revenue-simulator`, `/booking-system` for user access
+- **Missing Dependencies**: Include all dependencies in useEffect hooks to avoid warnings
 
 ## Brevo Form Integration Architecture
 
@@ -209,14 +254,16 @@ Teacher: https://e631d0f7.sibforms.com/serve/MUIFACcBK_aC-0JXT6lhpKFd8xYgm8CkGlX
 **SmartHub Educational Facility - Tunis City Center**
 - **Address**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
 - **Contact**: +216 99 456 059 | souad.dkhili@u-smart.net
-- **Hours**: Mon-Fri (8:00-20:00), Sat (9:00-13:00, 15:00-18:00)
+- **Hours**: Mon-Sat (9:00-13:00, 15:00-18:00), Sun (10:00-13:00)
 - **Services**: Teacher workspace rental (3 rooms), in-person educational services connecting competent teachers with serious students
 
 ## Deployment
 
 ### Hosting-Agnostic Static Site Deployment
-**Repository**: https://github.com/jalelchniti/u-smart-net.git
+**Repository**: https://github.com/jalelchniti/smarthub.git
 **Branch**: master
+**Production Hosting**: OVH shared hosting via FTP deployment
+**Live Application**: https://www.smarthub.com.tn (deployed September 11, 2025)
 
 **Build Process**:
 ```bash
@@ -224,6 +271,8 @@ Teacher: https://e631d0f7.sibforms.com/serve/MUIFACcBK_aC-0JXT6lhpKFd8xYgm8CkGlX
 npm run build
 
 # Deploy dist/ contents to any static hosting provider
+# Primary: OVH shared hosting via manual FTP upload to domain root
+# Files deployed at root level (/) for direct access at www.smarthub.com.tn
 # Supported platforms: Netlify, Vercel, GitHub Pages, Apache servers, IIS servers, AWS S3, etc.
 ```
 
@@ -322,8 +371,8 @@ npm run build
 - **Multi-user room booking system** for SmartHub's 3 educational spaces
 - **Date-based bookings** starting September 15th, 2025
 - **Multi-slot selection**: Select multiple time slots before confirming all at once
-- **Sunday availability**: 8:00 AM - 1:00 PM only
-- **Weekday availability**: 8:00 AM - 8:00 PM (with lunch break 1:00-3:00 PM)
+- **Sunday availability**: 10:00 AM - 1:00 PM only
+- **Mon-Sat availability**: 9:00 AM - 1:00 PM, 3:00 PM - 6:00 PM (with lunch break 1:00-3:00 PM)
 - **Real-time synchronization** across all devices via Firebase
 - **Comprehensive fee tracking**: Automatic calculation and storage of all costs
 - **VAT compliance**: 19% Tunisia standard rate applied and tracked
@@ -386,14 +435,76 @@ interface Booking {
 - **VAT Rate**: 19% (Tunisia standard rate) applied to all bookings
 - **Payment Status**: Automatic tracking (pending/paid/cancelled)
 
-### Payment Flow & User Experience (NEXT IMPLEMENTATION)
-- **Post-Booking Payment Choice**: After successful Firebase booking submission, user is presented with payment options
+### Payment Flow & User Experience (✅ IMPLEMENTED - September 2025)
+- **Post-Booking Payment Choice**: After successful Firebase booking submission, user is presented with payment options via professional modal
 - **Payment Methods**: 
-  - **Online Payment**: Integration with Paymee.tn payment gateway (Tunisia's leading payment processor)
+  - **Online Payment**: "Coming Soon" page with future Paymee.tn integration details
   - **Sur Place Payment**: Pay on arrival at SmartHub facility
-- **Online Payment Flow**: Redirect to Paymee.tn gateway → Payment processing → Automatic status update to 'paid' in Firebase
-- **Sur Place Payment Flow**: Redirect to thank you page → 3-second auto-redirect to home page → Booking status remains 'pending'
-- **Payment Status Integration**: Real-time update of booking payment status based on user choice and gateway response
+- **Online Payment Flow**: Redirect to PaymentOnlineComingSoon page → User can return home or make new booking
+- **Sur Place Payment Flow**: Redirect to BookingThankYou page → 3-second countdown with auto-redirect to home page → Booking status remains 'pending'
+- **Payment Choice Modal**: Professional glassmorphism modal showing booking total and count with clear payment options
+- **Enhanced UX**: Smooth transitions, countdown timers, manual navigation options, and consistent SmartHub branding
+
+### Payment Choice Components (✅ IMPLEMENTED - September 2025)
+
+#### PaymentChoiceModal (`src/components/ui/PaymentChoiceModal.tsx`)
+- **Purpose**: Modal dialog for payment method selection after successful booking
+- **Props**: `isOpen`, `onClose`, `totalAmount`, `bookingCount`
+- **Features**: Professional glassmorphism design, booking summary, two clear payment options
+- **Navigation**: Routes to appropriate payment pages based on user choice
+- **Form Reset**: Automatically resets booking form and closes all modals on selection
+
+#### PaymentOnlineComingSoon (`src/pages/PaymentOnlineComingSoon.tsx`)
+- **Route**: `/payment/online-coming-soon` (standalone page without navigation/footer)
+- **Purpose**: "Coming Soon" page for online payment with future features preview
+- **Features**: Professional design, contact information for offline payment, navigation options
+- **Future Integration**: Placeholder for Paymee.tn payment gateway implementation
+
+#### BookingThankYou (`src/pages/BookingThankYou.tsx`)
+- **Route**: `/booking/thank-you` (standalone page without navigation/footer)
+- **Purpose**: Confirmation page for offline payment choice with auto-redirect
+- **Features**: 3-second countdown timer, manual navigation options, booking confirmation details
+- **Auto-Navigation**: Automatic redirect to home page after 3 seconds
+- **Business Info**: Contact details and next steps for payment at SmartHub facility
+
+#### Booking System Integration
+- **Modified Flow**: `BookingSystem.tsx` now shows PaymentChoiceModal instead of alert on successful booking
+- **State Management**: Added `showPaymentChoice`, `bookingTotal`, `bookingCount` state variables
+- **Fee Calculation**: Automatically calculates total amount for payment choice display
+- **Error Handling**: Maintains original error flow for failed bookings
+
+## Rooms Page Navigation Enhancement (✅ IMPLEMENTED - September 2025)
+
+### Purpose & Features
+- **Enhanced User Experience**: Added direct navigation buttons to key SmartHub tools from Rooms page
+- **Strategic Placement**: Navigation buttons positioned above WhatsApp CTA for maximum visibility
+- **Responsive Design**: Buttons stack vertically on mobile, horizontally on desktop
+- **Professional Styling**: Glassmorphism effects consistent with SmartHub design system
+
+### Navigation Buttons Implementation
+- **Revenue Simulator Button**: Routes to `/revenue-simulator` (public route with header/footer)
+- **Booking System Button**: Routes to `/booking-system` (public route with header/footer)
+- **Visual Hierarchy**: Simulator button uses subtle white/transparent styling, booking button uses prominent blue styling
+- **Icons**: Calculator icon for simulator, BookOpen icon for booking system
+- **Hover Effects**: Scale transform and color transitions for enhanced interactivity
+
+### Technical Implementation
+- **Location**: `src/pages/Rooms.tsx` - added above existing WhatsApp CTA section
+- **Navigation**: Uses `useNavigate()` hook for React Router navigation
+- **Responsive Classes**: `flex-col sm:flex-row` for mobile-first responsive layout
+- **Accessibility**: Full keyboard navigation support with proper button semantics
+
+### Public Route Access
+- **New Public Routes**: Both `/revenue-simulator` and `/booking-system` now accessible with full navigation and footer
+- **Maintained Legacy**: Original private routes `/simulation` and `/booking` preserved for backward compatibility
+- **SEO Benefits**: Public routes improve discoverability and user access to key tools
+
+### User Experience Flow
+1. **User visits Rooms page** → Sees room information and pricing
+2. **Navigation buttons displayed** → Clear call-to-action for next steps
+3. **Revenue Simulator access** → Teachers can calculate potential earnings with full site navigation
+4. **Booking System access** → Users can make reservations with full site navigation
+5. **WhatsApp contact** → Final fallback for direct communication
 
 ## Firebase Admin Authentication System (NEW - January 2025)
 
@@ -426,11 +537,12 @@ interface Booking {
 
 ### User Experience Features
 - **Professional Login UI**: Glassmorphism design matching SmartHub aesthetics
-- **Setup Instructions**: Built-in Firebase configuration guidance
+- **Setup Instructions**: Available on-demand (no automatic popup interruption)
 - **Error Handling**: French localized error messages with user-friendly feedback
 - **Loading States**: Real-time authentication status with proper loading indicators
 - **Password Visibility**: Toggle for secure password entry
 - **Auto-Redirect**: Seamless navigation after successful authentication
+- **Non-Intrusive Experience**: Configuration popup removed from automatic display
 
 ### Security Advantages Over Legacy System
 - ✅ **No Hardcoded Passwords**: Eliminates security vulnerabilities in source code
@@ -529,6 +641,16 @@ npm run lint                # Must pass without warnings
 - Firebase Console access required for admin user management
 - All modern hosting platforms supported (Netlify, Vercel, GitHub Pages, Firebase, Apache, IIS)
 
+### Deployment Status (September 2025)
+- ✅ **Production Deployed**: https://www.smarthub.com.tn
+- ✅ **All Files Uploaded**: Root level deployment (index.html, assets/, images/)
+- ✅ **Server Configuration**: Enhanced .htaccess with asset protection rules
+- ✅ **Static Assets**: All CSS, JS bundles, and images properly served with correct MIME types
+- ✅ **SPA Routing**: All routes including `/admin/firebase-login` load correctly
+- ✅ **MIME Type Issues**: Resolved through Vite config and Apache configuration fixes
+- ✅ **Firebase Integration**: Ready for testing on production (configuration popup removed)
+- ✅ **Payment Choice Enhancement**: Deployed September 11, 2025 with new payment flow components
+
 ## Important Notes
 
 - **Form Field Names**: CRITICAL - Always use uppercase (`NOM`, `PRENOM`, `EMAIL`) for Brevo compatibility
@@ -542,6 +664,10 @@ npm run lint                # Must pass without warnings
 - **Teacher Marketing**: Use income protection as key value proposition in teacher recruitment campaigns
 - **Admin Panel**: Firebase Authentication required for booking management with enterprise security
 - **Legacy System**: Previous hardcoded password system deprecated in favor of Firebase Auth
+- **Payment Choice Flow**: CRITICAL - After booking success, PaymentChoiceModal appears automatically (no more alert messages)
+- **Auto-Redirect**: BookingThankYou page auto-redirects to home after 3 seconds for smooth UX
+- **Public Tool Access**: CRITICAL - Use `/revenue-simulator` and `/booking-system` for public access with navigation/footer
+- **Legacy Routes**: Private routes `/simulation` and `/booking` still work but are hidden from public navigation
 
 ## Firebase Configuration (Database Only)
 
@@ -584,7 +710,7 @@ If email notifications are needed, they will be implemented via:
 - **Error handling** with user feedback
 - **No server-side dependencies** maintaining static architecture
 
-## Firebase Services Architecture (Updated - January 2025)
+## Firebase Services Architecture (Updated - September 2025)
 
 ### Service Layer Implementation
 **Location**: `src/services/` directory with modular Firebase service architecture
@@ -677,21 +803,24 @@ VITE_ADMIN_PASSWORD=SmartHub2025Admin!
 - **CDN Reliability**: Firebase SDK served via Google CDN for optimal performance
 - **Monitoring**: Firebase Console provides authentication analytics and user management
 
-## Payment Integration System (NEXT PRIORITY - January 2025)
+## Payment Integration System (✅ PHASE 1 COMPLETE - September 2025)
 
-### Paymee.tn Integration Architecture
+### Current Implementation Status
+- **✅ Phase 1 Complete**: Payment choice modal and user experience flow fully implemented
+- **🔄 Phase 2 Pending**: Paymee.tn gateway integration for online payments
+- **✅ Sur Place Flow**: Complete offline payment experience with confirmation and auto-redirect
+
+### Paymee.tn Integration Architecture (Future Phase 2)
 - **Payment Gateway**: Paymee.tn (Tunisia's leading payment processor)
 - **Integration Method**: Frontend redirect integration maintaining static architecture
 - **Payment Flow**: Post-booking payment choice → Gateway redirect → Callback handling → Firebase status update
 - **Security**: Paymee.tn handles all payment processing, SmartHub receives payment confirmations only
 
-### Implementation Plan
-
-#### Phase 1: Payment Choice Modal (Next Implementation)
-- **Location**: `src/components/ui/PaymentChoiceModal.tsx`
-- **Trigger**: After successful booking submission to Firebase
-- **UI Features**: Professional modal with two clear payment options
-- **User Experience**: 
+### ✅ Phase 1: Payment Choice Modal (COMPLETED - September 2025)
+- **Location**: `src/components/ui/PaymentChoiceModal.tsx` ✅
+- **Trigger**: After successful booking submission to Firebase ✅
+- **UI Features**: Professional modal with two clear payment options ✅
+- **User Experience**: ✅
   - Modal appears immediately after booking confirmation
   - Clear pricing display with total amount
   - Two prominent buttons: "Payer en ligne" and "Payer sur place"

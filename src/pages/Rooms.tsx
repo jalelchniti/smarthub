@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import GoogleMapEmbed from '../components/GoogleMapEmbed';
-import { MapPin, Users, Clock, Wifi, Monitor, Building, CheckCircle, Calendar, X, MessageCircle } from 'lucide-react';
+import { MapPin, Users, Clock, Wifi, Monitor, Building, CheckCircle, Calendar, X, MessageCircle, Calculator, BookOpen } from 'lucide-react';
 
 interface Room {
   id: string;
@@ -19,6 +20,7 @@ interface Room {
 
 export const Rooms: React.FC = () => {
   const [showMap, setShowMap] = useState(false);
+  const navigate = useNavigate();
   
   const mapSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3194.927527841475!2d10.17702587640448!3d36.79628796791918!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd3472cdcd2081%3A0x6e5339efe27057be!2s13%20Rue%20de%20Belgique%2C%20Tunis!5e0!3m2!1sfr!2stn!4v1756241843416!5m2!1sfr!2stn';
 
@@ -264,10 +266,29 @@ export const Rooms: React.FC = () => {
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 text-center">
               Intéressé par Nos Espaces ?
             </h2>
-            <p className="text-xl text-green-100 mb-12 text-center max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-green-100 mb-8 text-center max-w-3xl mx-auto leading-relaxed">
               Contactez-nous pour plus d'informations sur la disponibilité et les modalités de nos espaces d'apprentissage 
               dans notre centre de Tunis. Installations professionnelles pour vos besoins éducatifs.
             </p>
+            
+            {/* Navigation Buttons */}
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12">
+              <button
+                onClick={() => navigate('/revenue-simulator')}
+                className="bg-purple-600/90 backdrop-blur-sm border border-purple-400/30 hover:bg-purple-700/90 text-white px-8 py-4 text-lg rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 w-full sm:w-auto min-w-[250px] justify-center"
+              >
+                <Calculator className="w-6 h-6" />
+                Simulateur de Revenus
+              </button>
+              
+              <button
+                onClick={() => navigate('/booking-system')}
+                className="bg-blue-600/90 backdrop-blur-sm border border-blue-400/30 hover:bg-blue-700/90 text-white px-8 py-4 text-lg rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 w-full sm:w-auto min-w-[250px] justify-center"
+              >
+                <BookOpen className="w-6 h-6" />
+                Réservez maintenant
+              </button>
+            </div>
             
             <div className="flex justify-center">
               <a 

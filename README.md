@@ -65,7 +65,7 @@ Visitez `http://localhost:5173`
 **SmartHub - Facilité Éducative**
 - **Adresse**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
 - **Contact**: +216 99 456 059 | souad.dkhili@u-smart.net
-- **Horaires**: Lun-Ven (8:00-20:00), Sam (9:00-13:00, 15:00-18:00)
+- **Horaires**: Lun-Sam (9:00-13:00, 15:00-18:00), Dim (10:00-13:00)
 - **Services**: Location d'espaces de travail pour enseignants, services éducatifs en présentiel
 
 ## 🛠️ Commandes de Développement
@@ -81,7 +81,7 @@ npm run preview      # Aperçu du build de production
 ## 🌐 Déploiement
 
 ### Déploiement Statique Universel
-- **Dépôt**: https://github.com/jalelchniti/u-smart-net.git
+- **Dépôt**: https://github.com/jalelchniti/smarthub.git
 - **Branche**: master
 - **Compatibilité**: Tous hébergeurs statiques (Netlify, Vercel, GitHub Pages, Apache, IIS)
 

@@ -35,7 +35,13 @@
       "Bash(firebase --version)",
       "Bash(firebase:*)",
       "Bash(copy:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(lftp:*)",
+      "Bash(grep:*)",
+      "Bash(echo:*)",
+      "WebFetch(domain:help.ovhcloud.com)",
+      "WebSearch",
+      "Bash(git remote set-url:*)"
     ],
     "deny": [],
     "ask": []

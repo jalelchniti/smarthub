@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Users, XCircle, MapPin, Building, Save, RotateCcw, ChevronLeft, ChevronRight, Calendar, Clock, AlertCircle, Calculator, TrendingUp } from 'lucide-react';
 import { FirebaseBookingService, type Booking, type BookingData, type FeeCalculation } from '../services/firebaseBookingService';
+import { PaymentChoiceModal } from '../components/ui/PaymentChoiceModal';
 
 interface BookingFormData {
   teacherName: string;
@@ -28,6 +29,9 @@ export const BookingSystem: React.FC = () => {
   const [showTimeSlots, setShowTimeSlots] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showCalculator, setShowCalculator] = useState(false);
+  const [showPaymentChoice, setShowPaymentChoice] = useState(false);
+  const [bookingTotal, setBookingTotal] = useState(0);
+  const [bookingCount, setBookingCount] = useState(0);
   const [viewMode, setViewMode] = useState<'week' | 'month'>('week');
   const [currentMonth, setCurrentMonth] = useState<string>('');
   const [availabilityCheck, setAvailabilityCheck] = useState<{
@@ -361,8 +365,8 @@ export const BookingSystem: React.FC = () => {
       }
     }
 
+    let successCount = 0;
     try {
-      let successCount = 0;
       const results = [];
 
       for (const slot of bookingsToCreate) {
@@ -393,9 +397,15 @@ export const BookingSystem: React.FC = () => {
         }
       }
 
-      // Show success/error message
+      // Show payment choice modal for successful bookings
       if (successCount === bookingsToCreate.length) {
-        alert(`✅ ${successCount} réservation(s) créée(s) avec succès!`);
+        // Calculate total amount for successful bookings
+        const feeCalc = calculateFees();
+        const totalAmount = feeCalc ? feeCalc.totalTTC : 0;
+        
+        setBookingTotal(totalAmount);
+        setBookingCount(successCount);
+        setShowPaymentChoice(true);
       } else {
         alert(`⚠️ ${successCount}/${bookingsToCreate.length} réservations créées avec succès. Certaines réservations ont échoué.`);
       }
@@ -408,20 +418,23 @@ export const BookingSystem: React.FC = () => {
       return;
     }
     
-    // Reset form and close all modals
-    setFormData({
-      teacherName: '',
-      subject: '',
-      studentCount: 1,
-      duration: 1,
-      contactInfo: ''
-    });
-    setShowBookingForm(false);
-    setShowTimeSlots(false);
-    setShowConfirmation(false);
-    setAvailabilityCheck(null);
-    setSelectedTimeSlot('');
-    setSelectedTimeSlots([]);
+    // Only reset form and close modals if there were errors
+    // For successful bookings, this will be handled by the payment modal's onClose
+    if (successCount !== bookingsToCreate.length) {
+      setFormData({
+        teacherName: '',
+        subject: '',
+        studentCount: 1,
+        duration: 1,
+        contactInfo: ''
+      });
+      setShowBookingForm(false);
+      setShowTimeSlots(false);
+      setShowConfirmation(false);
+      setAvailabilityCheck(null);
+      setSelectedTimeSlot('');
+      setSelectedTimeSlots([]);
+    }
   };
 
   const handleDateSelection = (date: string) => {
@@ -1359,6 +1372,30 @@ export const BookingSystem: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Payment Choice Modal */}
+      <PaymentChoiceModal
+        isOpen={showPaymentChoice}
+        onClose={() => {
+          setShowPaymentChoice(false);
+          // Reset form and close all modals after payment choice
+          setFormData({
+            teacherName: '',
+            subject: '',
+            studentCount: 1,
+            duration: 1,
+            contactInfo: ''
+          });
+          setShowBookingForm(false);
+          setShowTimeSlots(false);
+          setShowConfirmation(false);
+          setAvailabilityCheck(null);
+          setSelectedTimeSlot('');
+          setSelectedTimeSlots([]);
+        }}
+        totalAmount={bookingTotal}
+        bookingCount={bookingCount}
+      />
     </div>
   );
 };

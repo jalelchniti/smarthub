@@ -11,6 +11,8 @@ import StudentRegistration from './pages/StudentRegistration';
 import TeacherRegistration from './pages/TeacherRegistration';
 import { RevenueSimulator } from './pages/RevenueSimulator';
 import { BookingSystem } from './pages/BookingSystem';
+import { BookingThankYou } from './pages/BookingThankYou';
+import { PaymentOnlineComingSoon } from './pages/PaymentOnlineComingSoon';
 import { AdminBookings } from './pages/AdminBookings';
 import { AdminLogin } from './pages/AdminLogin';
 import { SecureAdminBookings } from './pages/SecureAdminBookings';
@@ -24,6 +26,10 @@ function App() {
         {/* Thank You pages without navigation/footer */}
         <Route path="/thank-you/student" element={<StudentThankYou />} />
         <Route path="/thank-you/teacher" element={<TeacherThankYou />} />
+        
+        {/* Payment pages without navigation/footer */}
+        <Route path="/booking/thank-you" element={<BookingThankYou />} />
+        <Route path="/payment/online-coming-soon" element={<PaymentOnlineComingSoon />} />
         
         {/* Private Revenue Simulator page - hidden from public navigation */}
         <Route path="/simulation" element={<RevenueSimulator />} />
@@ -57,6 +63,8 @@ function App() {
                 <Route path="/teachers" element={<Teachers />} />
                 <Route path="/learn-more" element={<LearnMore />} />
                 <Route path="/subjects" element={<LearnMore />} />
+                <Route path="/revenue-simulator" element={<RevenueSimulator />} />
+                <Route path="/booking-system" element={<BookingSystem />} />
                 <Route path="*" element={<Home />} />
               </Routes>
             </main>
