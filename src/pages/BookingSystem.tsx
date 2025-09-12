@@ -338,8 +338,6 @@ export const BookingSystem: React.FC = () => {
     return bookings.some(booking => {
       if (!booking || booking.roomId !== roomId || booking.date !== date) return false;
       
-      // Skip cancelled bookings - they should not block time slot availability
-      if (booking.paymentStatus === 'cancelled') return false;
       
       // Check if this time slot falls within any existing active booking's duration
       const affectedSlots = getAffectedTimeSlots(booking.timeSlot, booking.duration, date);

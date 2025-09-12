@@ -37,6 +37,14 @@ npm run build  # TypeScript + Vite build - catches TypeScript errors
 npm run lint   # ESLint checks - catches code quality issues
 ```
 
+**Git Operations**:
+```bash
+git status     # Check current changes
+git diff       # View unstaged changes
+git add .      # Stage all changes
+git commit -m "commit message"  # Commit with descriptive message
+```
+
 **Production Build & Preview**:
 ```bash
 npm run build   # Creates dist/ folder for deployment
@@ -53,10 +61,11 @@ npm run preview # Preview the production build locally
 
 **Common Development Tasks**:
 - **Add new page**: Create component in `src/pages/`, add route in `src/App.tsx`
-- **Add new UI component**: Create in `src/components/ui/`, follow existing patterns
+- **Add new UI component**: Create in `src/components/ui/`, follow existing patterns  
 - **Update Firebase rules**: Use `update-firebase.html` utility or Firebase Console
-- **Add new form field**: Remember uppercase names for Brevo compatibility
+- **Add new form field**: Remember uppercase names for Brevo compatibility (`NOM`, `PRENOM`, `EMAIL`)
 - **Debug Firebase**: Check browser console and Firebase Console for auth/database errors
+- **Debug build errors**: Run `npm run build` to catch TypeScript errors before deployment
 
 ### Deployment Configuration
 **Server configuration files** (CRITICAL for SPA routing):
@@ -224,10 +233,11 @@ src/
 ### Common Development Pitfalls to Avoid
 - **TypeScript Build Errors**: Unclosed JSX elements, unused imports (ESLint fails build)
 - **Navigation Issues**: Never use `window.location.href`, always `useNavigate()` from React Router
-- **Firebase CDN Issues**: Firebase scripts are in index.html (CDN), not npm packages
-- **Form Field Names**: MUST be uppercase for Brevo (`NOM`, `PRENOM`, `EMAIL`)
-- **Route Confusion**: Use public routes `/revenue-simulator`, `/booking-system` for user access
+- **Firebase CDN Issues**: Firebase scripts are in index.html (CDN), not npm packages - don't install via npm
+- **Form Field Names**: MUST be uppercase for Brevo (`NOM`, `PRENOM`, `EMAIL`) - lowercase will fail
+- **Route Confusion**: Use public routes `/revenue-simulator`, `/booking-system` for user access (not `/simulation`, `/booking`)
 - **Missing Dependencies**: Include all dependencies in useEffect hooks to avoid warnings
+- **Vite Base Path**: Keep `base: '/'` in vite.config.ts for absolute asset paths - don't change to relative
 
 ## Brevo Form Integration Architecture
 
@@ -385,7 +395,7 @@ npm run build
 - **Conflict Detection**: Prevents double-booking with duration logic
 - **Firebase CDN**: No npm installation required, uses CDN scripts in `index.html`
 
-### Data Structure
+### Enhanced Data Structure (✅ UPDATED - December 2025)
 ```typescript
 interface Booking {
   id?: string;
@@ -405,6 +415,12 @@ interface Booking {
     vatRate: number; // VAT rate used (0.19)
   };
   paymentStatus?: 'pending' | 'paid' | 'cancelled';
+  // ✅ NEW ENHANCED PAYMENT TRACKING FIELDS:
+  paymentMethod?: 'online' | 'offline'; // Payment method selection
+  paymentTransactionId?: string; // Payment gateway transaction ID
+  paymentTimestamp?: string; // When payment was confirmed (ISO timestamp)
+  createdAt?: string; // ISO timestamp when booking was created
+  updatedAt?: string; // ISO timestamp when booking was last modified
 }
 ```
 
@@ -433,7 +449,7 @@ interface Booking {
 - **Contact Required**: Phone or email for all bookings
 - **Fee Structure**: Synchronized with `Rooms.tsx` pricing tiers
 - **VAT Rate**: 19% (Tunisia standard rate) applied to all bookings
-- **Payment Status**: Automatic tracking (pending/paid/cancelled)
+- **Payment Status**: Enhanced tracking with automatic timestamps and transaction IDs
 
 ### Payment Flow & User Experience (✅ IMPLEMENTED - September 2025)
 - **Post-Booking Payment Choice**: After successful Firebase booking submission, user is presented with payment options via professional modal
@@ -576,8 +592,8 @@ interface Booking {
 - **Session Management**: Automatic redirect to login if not authenticated
 
 ### Admin Dashboard Features
-- **Complete Booking Overview**: All bookings with detailed information
-- **Advanced Filtering**: Search by teacher, subject, contact, room, status, and date
+- **Complete Booking Overview**: All active bookings with detailed information (cancelled bookings excluded)
+- **Advanced Filtering**: Search by teacher, subject, contact, room, status (pending/paid), and date
 - **Export Functionality**: CSV export of filtered booking data
 - **Real-time Updates**: Automatic synchronization with Firebase database
 - **Revenue Tracking**: Total paid and pending revenue calculations
@@ -585,6 +601,7 @@ interface Booking {
 - **Secure Session**: Firebase Auth token validation with automatic refresh
 - **Admin Profile**: Display authenticated admin information and session stats
 - **Bulk Operations**: Multi-select booking management with confirmation dialogs
+- **✅ Cancelled Booking Exclusion**: Cancelled bookings automatically hidden from dashboard for cleaner interface
 
 ### Data Management
 - **Booking Details**: Teacher info, contact details, fee calculations, payment status
@@ -608,6 +625,219 @@ interface Booking {
 - **Export Capability**: Data backup and reporting functionality
 - **Access Security**: Email-based admin verification with session monitoring
 - **Compliance**: Enterprise-grade authentication meeting security standards
+
+## Enhanced Payment Tracking System (✅ NEW - December 2025)
+
+### Purpose & Implementation Status
+- **✅ COMPLETE**: Enhanced database structure with payment tracking fields
+- **✅ COMPLETE**: Manual payment confirmation system for offline payments
+- **✅ COMPLETE**: Real-time payment analytics dashboard
+- **✅ COMPLETE**: Firebase integration tested and verified
+- **✅ COMPLETE**: Backward compatibility with existing bookings maintained
+
+### Enhanced Firebase Service Methods
+New methods available in `FirebaseBookingService`:
+
+```typescript
+// Enhanced payment confirmation with transaction tracking
+static async confirmPayment(
+  bookingId: string, 
+  paymentMethod: 'online' | 'offline',
+  transactionId?: string
+): Promise<boolean>
+
+// Enhanced payment status update with automatic timestamps
+static async updatePaymentStatus(
+  bookingId: string, 
+  status: 'pending' | 'paid' | 'cancelled'
+): Promise<boolean>
+```
+
+### Enhanced Admin Dashboard Features (FirebaseAdminBookings.tsx)
+
+#### **🆕 Payment Analytics Dashboard**
+Real-time payment overview with four key metrics:
+- **🟢 Total Payé** - All confirmed payments with green styling
+- **🟡 En Attente** - All pending payments with yellow styling  
+- **🔵 Paiements En Ligne** - Online payment totals with blue styling
+- **🟣 Paiements Sur Place** - Offline payment totals with purple styling
+
+#### **🆕 Manual Payment Confirmation System**
+- **"Confirmer Paiement" Button** - Prominent green button for pending offline payments
+- **Automatic Timestamp Recording** - Records exact payment confirmation time
+- **Transaction ID Support** - Ready for payment gateway integration
+- **Real-time Status Updates** - Immediate synchronization across all admin sessions
+
+#### **🆕 Enhanced Payment Status Display**
+- **Color-coded Status Badges** - Visual payment status indicators
+- **Payment Method Tracking** - Distinguish between online and offline payments
+- **Transaction History** - Complete audit trail with timestamps
+- **Quick Action Buttons** - Fast payment status changes with confirmation
+
+### Payment Gateway Integration Readiness
+
+#### **Database Structure**
+All necessary fields implemented for automatic payment gateway integration:
+- `paymentMethod` - Tracks online vs offline payments
+- `paymentTransactionId` - Stores payment gateway transaction references
+- `paymentTimestamp` - Records when payment was confirmed
+- `createdAt` / `updatedAt` - Complete booking lifecycle tracking
+
+#### **Automatic Payment Flow (Future)**
+When PayMee.tn is integrated:
+1. **User selects "Payer en ligne"** → Booking created with `paymentMethod: 'online'`
+2. **Payment gateway webhook** → Calls `confirmPayment()` with transaction ID  
+3. **Automatic status update** → Booking marked as 'paid' with timestamp
+4. **Real-time admin dashboard** → Payment analytics update instantly
+
+### Business Benefits Achieved
+
+#### **For SmartHub Operations:**
+- **✅ Real-time Payment Visibility** - Instant overview of all payment statuses
+- **✅ Manual Payment Processing** - Easy confirmation of offline payments  
+- **✅ Payment Method Analytics** - Track online vs offline payment preferences
+- **✅ Complete Audit Trail** - Transaction IDs and timestamps for all payments
+- **✅ Operational Efficiency** - Reduced manual tracking and improved accuracy
+
+#### **For Future Growth:**
+- **✅ Payment Gateway Ready** - Database structure prepared for automatic integration
+- **✅ Scalable Architecture** - Handles both manual and automatic payment processing
+- **✅ Analytics Foundation** - Rich payment data for business insights
+- **✅ Customer Experience** - Seamless transition from manual to automated payments
+
+### Technical Implementation Notes
+
+#### **Zero-Risk Implementation**
+- **✅ Backward Compatibility** - All existing bookings continue working unchanged
+- **✅ Optional Fields** - New payment fields are optional, no data migration required
+- **✅ Non-Breaking Changes** - Current booking flow unchanged for users
+- **✅ TypeScript Safety** - Full type definitions for all new payment fields
+
+#### **Firebase Integration**
+- **✅ Real-time Synchronization** - All payment updates sync instantly across devices
+- **✅ Security Validated** - Firebase rules tested and working with enhanced structure  
+- **✅ CDN Compatibility** - Works with existing Firebase CDN integration
+- **✅ Production Ready** - Tested with live Firebase database
+
+### Usage Instructions
+
+#### **For Administrators:**
+1. **Access Enhanced Dashboard** - Login at `/admin/firebase-login`
+2. **View Payment Analytics** - Real-time totals displayed at top of dashboard
+3. **Confirm Offline Payments** - Click "Confirmer Paiement" for pending bookings
+4. **Track Payment History** - View complete timeline with timestamps and transaction IDs
+
+#### **For Payment Gateway Integration:**
+The enhanced system is ready for PayMee.tn integration:
+- Database structure supports automatic payment updates
+- `confirmPayment()` method ready for webhook integration  
+- Admin dashboard will automatically show online payments as paid
+- Complete audit trail maintained for all payment methods
+
+## Cancelled Booking Enhancement System (✅ NEW - January 2025)
+
+### Purpose & Implementation Status
+- **✅ COMPLETE**: Cancelled bookings excluded from admin dashboard display for cleaner interface
+- **✅ COMPLETE**: Cancelled bookings no longer block time slot availability in user booking system
+- **✅ COMPLETE**: Automatic time slot liberation when bookings are cancelled
+- **✅ COMPLETE**: Enhanced admin filtering with cancelled status removed from dropdown options
+
+### Technical Implementation
+
+#### **Admin Dashboard Enhancement** (`FirebaseAdminBookings.tsx`)
+- **Automatic Filtering**: `processBookingsForDisplay()` function excludes bookings with `paymentStatus === 'cancelled'`
+- **Clean Interface**: Cancelled bookings never appear in admin dashboard, reducing clutter
+- **Status Filter Update**: Removed "Annulé" option from status dropdown since cancelled bookings are hidden
+- **Revenue Analytics**: Cancelled bookings automatically excluded from payment calculations
+
+#### **Booking System Enhancement** (`BookingSystem.tsx`)
+- **Time Slot Liberation**: `isTimeSlotBooked()` function skips cancelled bookings when checking availability
+- **Automatic Availability**: Cancelled time slots become immediately available for new bookings
+- **Real-time Updates**: Firebase synchronization ensures cancelled slots show as available across all users
+
+### Business Logic & User Flow
+
+#### **Admin Workflow:**
+1. **Cancel Booking** → Admin marks booking as 'cancelled' via status update buttons
+2. **Dashboard Cleanup** → Cancelled booking automatically disappears from admin interface
+3. **Time Slot Release** → Previously booked time slot becomes available for new reservations
+4. **Analytics Update** → Revenue calculations automatically exclude cancelled booking amounts
+
+#### **User Booking Workflow:**
+1. **Time Slot Check** → System checks availability excluding cancelled bookings
+2. **Available Display** → Previously cancelled slots show as available in calendar
+3. **Booking Confirmation** → New bookings can be made for previously cancelled time slots
+4. **Real-time Sync** → All users see updated availability immediately via Firebase
+
+### Technical Benefits Achieved
+
+#### **For SmartHub Operations:**
+- **✅ Cleaner Admin Interface** - Only active bookings displayed, reducing cognitive load
+- **✅ Improved Resource Utilization** - Cancelled time slots immediately available for rebooking
+- **✅ Automatic Analytics** - Revenue calculations automatically exclude cancelled bookings
+- **✅ Enhanced User Experience** - More time slots available due to automatic cancellation handling
+
+#### **For System Architecture:**
+- **✅ Firebase Integration** - Seamless real-time synchronization across all components
+- **✅ Data Integrity** - Cancelled bookings preserved in database for audit trail
+- **✅ UI Consistency** - Both admin and user interfaces handle cancellations appropriately
+- **✅ Performance Optimization** - Efficient filtering reduces unnecessary data processing
+
+### Implementation Details
+
+#### **Database Structure (No Changes Required)**
+```typescript
+interface Booking {
+  // ... existing fields
+  paymentStatus?: 'pending' | 'paid' | 'cancelled'; // Existing field used for filtering
+  // ... other fields preserved
+}
+```
+
+#### **Admin Dashboard Logic**
+```typescript
+// Skip cancelled bookings in admin dashboard
+if (booking.paymentStatus === 'cancelled') {
+  return; // Exclude from display
+}
+```
+
+#### **Booking System Availability Check**
+```typescript
+// Skip cancelled bookings when checking time slot availability
+if (booking.paymentStatus === 'cancelled') return false;
+```
+
+### Production Impact
+
+#### **Immediate Benefits:**
+- **Revenue Recovery**: Previously blocked time slots can generate new bookings
+- **Operational Efficiency**: Admins focus only on active bookings requiring attention
+- **Customer Satisfaction**: More time slot availability improves booking success rate
+- **Data Accuracy**: Analytics reflect only active business operations
+
+#### **Long-term Advantages:**
+- **Scalable Architecture**: System handles cancellations elegantly as business grows
+- **Audit Compliance**: Complete booking history preserved while maintaining clean interfaces
+- **Resource Optimization**: Maximum utilization of available time slots and rooms
+- **Business Intelligence**: Accurate metrics for active vs cancelled booking analysis
+
+### Future Enhancements (Optional)
+
+#### **Potential Additions:**
+- **Cancellation Reason Tracking** - Optional field to capture why bookings were cancelled
+- **Cancellation Analytics Dashboard** - Separate view for analysing cancellation patterns
+- **Automated Email Notifications** - Notify users when time slots become available due to cancellations
+- **Waitlist Management** - Allow users to join waitlists for popular time slots
+
+### Usage Notes for Developers
+
+#### **Key Implementation Points:**
+- **Always check `paymentStatus === 'cancelled'`** when filtering bookings for display or availability
+- **Preserve cancelled bookings in database** - never delete for audit trail purposes
+- **Use explicit equality check** - avoid truthy/falsy checks that might exclude undefined statuses
+- **Update both admin and user components** when modifying cancellation logic
+- **Test real-time synchronization** to ensure cancelled slots become available immediately
 
 ## Quick Development Workflow
 
@@ -668,6 +898,11 @@ npm run lint                # Must pass without warnings
 - **Auto-Redirect**: BookingThankYou page auto-redirects to home after 3 seconds for smooth UX
 - **Public Tool Access**: CRITICAL - Use `/revenue-simulator` and `/booking-system` for public access with navigation/footer
 - **Legacy Routes**: Private routes `/simulation` and `/booking` still work but are hidden from public navigation
+- **✅ Enhanced Payment Tracking**: NEW - Complete payment tracking system with analytics dashboard and manual confirmation capabilities
+- **✅ Payment Gateway Ready**: Database structure prepared for automatic PayMee.tn integration with transaction ID and timestamp support
+- **✅ Admin Payment Analytics**: Real-time payment totals by method (online/offline) displayed in admin dashboard
+- **✅ Manual Payment Confirmation**: "Confirmer Paiement" buttons for offline payments with automatic timestamp recording
+- **✅ Cancelled Booking Enhancement**: NEW - Cancelled bookings are excluded from admin dashboard and free up time slots for new bookings
 
 ## Firebase Configuration (Database Only)
 

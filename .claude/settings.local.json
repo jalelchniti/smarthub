@@ -41,7 +41,8 @@
       "Bash(echo:*)",
       "WebFetch(domain:help.ovhcloud.com)",
       "WebSearch",
-      "Bash(git remote set-url:*)"
+      "Bash(git remote set-url:*)",
+      "Bash(start test-enhanced-booking.html)"
     ],
     "deny": [],
     "ask": []

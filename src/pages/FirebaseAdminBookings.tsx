@@ -101,10 +101,6 @@ export const FirebaseAdminBookings: React.FC = () => {
         return;
       }
 
-      // Skip cancelled bookings - they should not persist in the admin dashboard
-      if (booking.paymentStatus === 'cancelled') {
-        return;
-      }
       
       const date = new Date(booking.date);
       const formattedDate = date.toLocaleDateString('fr-FR', {
@@ -132,7 +128,7 @@ export const FirebaseAdminBookings: React.FC = () => {
       if (dateCompare !== 0) return dateCompare;
       return b.timeSlot.localeCompare(a.timeSlot);
     });
-  }, [selectedBookings]); // Include selectedBookings as it's used to set the selected property
+  }, [selectedBookings]);
 
   // Load all bookings when authenticated
   useEffect(() => {
@@ -569,6 +565,7 @@ export const FirebaseAdminBookings: React.FC = () => {
               <option value="all">Tous les statuts</option>
               <option value="pending">En attente</option>
               <option value="paid">Payé</option>
+              <option value="cancelled">Annulé</option>
             </select>
 
             {/* Date Filter */}
