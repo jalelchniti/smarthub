@@ -100,6 +100,11 @@ export const FirebaseAdminBookings: React.FC = () => {
         console.warn('Invalid booking data:', bookingId, booking);
         return;
       }
+
+      // Skip cancelled bookings - they should not persist in the admin dashboard
+      if (booking.paymentStatus === 'cancelled') {
+        return;
+      }
       
       const date = new Date(booking.date);
       const formattedDate = date.toLocaleDateString('fr-FR', {
@@ -297,6 +302,22 @@ export const FirebaseAdminBookings: React.FC = () => {
     }
   };
 
+  // Confirm offline payment (enhanced method)
+  const confirmOfflinePayment = async (bookingId: string) => {
+    try {
+      const success = await FirebaseBookingService.confirmPayment(bookingId, 'offline');
+      if (success) {
+        await refreshBookings();
+        setError('');
+      } else {
+        setError('Erreur lors de la confirmation du paiement');
+      }
+    } catch (err) {
+      console.error('Payment confirmation error:', err);
+      setError('Erreur lors de la confirmation du paiement');
+    }
+  };
+
   // Logout function
   const handleLogout = async () => {
     const success = await FirebaseAuthService.signOut();
@@ -359,14 +380,34 @@ export const FirebaseAdminBookings: React.FC = () => {
     );
   };
 
-  // Calculate total revenue
-  const totalRevenue = filteredBookings
-    .filter(booking => booking.paymentStatus === 'paid')
-    .reduce((sum, booking) => sum + (booking.feeCalculation?.totalTTC || 0), 0);
+  // Calculate comprehensive revenue analytics
+  const paymentAnalytics = filteredBookings.reduce((stats, booking) => {
+    const amount = booking.feeCalculation?.totalTTC || 0;
+    const status = booking.paymentStatus || 'pending';
+    const method = booking.paymentMethod || 'unknown';
 
-  const pendingRevenue = filteredBookings
-    .filter(booking => booking.paymentStatus === 'pending' || !booking.paymentStatus)
-    .reduce((sum, booking) => sum + (booking.feeCalculation?.totalTTC || 0), 0);
+    if (status === 'paid') {
+      stats.totalPaid += amount;
+      if (method === 'online') {
+        stats.onlinePayments += amount;
+      } else if (method === 'offline') {
+        stats.offlinePayments += amount;
+      }
+    } else if (status === 'pending') {
+      stats.totalPending += amount;
+    }
+    
+    return stats;
+  }, {
+    totalPaid: 0,
+    totalPending: 0,
+    onlinePayments: 0,
+    offlinePayments: 0
+  });
+
+  // Legacy variables for backward compatibility
+  const totalRevenue = paymentAnalytics.totalPaid;
+  const pendingRevenue = paymentAnalytics.totalPending;
 
   if (authState.loading) {
     return (
@@ -528,7 +569,6 @@ export const FirebaseAdminBookings: React.FC = () => {
               <option value="all">Tous les statuts</option>
               <option value="pending">En attente</option>
               <option value="paid">Payé</option>
-              <option value="cancelled">Annulé</option>
             </select>
 
             {/* Date Filter */}
@@ -538,6 +578,68 @@ export const FirebaseAdminBookings: React.FC = () => {
               onChange={(e) => setFilterDate(e.target.value)}
               className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+          </div>
+        </div>
+
+        {/* Payment Analytics Dashboard */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-xl border border-white/20 p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6 flex items-center gap-2">
+            <DollarSign className="w-5 h-5" />
+            Aperçu des Paiements
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Total Paid */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-4 border border-green-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-green-700 font-medium">Total Payé</p>
+                  <p className="text-2xl font-bold text-green-800">{paymentAnalytics.totalPaid.toFixed(2)} TND</p>
+                </div>
+                <div className="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                  <Check className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Total Pending */}
+            <div className="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-lg p-4 border border-yellow-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-yellow-700 font-medium">En Attente</p>
+                  <p className="text-2xl font-bold text-yellow-800">{paymentAnalytics.totalPending.toFixed(2)} TND</p>
+                </div>
+                <div className="w-12 h-12 bg-yellow-500 rounded-lg flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Online Payments */}
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-blue-700 font-medium">Paiements En Ligne</p>
+                  <p className="text-2xl font-bold text-blue-800">{paymentAnalytics.onlinePayments.toFixed(2)} TND</p>
+                </div>
+                <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                  <DollarSign className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Offline Payments */}
+            <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg p-4 border border-purple-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-purple-700 font-medium">Paiements Sur Place</p>
+                  <p className="text-2xl font-bold text-purple-800">{paymentAnalytics.offlinePayments.toFixed(2)} TND</p>
+                </div>
+                <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                  <Building className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -689,10 +791,11 @@ export const FirebaseAdminBookings: React.FC = () => {
                           ) : (
                             <p className="text-sm text-gray-500">Tarif non calculé</p>
                           )}
-                          <div className="mt-1 flex items-center gap-2">
+                          <div className="mt-1 space-y-1">
                             {getStatusBadge(booking.paymentStatus)}
                             {booking.paymentStatus === 'pending' && (
-                              <div className="flex gap-1">
+                              <div className="flex items-center gap-1">
+                                {/* Quick status buttons */}
                                 <button
                                   onClick={() => updatePaymentStatus(booking.id!, 'paid')}
                                   className="p-1 text-green-600 hover:bg-green-50 rounded"
@@ -708,6 +811,16 @@ export const FirebaseAdminBookings: React.FC = () => {
                                   <X className="w-3 h-3" />
                                 </button>
                               </div>
+                            )}
+                            {booking.paymentStatus === 'pending' && (
+                              <button
+                                onClick={() => confirmOfflinePayment(booking.id!)}
+                                className="px-3 py-1 text-xs bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-1"
+                                title="Confirmer le paiement sur place"
+                              >
+                                <DollarSign className="w-3 h-3" />
+                                Confirmer Paiement
+                              </button>
                             )}
                           </div>
                         </div>

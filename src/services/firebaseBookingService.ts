@@ -28,6 +28,11 @@ interface Booking {
   createdBy?: string; // Teacher identifier
   feeCalculation?: FeeCalculation; // Fee breakdown
   paymentStatus?: 'pending' | 'paid' | 'cancelled'; // Payment tracking
+  paymentMethod?: 'online' | 'offline'; // Payment method selection
+  paymentTransactionId?: string; // Payment gateway transaction ID
+  paymentTimestamp?: string; // When payment was confirmed
+  createdAt?: string; // ISO timestamp when booking was created
+  updatedAt?: string; // ISO timestamp when booking was last modified
 }
 
 interface BookingData {
@@ -218,7 +223,9 @@ export class FirebaseBookingService {
         bookingDate: new Date().toISOString(),
         createdBy: booking.teacherName, // Simple teacher identification
         feeCalculation, // Store fee breakdown
-        paymentStatus: 'pending' // Default payment status
+        paymentStatus: 'pending', // Default payment status
+        createdAt: new Date().toISOString(), // Track creation time
+        updatedAt: new Date().toISOString() // Track last modification
       };
       
       await newBookingRef.set(bookingWithId);
@@ -402,8 +409,14 @@ export class FirebaseBookingService {
     }
 
     try {
-      const bookingRef = database.ref(`bookings/${bookingId}/paymentStatus`);
-      await bookingRef.set(status);
+      const bookingRef = database.ref(`bookings/${bookingId}`);
+      const updates = {
+        paymentStatus: status,
+        updatedAt: new Date().toISOString(),
+        ...(status === 'paid' && { paymentTimestamp: new Date().toISOString() })
+      };
+      
+      await bookingRef.update(updates);
       
       // Update last modified timestamp
       await database.ref('lastUpdated').set(new Date().toISOString());
@@ -411,6 +424,38 @@ export class FirebaseBookingService {
       return true;
     } catch (error) {
       console.error('Failed to update payment status:', error);
+      return false;
+    }
+  }
+
+  // Enhanced payment confirmation with transaction details (for payment gateway integration)
+  static async confirmPayment(
+    bookingId: string, 
+    paymentMethod: 'online' | 'offline',
+    transactionId?: string
+  ): Promise<boolean> {
+    if (!initializeFirebase() || !database) {
+      return false;
+    }
+
+    try {
+      const bookingRef = database.ref(`bookings/${bookingId}`);
+      const updates = {
+        paymentStatus: 'paid',
+        paymentMethod,
+        paymentTimestamp: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        ...(transactionId && { paymentTransactionId: transactionId })
+      };
+      
+      await bookingRef.update(updates);
+      
+      // Update last modified timestamp
+      await database.ref('lastUpdated').set(new Date().toISOString());
+      
+      return true;
+    } catch (error) {
+      console.error('Failed to confirm payment:', error);
       return false;
     }
   }
