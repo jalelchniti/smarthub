@@ -63,7 +63,7 @@ const rooms: Room[] = [
 export const RevenueSimulator: React.FC = () => {
   const [selectedRoom, setSelectedRoom] = useState<string>('');
   const [studentsPerGroup, setStudentsPerGroup] = useState<string>('1');
-  const [sessionHours, setSessionHours] = useState<string>('1');
+  const [sessionHours, setSessionHours] = useState<string>('1.5'); // Minimum créneau duration
   const [sessionsPerWeek, setSessionsPerWeek] = useState<string>('1');
   const [feePerStudent, setFeePerStudent] = useState<string>('120');
   const [result, setResult] = useState<SimulationResult | null>(null);
@@ -98,8 +98,11 @@ export const RevenueSimulator: React.FC = () => {
     // Check room capacity validation
     const currentRoom = rooms.find(r => r.id === selectedRoom);
     const isCapacityExceeded = currentRoom && studentsNum > currentRoom.capacity;
+    
+    // Validate créneau duration (1.5h to 3h only)
+    const isValidCreneauDuration = sessionHoursNum >= 1.5 && sessionHoursNum <= 3.0;
 
-    if (selectedRoom && studentsNum > 0 && sessionHoursNum > 0 && sessionsPerWeekNum > 0 && feePerStudentNum > 0 && !isCapacityExceeded) {
+    if (selectedRoom && studentsNum > 0 && sessionHoursNum > 0 && sessionsPerWeekNum > 0 && feePerStudentNum > 0 && !isCapacityExceeded && isValidCreneauDuration) {
       const roomRate = getRoomRate(selectedRoom, studentsNum);
       const weeklyHours = sessionHoursNum * sessionsPerWeekNum;
       const monthlyHours = weeklyHours * 4.33; // Average weeks per month
@@ -255,7 +258,7 @@ export const RevenueSimulator: React.FC = () => {
                   <div>
                     <label className="block text-lg font-bold text-gray-800 mb-4 text-center">
                       <Building className="w-6 h-6 inline mr-2 text-blue-600" />
-                      Salle d'Apprentissage
+                      Salle de cours
                     </label>
                     <select
                       value={selectedRoom}
@@ -323,20 +326,20 @@ export const RevenueSimulator: React.FC = () => {
                   <div>
                     <label className="block text-lg font-bold text-gray-800 mb-4 text-center">
                       <Clock className="w-6 h-6 inline mr-2 text-green-600" />
-                      Durée d'une Séance (heures)
+                      Durée d'un Créneau (heures)
                     </label>
                     <input
                       type="number"
                       inputMode="decimal"
-                      min="0.5"
-                      max="8"
+                      min="1.5"
+                      max="3"
                       step="0.5"
                       value={sessionHours}
                       onChange={(e) => setSessionHours(e.target.value)}
                       onInput={(e) => setSessionHours((e.target as HTMLInputElement).value)}
                       onBlur={(e) => {
-                        const value = parseFloat(e.target.value) || 1;
-                        setSessionHours(Math.min(Math.max(value, 0.5), 8).toString());
+                        const value = parseFloat(e.target.value) || 1.5;
+                        setSessionHours(Math.min(Math.max(value, 1.5), 3).toString());
                       }}
                       placeholder="1.0"
                       autoComplete="off"
@@ -350,7 +353,7 @@ export const RevenueSimulator: React.FC = () => {
                   <div>
                     <label className="block text-lg font-bold text-gray-800 mb-4 text-center">
                       <Calendar className="w-6 h-6 inline mr-2 text-orange-600" />
-                      Nombre de Séances par Semaine
+                      Nombre de Créneaux par Semaine
                     </label>
                     <input
                       type="number"

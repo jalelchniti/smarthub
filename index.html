@@ -93,17 +93,26 @@
         
         var AUTOHIDE = Boolean(1);
         
-        // Load Brevo script after DOM is ready
-        var brevoScript = document.createElement('script');
-        brevoScript.defer = true;
-        brevoScript.src = 'https://sibforms.com/forms/end-form/build/main.js';
-        brevoScript.onload = function() {
-          console.log('Brevo script loaded successfully');
-        };
-        brevoScript.onerror = function() {
-          console.warn('Failed to load Brevo script');
-        };
-        document.head.appendChild(brevoScript);
+        // Load Brevo script only when needed (on pages with forms)
+        function loadBrevoScript() {
+          // Check if Brevo forms exist on the page
+          var brevoForms = document.querySelectorAll('[data-type="sibforms"]');
+          if (brevoForms.length > 0) {
+            var brevoScript = document.createElement('script');
+            brevoScript.defer = true;
+            brevoScript.src = 'https://sibforms.com/forms/end-form/build/main.js';
+            brevoScript.onload = function() {
+              console.log('Brevo script loaded successfully');
+            };
+            brevoScript.onerror = function() {
+              console.warn('Failed to load Brevo script');
+            };
+            document.head.appendChild(brevoScript);
+          }
+        }
+        
+        // Wait for React to render, then check for forms
+        setTimeout(loadBrevoScript, 1000);
       });
     </script>
     

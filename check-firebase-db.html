@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Database Diagnostics - SmartHub</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        h1 { text-align: center; color: #fff; }
+        h2 { color: #ffd700; border-bottom: 2px solid #ffd700; padding-bottom: 10px; }
+        .status { 
+            padding: 15px; 
+            border-radius: 10px; 
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .status.success { background: rgba(34, 197, 94, 0.2); border: 2px solid #22c55e; }
+        .status.error { background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; }
+        .status.info { background: rgba(59, 130, 246, 0.2); border: 2px solid #3b82f6; }
+        .booking-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #ffd700;
+        }
+        .cancelled { border-left-color: #ef4444; opacity: 0.7; }
+        .paid { border-left-color: #22c55e; }
+        .pending { border-left-color: #f59e0b; }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: scale(1.05); }
+        .button-group { text-align: center; margin: 20px 0; }
+        pre { 
+            background: rgba(0,0,0,0.3); 
+            padding: 15px; 
+            border-radius: 8px; 
+            overflow-x: auto; 
+            font-size: 12px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-number { font-size: 2em; font-weight: bold; color: #ffd700; }
+        .realtime-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            z-index: 1000;
+        }
+        .realtime-connected { background: rgba(34, 197, 94, 0.9); }
+        .realtime-disconnected { background: rgba(239, 68, 68, 0.9); }
+    </style>
+</head>
+<body>
+    <div class="realtime-indicator" id="realtimeStatus">🔌 Connecting...</div>
+    
+    <h1>🔥 Firebase Database Diagnostics</h1>
+    <p style="text-align: center;">SmartHub Booking System - Real-time Database Monitor</p>
+
+    <div class="container">
+        <h2>📊 Database Statistics</h2>
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalBookings">-</div>
+                <div>Total Bookings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingBookings">-</div>
+                <div>Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="paidBookings">-</div>
+                <div>Paid</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="cancelledBookings">-</div>
+                <div>Cancelled</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔥 Firebase Connection Status</h2>
+        <div id="connectionStatus" class="status info">Checking connection...</div>
+        
+        <div class="button-group">
+            <button onclick="checkConnection()">🔍 Check Connection</button>
+            <button onclick="loadAllData()">📥 Load All Data</button>
+            <button onclick="listenToUpdates()">👁️ Start Real-time Monitoring</button>
+            <button onclick="clearDisplay()">🗑️ Clear Display</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📋 All Bookings</h2>
+        <div id="bookingsList">No bookings loaded. Click "Load All Data" to fetch bookings.</div>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Raw Database JSON</h2>
+        <button onclick="showRawData()">View Raw JSON Data</button>
+        <pre id="rawData" style="display: none;"></pre>
+    </div>
+
+    <!-- Firebase CDN Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnjZRrhG7qmJqcZcJWO7FnN2LznNSk07k",
+            authDomain: "u-smart-booking.firebaseapp.com",
+            databaseURL: "https://u-smart-booking-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "u-smart-booking",
+            storageBucket: "u-smart-booking.firebasestorage.app",
+            messagingSenderId: "512917348858",
+            appId: "1:512917348858:web:77d83cc427db118f118443"
+        };
+
+        // Initialize Firebase
+        let database, auth;
+        let realtimeListener = null;
+
+        try {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+            auth = firebase.auth();
+            updateConnectionStatus('✅ Firebase initialized successfully', 'success');
+            updateRealtimeStatus(true);
+        } catch (error) {
+            updateConnectionStatus('❌ Firebase initialization failed: ' + error.message, 'error');
+            updateRealtimeStatus(false);
+            console.error('Firebase init error:', error);
+        }
+
+        function updateConnectionStatus(message, type) {
+            const statusEl = document.getElementById('connectionStatus');
+            statusEl.textContent = message;
+            statusEl.className = 'status ' + type;
+        }
+
+        function updateRealtimeStatus(connected) {
+            const indicator = document.getElementById('realtimeStatus');
+            if (connected) {
+                indicator.textContent = '🟢 Connected';
+                indicator.className = 'realtime-indicator realtime-connected';
+            } else {
+                indicator.textContent = '🔴 Disconnected';
+                indicator.className = 'realtime-indicator realtime-disconnected';
+            }
+        }
+
+        function updateStats(data) {
+            const bookings = data?.bookings || {};
+            const bookingsArray = Object.values(bookings);
+            
+            const stats = {
+                total: bookingsArray.length,
+                pending: bookingsArray.filter(b => (b.paymentStatus || 'pending') === 'pending').length,
+                paid: bookingsArray.filter(b => b.paymentStatus === 'paid').length,
+                cancelled: bookingsArray.filter(b => b.paymentStatus === 'cancelled').length
+            };
+
+            document.getElementById('totalBookings').textContent = stats.total;
+            document.getElementById('pendingBookings').textContent = stats.pending;
+            document.getElementById('paidBookings').textContent = stats.paid;
+            document.getElementById('cancelledBookings').textContent = stats.cancelled;
+        }
+
+        async function checkConnection() {
+            updateConnectionStatus('🔍 Testing connection...', 'info');
+            
+            try {
+                const ref = database.ref('/.info/connected');
+                const snapshot = await ref.once('value');
+                const connected = snapshot.val();
+                
+                if (connected) {
+                    updateConnectionStatus('✅ Database connection active', 'success');
+                    updateRealtimeStatus(true);
+                } else {
+                    updateConnectionStatus('⚠️ Database connection inactive', 'error');
+                    updateRealtimeStatus(false);
+                }
+            } catch (error) {
+                updateConnectionStatus('❌ Connection test failed: ' + error.message, 'error');
+                updateRealtimeStatus(false);
+                console.error('Connection test error:', error);
+            }
+        }
+
+        async function loadAllData() {
+            updateConnectionStatus('📥 Loading all data...', 'info');
+            
+            try {
+                const ref = database.ref('/');
+                const snapshot = await ref.once('value');
+                
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    updateConnectionStatus('✅ Data loaded successfully', 'success');
+                    updateStats(data);
+                    displayBookings(data.bookings || {});
+                    
+                    // Store raw data for viewing
+                    window.currentData = data;
+                } else {
+                    updateConnectionStatus('⚠️ No data found in database', 'info');
+                    updateStats({});
+                }
+            } catch (error) {
+                updateConnectionStatus('❌ Failed to load data: ' + error.message, 'error');
+                console.error('Load data error:', error);
+            }
+        }
+
+        function displayBookings(bookings) {
+            const container = document.getElementById('bookingsList');
+            
+            if (!bookings || Object.keys(bookings).length === 0) {
+                container.innerHTML = '<div class="status info">No bookings found in database.</div>';
+                return;
+            }
+
+            let html = '';
+            const bookingEntries = Object.entries(bookings);
+            
+            // Sort by date and time (newest first)
+            bookingEntries.sort(([,a], [,b]) => {
+                const dateCompare = new Date(b.date).getTime() - new Date(a.date).getTime();
+                if (dateCompare !== 0) return dateCompare;
+                return b.timeSlot.localeCompare(a.timeSlot);
+            });
+
+            bookingEntries.forEach(([id, booking]) => {
+                const status = booking.paymentStatus || 'pending';
+                const statusEmoji = {
+                    pending: '⏳',
+                    paid: '✅',
+                    cancelled: '❌'
+                };
+
+                // Calculate end time
+                const [hours, minutes] = booking.timeSlot.split(':').map(Number);
+                const totalMinutes = hours * 60 + minutes + (booking.duration * 60);
+                const endHours = Math.floor(totalMinutes / 60);
+                const endMinutes = totalMinutes % 60;
+                const endTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+
+                html += `
+                    <div class="booking-item ${status}" id="booking-${id}">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: center;">
+                            <div>
+                                <strong>📅 ${booking.date}</strong><br>
+                                <span>🕐 ${booking.timeSlot} - ${endTime} (${booking.duration}h)</span>
+                            </div>
+                            <div>
+                                <strong>👨‍🏫 ${booking.teacherName}</strong><br>
+                                <span>📚 ${booking.subject}</span>
+                            </div>
+                            <div>
+                                <strong>🏢 Salle ${booking.roomId}</strong><br>
+                                <span>👥 ${booking.studentCount} étudiant(s)</span>
+                            </div>
+                            <div>
+                                <span style="font-size: 1.5em;">${statusEmoji[status] || '❓'}</span><br>
+                                <strong>${status.toUpperCase()}</strong>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; opacity: 0.8;">
+                            ID: ${id} | Contact: ${booking.contactInfo} | 
+                            Created: ${new Date(booking.bookingDate).toLocaleString('fr-FR')}
+                            ${booking.feeCalculation ? ` | Cost: ${booking.feeCalculation.totalTTC.toFixed(2)} TND` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function listenToUpdates() {
+            if (realtimeListener) {
+                updateConnectionStatus('👁️ Real-time monitoring already active', 'info');
+                return;
+            }
+
+            updateConnectionStatus('👁️ Starting real-time monitoring...', 'info');
+
+            try {
+                const ref = database.ref('/');
+                realtimeListener = ref.on('value', (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        updateConnectionStatus('🔄 Real-time update received', 'success');
+                        updateStats(data);
+                        displayBookings(data.bookings || {});
+                        
+                        // Store raw data
+                        window.currentData = data;
+                        
+                        // Flash the indicator
+                        const indicator = document.getElementById('realtimeStatus');
+                        indicator.style.background = 'rgba(34, 197, 94, 1)';
+                        setTimeout(() => {
+                            indicator.style.background = 'rgba(34, 197, 94, 0.9)';
+                        }, 500);
+                    }
+                });
+
+                setTimeout(() => {
+                    updateConnectionStatus('✅ Real-time monitoring active', 'success');
+                }, 1000);
+
+            } catch (error) {
+                updateConnectionStatus('❌ Failed to start real-time monitoring: ' + error.message, 'error');
+                console.error('Real-time monitoring error:', error);
+            }
+        }
+
+        function showRawData() {
+            const rawDataEl = document.getElementById('rawData');
+            if (window.currentData) {
+                rawDataEl.textContent = JSON.stringify(window.currentData, null, 2);
+                rawDataEl.style.display = rawDataEl.style.display === 'none' ? 'block' : 'none';
+            } else {
+                alert('No data loaded. Click "Load All Data" first.');
+            }
+        }
+
+        function clearDisplay() {
+            document.getElementById('bookingsList').innerHTML = 'Display cleared. Click "Load All Data" to reload.';
+            document.getElementById('rawData').style.display = 'none';
+            document.getElementById('totalBookings').textContent = '-';
+            document.getElementById('pendingBookings').textContent = '-';
+            document.getElementById('paidBookings').textContent = '-';
+            document.getElementById('cancelledBookings').textContent = '-';
+            
+            if (realtimeListener) {
+                database.ref('/').off('value', realtimeListener);
+                realtimeListener = null;
+                updateConnectionStatus('Real-time monitoring stopped', 'info');
+            }
+        }
+
+        // Auto-initialize
+        window.addEventListener('load', () => {
+            checkConnection();
+            setTimeout(() => {
+                loadAllData();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

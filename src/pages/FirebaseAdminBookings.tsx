@@ -101,6 +101,10 @@ export const FirebaseAdminBookings: React.FC = () => {
         return;
       }
 
+      // ADMIN DASHBOARD: Show cancelled bookings (marked as cancelled for history/audit)
+      // Cancelled bookings stay visible to admins but are marked with cancelled status
+      // This allows admins to maintain complete booking history and audit trail
+
       
       const date = new Date(booking.date);
       const formattedDate = date.toLocaleDateString('fr-FR', {
@@ -108,7 +112,13 @@ export const FirebaseAdminBookings: React.FC = () => {
         month: 'long',
         year: 'numeric'
       });
-      const formattedTime = `${booking.timeSlot} (${booking.duration}h)`;
+      // Calculate end time for the créneau
+      const [hours, minutes] = booking.timeSlot.split(':').map(Number);
+      const totalMinutes = hours * 60 + minutes + (booking.duration * 60);
+      const endHours = Math.floor(totalMinutes / 60);
+      const endMinutes = totalMinutes % 60;
+      const endTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+      const formattedTime = `${booking.timeSlot} - ${endTime} (${booking.duration}h)`;
       const dayOfWeek = weekDays[date.getDay()];
       
       bookings.push({
@@ -285,15 +295,22 @@ export const FirebaseAdminBookings: React.FC = () => {
 
   // Update payment status
   const updatePaymentStatus = async (bookingId: string, status: 'pending' | 'paid' | 'cancelled') => {
+    console.log(`🔄 Admin: Starting payment status update for booking ${bookingId} to ${status}`);
+    
     try {
       const success = await FirebaseBookingService.updatePaymentStatus(bookingId, status);
+      console.log(`📊 Firebase service update result:`, success);
+      
       if (success) {
+        console.log(`✅ Admin: Status update successful, refreshing bookings...`);
         await refreshBookings();
+        console.log(`🔄 Admin: Bookings refreshed after ${status} update`);
       } else {
+        console.error(`❌ Admin: Firebase service returned false for booking ${bookingId}`);
         setError('Erreur lors de la mise à jour du statut');
       }
     } catch (err) {
-      console.error('Status update error:', err);
+      console.error('❌ Admin: Status update error:', err);
       setError('Erreur lors de la mise à jour du statut');
     }
   };
@@ -325,7 +342,7 @@ export const FirebaseAdminBookings: React.FC = () => {
   // Export bookings to CSV
   const exportToCSV = () => {
     const headers = [
-      'Date', 'Heure', 'Salle', 'Enseignant', 'Matière', 'Étudiants', 'Durée (h)', 
+      'Date', 'Heure', 'Salle', 'Enseignant', 'Matière', 'Étudiants', 'Créneau (h)', 
       'Contact', 'Coût HT', 'TVA', 'Total TTC', 'Statut'
     ];
     
@@ -747,7 +764,7 @@ export const FirebaseAdminBookings: React.FC = () => {
                           <p className="font-semibold text-gray-800">{booking.formattedDate}</p>
                           <p className="text-sm text-gray-600 flex items-center gap-1">
                             <Clock className="w-4 h-4" />
-                            {booking.formattedTime} ({booking.duration}h)
+                            {booking.formattedTime}
                           </p>
                         </div>
                       </div>
@@ -868,8 +885,8 @@ export const FirebaseAdminBookings: React.FC = () => {
                               <span className="font-medium">{booking.feeCalculation.hourlyRate} TND/h</span>
                             </div>
                             <div className="flex justify-between">
-                              <span>Durée:</span>
-                              <span className="font-medium">{booking.duration}h</span>
+                              <span>Créneau:</span>
+                              <span className="font-medium">{booking.duration}h (Séance d'enseignement)</span>
                             </div>
                             <div className="flex justify-between">
                               <span>Sous-total HT:</span>

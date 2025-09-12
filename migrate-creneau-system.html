@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartHub - Migration Système Créneau</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .status { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .error { background: #ffe6e6; border-left: 4px solid #ff0000; }
+        .success { background: #e6ffe6; border-left: 4px solid #00ff00; }
+        .warning { background: #fff3cd; border-left: 4px solid #ffc107; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .migration-stats { background: #e7f1ff; padding: 15px; border-radius: 8px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎯 SmartHub - Migration Système Créneau</h1>
+    <p><strong>Objectif:</strong> Migrer les réservations existantes vers le nouveau système de créneaux (1.5h-3h)</p>
+
+    <div class="migration-stats">
+        <h3>📊 Règles de Migration</h3>
+        <ul>
+            <li><strong>Durée < 1.5h:</strong> Mise à jour vers 1.5h (créneau minimum)</li>
+            <li><strong>Durée > 3h:</strong> Mise à jour vers 3h (créneau maximum)</li>
+            <li><strong>1.5h ≤ Durée ≤ 3h:</strong> Aucun changement nécessaire</li>
+            <li><strong>Recalcul automatique:</strong> Frais mis à jour selon nouvelles durées</li>
+        </ul>
+    </div>
+
+    <div>
+        <button onclick="analyzeDatabase()">🔍 Analyser la Base de Données</button>
+        <button onclick="migrateToCreneau()" style="background: #28a745;">🚀 Migrer vers Système Créneau</button>
+        <button onclick="rollbackMigration()" style="background: #dc3545;">⏪ Annuler Migration (Rollback)</button>
+    </div>
+
+    <div id="status"></div>
+
+    <script>
+        // Firebase config (utilise les mêmes paramètres que l'application principale)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnjZRrhG7qmJqcZcJWO7FnN2LznNSk07k",
+            authDomain: "u-smart-booking.firebaseapp.com",
+            databaseURL: "https://u-smart-booking-default-rtdb.asia-southeast1.firebasedatabase.app/",
+            projectId: "u-smart-booking",
+            storageBucket: "u-smart-booking.firebasestorage.app",
+            messagingSenderId: "512917348858",
+            appId: "1:512917348858:web:77d83cc427db118f118443"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            const className = type === 'error' ? 'status error' : 
+                             type === 'success' ? 'status success' : 
+                             type === 'warning' ? 'status warning' : 'status';
+            statusDiv.innerHTML += `<div class="${className}"><strong>[${new Date().toLocaleTimeString()}]</strong> ${message}</div>`;
+            console.log(message);
+        }
+
+        // Validation des durées de créneau (1.5h - 3h)
+        function validateCreneauDuration(duration) {
+            if (duration < 1.5) return { isValid: false, newDuration: 1.5, reason: 'Durée trop courte (< 1.5h)' };
+            if (duration > 3.0) return { isValid: false, newDuration: 3.0, reason: 'Durée trop longue (> 3h)' };
+            if (duration % 0.5 !== 0) {
+                const rounded = Math.round(duration * 2) / 2; // Round to nearest 0.5h
+                const clamped = Math.max(1.5, Math.min(3.0, rounded));
+                return { isValid: false, newDuration: clamped, reason: `Durée non multiple de 0.5h (${duration}h → ${clamped}h)` };
+            }
+            return { isValid: true, newDuration: duration, reason: 'Durée valide' };
+        }
+
+        // Calcul des frais pour une réservation (synchronisé avec firebaseBookingService.ts)
+        function calculateBookingFees(roomId, studentCount, duration) {
+            // Tarification des salles (identique à firebaseBookingService.ts)
+            const roomPricing = [
+                {
+                    roomId: '1',
+                    pricing: [
+                        { rate: 20, minStudents: 1, maxStudents: 1 },
+                        { rate: 25, minStudents: 2, maxStudents: 6 },
+                        { rate: 30, minStudents: 7, maxStudents: 9 },
+                        { rate: 35, minStudents: 10, maxStudents: 15 }
+                    ]
+                },
+                {
+                    roomId: '2',
+                    pricing: [
+                        { rate: 15, minStudents: 1, maxStudents: 1 },
+                        { rate: 20, minStudents: 2, maxStudents: 6 },
+                        { rate: 25, minStudents: 7, maxStudents: 9 }
+                    ]
+                },
+                {
+                    roomId: '3',
+                    pricing: [
+                        { rate: 15, minStudents: 1, maxStudents: 1 },
+                        { rate: 20, minStudents: 2, maxStudents: 6 },
+                        { rate: 25, minStudents: 7, maxStudents: 9 }
+                    ]
+                }
+            ];
+
+            const roomData = roomPricing.find(r => r.roomId === roomId);
+            if (!roomData) return null;
+
+            let hourlyRate = roomData.pricing[roomData.pricing.length - 1].rate; // Default to highest
+            for (const tier of roomData.pricing) {
+                if (studentCount >= tier.minStudents && studentCount <= tier.maxStudents) {
+                    hourlyRate = tier.rate;
+                    break;
+                }
+            }
+
+            const subtotalHT = hourlyRate * duration;
+            const vatAmount = subtotalHT * 0.19; // 19% VAT Tunisia
+            const totalTTC = subtotalHT + vatAmount;
+
+            return {
+                subtotalHT,
+                vatAmount,
+                totalTTC,
+                hourlyRate,
+                vatRate: 0.19
+            };
+        }
+
+        async function analyzeDatabase() {
+            try {
+                updateStatus('🔍 Début de l\'analyse de la base de données...', 'info');
+                
+                const snapshot = await database.ref('/bookings').once('value');
+                const bookings = snapshot.val() || {};
+                
+                const stats = {
+                    total: 0,
+                    needsMigration: 0,
+                    validCreneaux: 0,
+                    tooShort: 0,
+                    tooLong: 0,
+                    invalidIncrement: 0,
+                    details: []
+                };
+
+                for (const [bookingId, booking] of Object.entries(bookings)) {
+                    stats.total++;
+                    
+                    if (booking.paymentStatus === 'cancelled') {
+                        continue; // Skip cancelled bookings
+                    }
+
+                    const duration = booking.duration || 1;
+                    const validation = validateCreneauDuration(duration);
+                    
+                    if (!validation.isValid) {
+                        stats.needsMigration++;
+                        
+                        if (duration < 1.5) stats.tooShort++;
+                        else if (duration > 3.0) stats.tooLong++;
+                        else stats.invalidIncrement++;
+
+                        stats.details.push({
+                            id: bookingId,
+                            teacher: booking.teacherName,
+                            date: booking.date,
+                            currentDuration: duration,
+                            newDuration: validation.newDuration,
+                            reason: validation.reason
+                        });
+                    } else {
+                        stats.validCreneaux++;
+                    }
+                }
+
+                updateStatus(`📊 Analyse terminée:`, 'success');
+                updateStatus(`• Total réservations: ${stats.total}`, 'info');
+                updateStatus(`• Créneaux déjà valides: ${stats.validCreneaux}`, 'success');
+                updateStatus(`• Nécessitent migration: ${stats.needsMigration}`, 'warning');
+                updateStatus(`  - Trop courtes (< 1.5h): ${stats.tooShort}`, 'warning');
+                updateStatus(`  - Trop longues (> 3h): ${stats.tooLong}`, 'warning');
+                updateStatus(`  - Incrément invalide: ${stats.invalidIncrement}`, 'warning');
+
+                if (stats.needsMigration > 0) {
+                    updateStatus(`🔧 Réservations à migrer:`, 'warning');
+                    stats.details.forEach(detail => {
+                        updateStatus(`  • ${detail.teacher} (${detail.date}): ${detail.currentDuration}h → ${detail.newDuration}h (${detail.reason})`, 'warning');
+                    });
+                }
+
+                return stats;
+
+            } catch (error) {
+                updateStatus(`❌ Erreur lors de l'analyse: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function migrateToCreneau() {
+            try {
+                updateStatus('🚀 Début de la migration vers le système créneau...', 'info');
+                
+                // Backup current data
+                const backupRef = database.ref('/migration_backup_' + Date.now());
+                const currentData = await database.ref('/bookings').once('value');
+                await backupRef.set(currentData.val());
+                updateStatus('💾 Sauvegarde créée avant migration', 'success');
+
+                const snapshot = await database.ref('/bookings').once('value');
+                const bookings = snapshot.val() || {};
+                
+                let migrationCount = 0;
+                const migrations = [];
+
+                for (const [bookingId, booking] of Object.entries(bookings)) {
+                    if (booking.paymentStatus === 'cancelled') {
+                        continue; // Skip cancelled bookings
+                    }
+
+                    const duration = booking.duration || 1;
+                    const validation = validateCreneauDuration(duration);
+                    
+                    if (!validation.isValid) {
+                        migrationCount++;
+                        
+                        // Recalculate fees with new duration
+                        const newFees = calculateBookingFees(booking.roomId, booking.studentCount, validation.newDuration);
+                        
+                        const updatedBooking = {
+                            ...booking,
+                            duration: validation.newDuration,
+                            feeCalculation: newFees,
+                            updatedAt: new Date().toISOString(),
+                            migrationNote: `Migré vers système créneau: ${duration}h → ${validation.newDuration}h (${validation.reason})`
+                        };
+
+                        migrations.push({
+                            id: bookingId,
+                            data: updatedBooking,
+                            oldDuration: duration,
+                            newDuration: validation.newDuration,
+                            teacher: booking.teacherName
+                        });
+                    }
+                }
+
+                // Apply migrations
+                for (const migration of migrations) {
+                    await database.ref(`/bookings/${migration.id}`).set(migration.data);
+                    updateStatus(`✅ Migré: ${migration.teacher} (${migration.oldDuration}h → ${migration.newDuration}h)`, 'success');
+                }
+
+                // Update last modified timestamp
+                await database.ref('/lastUpdated').set(new Date().toISOString());
+                await database.ref('/migrationInfo').set({
+                    migratedAt: new Date().toISOString(),
+                    migratedBookings: migrationCount,
+                    version: 'creneau-system-v1.0'
+                });
+
+                updateStatus(`🎉 Migration terminée avec succès!`, 'success');
+                updateStatus(`📊 ${migrationCount} réservations migrées vers le système créneau`, 'success');
+
+            } catch (error) {
+                updateStatus(`❌ Erreur lors de la migration: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        async function rollbackMigration() {
+            try {
+                if (!confirm('⚠️ Êtes-vous sûr de vouloir annuler la migration? Cette action est irréversible.')) {
+                    return;
+                }
+
+                updateStatus('⏪ Recherche de la dernière sauvegarde...', 'info');
+                
+                // Find the most recent backup
+                const backupsSnapshot = await database.ref('/').once('value');
+                const data = backupsSnapshot.val();
+                
+                const backupKeys = Object.keys(data).filter(key => key.startsWith('migration_backup_'));
+                if (backupKeys.length === 0) {
+                    updateStatus('❌ Aucune sauvegarde trouvée pour le rollback', 'error');
+                    return;
+                }
+
+                const latestBackupKey = backupKeys.sort().pop();
+                updateStatus(`📂 Utilisation de la sauvegarde: ${latestBackupKey}`, 'info');
+
+                const backupData = data[latestBackupKey];
+                await database.ref('/bookings').set(backupData);
+                await database.ref('/lastUpdated').set(new Date().toISOString());
+
+                updateStatus('✅ Rollback terminé avec succès', 'success');
+                updateStatus('🔄 Les données ont été restaurées à l\'état précédant la migration', 'success');
+
+            } catch (error) {
+                updateStatus(`❌ Erreur lors du rollback: ${error.message}`, 'error');
+                console.error(error);
+            }
+        }
+
+        // Auto-analyze on page load
+        window.onload = function() {
+            updateStatus('🌐 Connexion à Firebase établie', 'success');
+            updateStatus('📋 Prêt pour la migration du système créneau', 'info');
+        };
+    </script>
+</body>
+</html>

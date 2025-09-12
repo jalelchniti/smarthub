@@ -34,9 +34,6 @@ function App() {
         {/* Private Revenue Simulator page - hidden from public navigation */}
         <Route path="/simulation" element={<RevenueSimulator />} />
         
-        {/* Private Booking System page - hidden from public navigation */}
-        <Route path="/booking" element={<BookingSystem />} />
-        
         {/* Admin Login pages - secure authentication */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/firebase-login" element={<FirebaseAdminLogin />} />

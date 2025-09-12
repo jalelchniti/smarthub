@@ -60,7 +60,7 @@
         },
         
         "duration": {
-          ".validate": "newData.isNumber() && newData.val() >= 0.5 && newData.val() <= 8"
+          ".validate": "newData.isNumber() && newData.val() >= 1.5 && newData.val() <= 3.0 && (newData.val() * 2) % 1 == 0"
         }
       }
     },

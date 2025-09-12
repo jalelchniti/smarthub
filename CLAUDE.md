@@ -120,6 +120,7 @@ RewriteRule . /index.html [L]
 - **Service Pattern**: Use `FirebaseBookingService` and `FirebaseAuthService` classes
 
 ### SmartHub Business Logic
+- **Créneau System**: Teaching periods with strict duration rules (1.5h minimum, 3h maximum, 30-minute increments)
 - **Income Protection**: 12 TND/hour minimum guaranteed for teachers (automatic discount up to 35%)
 - **VAT Calculation**: 19% Tunisia rate applied to room costs only, not teacher revenue
 - **Room Pricing**: Synchronized between `RevenueSimulator.tsx` and `firebaseBookingService.ts`
@@ -141,7 +142,7 @@ RewriteRule . /index.html [L]
 - **Registration Pages**: `/register/student`, `/register/teacher` - standalone pages with custom navigation
 - **Thank You Pages**: `/thank-you/student`, `/thank-you/teacher` - standalone without navigation/footer
 - **Payment Pages**: `/booking/thank-you`, `/payment/online-coming-soon` - standalone without navigation/footer
-- **Legacy Private Routes**: `/simulation`, `/booking` - hidden routes for backward compatibility
+- **Legacy Private Routes**: `/simulation` - hidden route for backward compatibility
 - **Admin Authentication**: `/admin/login` (legacy), `/admin/firebase-login` (current)
 - **Admin Dashboard**: `/admin/bookings` (deprecated), `/admin/firebase-bookings` (current), `/admin/legacy` (reference)
 
@@ -235,9 +236,12 @@ src/
 - **Navigation Issues**: Never use `window.location.href`, always `useNavigate()` from React Router
 - **Firebase CDN Issues**: Firebase scripts are in index.html (CDN), not npm packages - don't install via npm
 - **Form Field Names**: MUST be uppercase for Brevo (`NOM`, `PRENOM`, `EMAIL`) - lowercase will fail
-- **Route Confusion**: Use public routes `/revenue-simulator`, `/booking-system` for user access (not `/simulation`, `/booking`)
+- **Route Confusion**: Use public routes `/revenue-simulator`, `/booking-system` for user access (not legacy `/simulation`)
 - **Missing Dependencies**: Include all dependencies in useEffect hooks to avoid warnings
 - **Vite Base Path**: Keep `base: '/'` in vite.config.ts for absolute asset paths - don't change to relative
+- **Créneau Duration Logic**: Always use créneau business rules (1.5h-3h) - never allow individual 30-minute slot bookings
+- **Brevo Script Loading**: Only load Brevo scripts conditionally to avoid console errors on pages without forms
+- **Debug Code Cleanup**: Remove all console.log debugging statements before production deployment
 
 ## Brevo Form Integration Architecture
 
@@ -375,12 +379,51 @@ npm run build
 - **Final calculation**: New TTC cost = (OriginalHT - Discount) × 1.19
 - **UI display**: Shows original vs discounted costs with percentage saved
 
-## SmartHub Booking System (Enhanced - December 2025)
+## SmartHub Créneau (Teaching Period) System ✅ (NEW - January 2025)
+
+### Critical Business Rule: Créneau vs Time Slot
+**IMPORTANT**: SmartHub operates on a "Créneau" system, NOT individual time slot bookings:
+
+- **Time Slot** = 30-minute calendar grid unit (visual display only)
+- **Créneau** = Bookable teaching period (French: "créneau" = period/session)
+- **Séance** = Teaching session (same as créneau)
+
+### Créneau Duration Rules
+- **Minimum Duration**: 1.5 hours (90 minutes) = 3 consecutive time slots
+- **Maximum Duration**: 3.0 hours (180 minutes) = 6 consecutive time slots  
+- **Valid Increments**: 30 minutes (0.5 hours)
+- **Valid Options**: 1.5h, 2.0h, 2.5h, 3.0h ONLY
+
+### System Implementation
+- ✅ **BookingSystem.tsx**: Enforces créneau selection (not individual time slots)
+- ✅ **firebaseBookingService.ts**: Validates créneau duration in `validateCreneauDuration()`
+- ✅ **RevenueSimulator.tsx**: Restricts duration input to 1.5h-3h range
+- ✅ **FirebaseAdminBookings.tsx**: Displays "Créneau" instead of "Duration"
+- ✅ **PaymentChoiceModal.tsx**: Shows créneau count instead of time slot count
+- ✅ **Firebase Security Rules**: Enhanced with créneau duration validation (1.5h-3h)
+- ✅ **Data Migration**: Existing bookings converted to valid créneaux via migration tool
+- ✅ **Production Deployment**: Créneau system fully tested and deployed
+
+### User Experience
+- **Calendar Display**: Users see 30-minute time slots for visual reference
+- **Booking Selection**: Clicking a time slot books entire créneau starting at that time
+- **Automatic Selection**: System automatically selects correct number of consecutive slots (e.g., 4 slots for 2h créneau)
+- **Validation**: System prevents booking of invalid durations or incomplete créneaux
+- **Terminology**: All UI uses "Créneau" terminology, not "time slot" or "session"
+
+### Bug Fixes (January 2025)
+- ✅ **Fixed Slot Selection Bug**: 2-hour créneaux now correctly select 4 consecutive time slots instead of 3
+- ✅ **Enhanced Boundary Validation**: Improved time slot availability checking and conflict detection
+- ✅ **Production Debugging**: Added and removed debug logging for troubleshooting slot selection issues
+- ✅ **Brevo Script Optimization**: Fixed console errors by conditionally loading Brevo scripts only when needed
+- ✅ **Real-time Testing**: Comprehensive testing of all créneau durations (1.5h, 2h, 2.5h, 3h) confirmed working
+
+## SmartHub Booking System (Enhanced - January 2025)
 
 ### Purpose & Features
-- **Multi-user room booking system** for SmartHub's 3 educational spaces
+- **Multi-user créneau booking system** for SmartHub's 3 educational spaces
 - **Date-based bookings** starting September 15th, 2025
-- **Multi-slot selection**: Select multiple time slots before confirming all at once
+- **Multi-créneau selection**: Select multiple créneaux before confirming all at once
 - **Sunday availability**: 10:00 AM - 1:00 PM only
 - **Mon-Sat availability**: 9:00 AM - 1:00 PM, 3:00 PM - 6:00 PM (with lunch break 1:00-3:00 PM)
 - **Real-time synchronization** across all devices via Firebase
@@ -401,11 +444,11 @@ interface Booking {
   id?: string;
   roomId: string;
   date: string; // YYYY-MM-DD format
-  timeSlot: string; // "08:00", "08:30", etc.
+  timeSlot: string; // "08:00", "08:30", etc. (start time of créneau)
   teacherName: string;
   subject: string;
   studentCount: number;
-  duration: number; // Hours (0.5, 1, 1.5, 2, 2.5, 3)
+  duration: number; // Créneau duration in hours (1.5, 2.0, 2.5, 3.0 ONLY)
   contactInfo: string;
   feeCalculation?: {
     subtotalHT: number; // Amount before VAT
@@ -445,7 +488,7 @@ interface Booking {
 - **Start Date**: September 15th, 2025 (configurable)
 - **Room Capacity**: Salle 1 (15), Salle 2 (9), Salle 3 (9)
 - **Subjects**: Same 9 standardized subjects as Teachers page
-- **Duration**: 30 minutes to 3 hours in 30-minute increments
+- **Créneau Duration**: STRICT - 1.5h minimum, 3.0h maximum, 30-minute increments only
 - **Contact Required**: Phone or email for all bookings
 - **Fee Structure**: Synchronized with `Rooms.tsx` pricing tiers
 - **VAT Rate**: 19% (Tunisia standard rate) applied to all bookings
@@ -512,7 +555,7 @@ interface Booking {
 
 ### Public Route Access
 - **New Public Routes**: Both `/revenue-simulator` and `/booking-system` now accessible with full navigation and footer
-- **Maintained Legacy**: Original private routes `/simulation` and `/booking` preserved for backward compatibility
+- **Maintained Legacy**: Original private route `/simulation` preserved for backward compatibility
 - **SEO Benefits**: Public routes improve discoverability and user access to key tools
 
 ### User Experience Flow
@@ -871,7 +914,7 @@ npm run lint                # Must pass without warnings
 - Firebase Console access required for admin user management
 - All modern hosting platforms supported (Netlify, Vercel, GitHub Pages, Firebase, Apache, IIS)
 
-### Deployment Status (September 2025)
+### Deployment Status (Updated January 2025)
 - ✅ **Production Deployed**: https://www.smarthub.com.tn
 - ✅ **All Files Uploaded**: Root level deployment (index.html, assets/, images/)
 - ✅ **Server Configuration**: Enhanced .htaccess with asset protection rules
@@ -880,6 +923,68 @@ npm run lint                # Must pass without warnings
 - ✅ **MIME Type Issues**: Resolved through Vite config and Apache configuration fixes
 - ✅ **Firebase Integration**: Ready for testing on production (configuration popup removed)
 - ✅ **Payment Choice Enhancement**: Deployed September 11, 2025 with new payment flow components
+- ✅ **Créneau System**: Complete migration and bug fixes deployed January 2025
+
+### Recent Development Sessions
+
+#### **September 2025 - Booking Synchronization Fix** ✅
+**Complete Resolution of Admin-User Booking Display Issue**
+- **Issue Identified**: Cancelled bookings were disappearing from admin dashboard but remaining visible to users (opposite of desired behavior)
+- **Root Cause Analysis**: Logic was reversed between admin and user interfaces
+  1. **Admin Dashboard**: Incorrectly excluded cancelled bookings (should show for audit/history)
+  2. **User Booking System**: Time slot availability was correct, but conflict detection still treated cancelled bookings as active
+  3. **Firebase Service**: `checkBookingConflict` function didn't exclude cancelled bookings, preventing rebooking of cancelled slots
+- **Complete Fix Applied**:
+  1. **Admin Dashboard Enhancement** (`FirebaseAdminBookings.tsx`):
+     - Removed logic excluding cancelled bookings from admin view
+     - Re-added "Annulé" filter option for complete status management
+     - Result: Admins now see ALL bookings including cancelled ones marked with proper status
+  2. **User Interface Optimization** (`BookingSystem.tsx`):
+     - Enhanced calendar view to exclude cancelled bookings from booking indicator dots
+     - Maintained proper time slot availability checking (already working correctly)
+     - Result: Users see cancelled time slots as available and can book them
+  3. **Firebase Service Critical Fix** (`firebaseBookingService.ts`):
+     - Updated `checkBookingConflict()` to exclude cancelled bookings from conflict detection
+     - Added `booking.paymentStatus !== 'cancelled'` condition to allow rebooking
+     - Result: New bookings can now be successfully created on previously cancelled slots
+- **Final Working Behavior**:
+  - ✅ **Admin marks booking as cancelled** → Booking stays visible in admin (marked "Annulé") + disappears from user calendar
+  - ✅ **Time slot becomes available** → Users can immediately book previously cancelled slots
+  - ✅ **New booking succeeds** → No conflict errors, full booking creation works
+  - ✅ **Audit trail maintained** → Complete booking history preserved for admin while optimizing user experience
+- **Testing Completed**: Full booking flow verified including cancellation → rebooking → admin visibility
+- **Deployment Status**: Successfully deployed and working in production
+
+#### **December 2025 - Terminology & System Enhancement**
+**Major Terminology Standardization & Bug Fixes**
+- **Issue Identified**: Multiple critical issues with booking system synchronization and terminology consistency
+- **Terminology Fixes Applied**:
+  1. **Consistent Terminology**: Clarified "Créneau" = Teaching period/lesson, "Plages Horaires" = Time selection interface, "Time Slots" = 30-min technical units
+  2. **Room Labels**: Updated all "Salle d'Apprentissage" to "Salle de cours" across BookingSystem and RevenueSimulator
+  3. **User Interface Clarity**: Updated explanatory text to use "plages horaires" for 30-min units consistently
+- **Critical Bug Fixes**:
+  1. **Admin Dashboard Duplication**: Fixed booking creation to create 1 database entry per créneau instead of 1 per time slot (eliminated duplicate entries in admin)
+  2. **User-Admin Synchronization**: Fixed new bookings appearing as "Annulé" instead of "En attente" by ensuring `paymentStatus: 'pending'` is set correctly
+  3. **Cancelled Booking Handling**: Enhanced system to hide cancelled bookings from users while keeping them visible to admins for audit
+- **System Enhancements**:
+  1. **Cancel vs Delete Distinction**: Cancelled bookings disappear from user view but remain in admin; Deleted bookings disappear from both
+  2. **Real-time Synchronization**: Improved Firebase sync between user booking creation and admin dashboard display
+  3. **Time Slot Liberation**: Cancelled slots immediately become available for new bookings
+- **Testing Completed**: All booking flows, admin dashboard synchronization, and terminology consistency verified working correctly
+- **Deployment Status**: Ready for production with enhanced booking system and clear terminology
+
+#### **January 2025 - Previous Session**
+**Critical Bug Fix: Créneau Slot Selection**
+- **Issue Identified**: 2-hour créneaux only selecting 3 time slots (1.5h) instead of 4 slots (2h)
+- **Root Cause**: User experience bug where automatic slot selection wasn't working correctly
+- **Resolution Applied**:
+  1. **Firebase Security Rules Updated**: Enhanced validation for 1.5h-3h créneau durations
+  2. **Data Migration Completed**: Existing bookings converted to valid créneaux via migration tool
+  3. **Bug Fix Implemented**: Fixed slot selection logic in BookingSystem.tsx
+  4. **Console Error Resolved**: Fixed Brevo script loading to prevent console errors
+  5. **Debug Code Cleaned**: Removed all debugging statements for production readiness
+- **Testing Completed**: All créneau durations (1.5h, 2h, 2.5h, 3h) verified working correctly
+- **Deployment Status**: Ready for production with complete créneau system functionality
 
 ## Important Notes
 
@@ -897,12 +1002,12 @@ npm run lint                # Must pass without warnings
 - **Payment Choice Flow**: CRITICAL - After booking success, PaymentChoiceModal appears automatically (no more alert messages)
 - **Auto-Redirect**: BookingThankYou page auto-redirects to home after 3 seconds for smooth UX
 - **Public Tool Access**: CRITICAL - Use `/revenue-simulator` and `/booking-system` for public access with navigation/footer
-- **Legacy Routes**: Private routes `/simulation` and `/booking` still work but are hidden from public navigation
+- **Legacy Routes**: Private route `/simulation` still works but is hidden from public navigation
 - **✅ Enhanced Payment Tracking**: NEW - Complete payment tracking system with analytics dashboard and manual confirmation capabilities
 - **✅ Payment Gateway Ready**: Database structure prepared for automatic PayMee.tn integration with transaction ID and timestamp support
 - **✅ Admin Payment Analytics**: Real-time payment totals by method (online/offline) displayed in admin dashboard
 - **✅ Manual Payment Confirmation**: "Confirmer Paiement" buttons for offline payments with automatic timestamp recording
-- **✅ Cancelled Booking Enhancement**: NEW - Cancelled bookings are excluded from admin dashboard and free up time slots for new bookings
+- **✅ Booking Synchronization Fix**: NEW - Complete resolution of admin-user booking synchronization issue (cancelled bookings stay visible to admin for history, disappear from user view, time slots become available for rebooking)
 
 ## Firebase Configuration (Database Only)
 

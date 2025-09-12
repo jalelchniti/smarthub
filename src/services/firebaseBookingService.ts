@@ -129,10 +129,17 @@ export class FirebaseBookingService {
     return tier ? tier.rate : roomPricingData.pricing[roomPricingData.pricing.length - 1].rate;
   }
 
-  // Calculate fee breakdown for a booking
+  // Calculate fee breakdown for a créneau booking
+  // Note: Duration must be validated (1.5h-3h) before calling this method
   static calculateBookingFees(roomId: string, studentCount: number, duration: number): FeeCalculation {
+    // Validate duration range (defensive programming)
+    const validation = this.validateCreneauDuration(duration);
+    if (!validation.isValid) {
+      throw new Error(`Invalid créneau duration: ${validation.message}`);
+    }
+
     const hourlyRate = this.getHourlyRate(roomId, studentCount);
-    const subtotalHT = hourlyRate * duration;
+    const subtotalHT = hourlyRate * duration; // Duration is in hours (1.5, 2.0, 2.5, 3.0)
     const vatAmount = subtotalHT * this.VAT_RATE;
     const totalTTC = subtotalHT + vatAmount;
 
@@ -198,6 +205,20 @@ export class FirebaseBookingService {
     }
   }
 
+  // Validate créneau duration (business rule: 1.5h to 3h only)
+  static validateCreneauDuration(duration: number): { isValid: boolean; message: string } {
+    if (duration < 1.5) {
+      return { isValid: false, message: 'La durée minimale d\'un créneau est de 1h30 (90 minutes).' };
+    }
+    if (duration > 3.0) {
+      return { isValid: false, message: 'La durée maximale d\'un créneau est de 3h00 (180 minutes).' };
+    }
+    if (duration % 0.5 !== 0) {
+      return { isValid: false, message: 'La durée d\'un créneau doit être un multiple de 30 minutes (0.5h).' };
+    }
+    return { isValid: true, message: 'Durée de créneau valide.' };
+  }
+
   // Create a new booking
   static async createBooking(booking: Omit<Booking, 'id'>): Promise<string | null> {
     if (!initializeFirebase() || !database) {
@@ -205,6 +226,12 @@ export class FirebaseBookingService {
     }
 
     try {
+      // Validate créneau duration first
+      const durationValidation = this.validateCreneauDuration(booking.duration);
+      if (!durationValidation.isValid) {
+        throw new Error(durationValidation.message);
+      }
+
       // Check for conflicts first
       const hasConflict = await this.checkBookingConflict(booking.roomId, booking.date, booking.timeSlot);
       if (hasConflict) {
@@ -223,7 +250,7 @@ export class FirebaseBookingService {
         bookingDate: new Date().toISOString(),
         createdBy: booking.teacherName, // Simple teacher identification
         feeCalculation, // Store fee breakdown
-        paymentStatus: 'pending', // Default payment status
+        paymentStatus: booking.paymentStatus || 'pending', // Preserve provided status or default to pending
         createdAt: new Date().toISOString(), // Track creation time
         updatedAt: new Date().toISOString() // Track last modification
       };
@@ -274,12 +301,14 @@ export class FirebaseBookingService {
       if (snapshot.exists()) {
         const bookings = snapshot.val();
         
-        // Check if any booking matches room, date, and time slot
+        // Check if any ACTIVE booking matches room, date, and time slot
+        // Exclude cancelled bookings so they don't block new reservations
         const bookingsArray = Object.values(bookings as Record<string, Booking>);
         return bookingsArray.some((booking: Booking) => 
           booking.roomId === roomId && 
           booking.date === date && 
-          booking.timeSlot === timeSlot
+          booking.timeSlot === timeSlot &&
+          booking.paymentStatus !== 'cancelled' // Allow booking over cancelled slots
         );
       }
       
@@ -404,26 +433,39 @@ export class FirebaseBookingService {
 
   // Update booking payment status (admin function)
   static async updatePaymentStatus(bookingId: string, status: 'pending' | 'paid' | 'cancelled'): Promise<boolean> {
+    console.log(`🔥 Firebase Service: updatePaymentStatus called for ${bookingId} → ${status}`);
+    
     if (!initializeFirebase() || !database) {
+      console.error('❌ Firebase Service: Firebase not initialized or database unavailable');
       return false;
     }
 
     try {
+      console.log(`📍 Firebase Service: Creating booking reference for path bookings/${bookingId}`);
       const bookingRef = database.ref(`bookings/${bookingId}`);
+      
       const updates = {
         paymentStatus: status,
         updatedAt: new Date().toISOString(),
         ...(status === 'paid' && { paymentTimestamp: new Date().toISOString() })
       };
       
+      console.log(`📝 Firebase Service: Preparing updates:`, updates);
+      
+      console.log(`⏳ Firebase Service: Executing database update...`);
       await bookingRef.update(updates);
+      console.log(`✅ Firebase Service: Booking update completed successfully`);
       
       // Update last modified timestamp
+      console.log(`⏳ Firebase Service: Updating lastUpdated timestamp...`);
       await database.ref('lastUpdated').set(new Date().toISOString());
+      console.log(`✅ Firebase Service: LastUpdated timestamp set successfully`);
       
+      console.log(`🎉 Firebase Service: Payment status update COMPLETE for ${bookingId}`);
       return true;
     } catch (error) {
-      console.error('Failed to update payment status:', error);
+      console.error('❌ Firebase Service: Failed to update payment status:', error);
+      console.error('❌ Firebase Service: Error details:', error);
       return false;
     }
   }

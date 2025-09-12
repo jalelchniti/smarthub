@@ -52,8 +52,8 @@ export const PaymentChoiceModal: React.FC<PaymentChoiceModalProps> = ({
           </h2>
           <p className="text-gray-600">
             {bookingCount > 1 
-              ? `${bookingCount} réservations créées avec succès`
-              : 'Réservation créée avec succès'
+              ? `${Math.ceil(bookingCount / 3)} créneau${Math.ceil(bookingCount / 3) > 1 ? 'x' : ''} réservé${Math.ceil(bookingCount / 3) > 1 ? 's' : ''} avec succès`
+              : 'Créneau réservé avec succès'
             }
           </p>
           <div className="mt-4 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-100">

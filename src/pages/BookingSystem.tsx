@@ -43,7 +43,7 @@ export const BookingSystem: React.FC = () => {
     teacherName: '',
     subject: '',
     studentCount: 1,
-    duration: 1,
+    duration: 1.5, // Minimum créneau duration
     contactInfo: ''
   });
   const [loading, setLoading] = useState(true);
@@ -65,10 +65,14 @@ export const BookingSystem: React.FC = () => {
       formData.duration
     );
 
-    const totalHours = bookingsToCalculate.length * formData.duration;
-    const totalSubtotalHT = baseFeeCalculation.subtotalHT * bookingsToCalculate.length;
-    const totalVatAmount = baseFeeCalculation.vatAmount * bookingsToCalculate.length;
-    const totalTTC = baseFeeCalculation.totalTTC * bookingsToCalculate.length;
+    // Calculate number of créneaux (not time slots)
+    const slotsPerCreneau = formData.duration * 2; // 2 slots per hour
+    const numberOfCreneaux = Math.ceil(bookingsToCalculate.length / slotsPerCreneau);
+    
+    const totalHours = numberOfCreneaux * formData.duration;
+    const totalSubtotalHT = baseFeeCalculation.subtotalHT * numberOfCreneaux;
+    const totalVatAmount = baseFeeCalculation.vatAmount * numberOfCreneaux;
+    const totalTTC = baseFeeCalculation.totalTTC * numberOfCreneaux;
 
     return {
       ...baseFeeCalculation,
@@ -78,7 +82,7 @@ export const BookingSystem: React.FC = () => {
       totalHours,
       studentCount: formData.studentCount,
       roomName: bookingData.rooms[selectedRoom].name,
-      slotCount: bookingsToCalculate.length
+      slotCount: numberOfCreneaux
     };
   };
 
@@ -262,13 +266,13 @@ export const BookingSystem: React.FC = () => {
     return { isAvailable: true, message: 'Créneau disponible!' };
   };
 
-  // Helper function to add a time slot to selections
-  const addTimeSlotSelection = (date: string, timeSlot: string) => {
-    const id = `${date}-${timeSlot}`;
-    if (!selectedTimeSlots.some(slot => slot.id === id)) {
-      setSelectedTimeSlots(prev => [...prev, { date, timeSlot, id }]);
-    }
-  };
+  // Legacy function - kept for backward compatibility but unused in créneau system
+  // const addTimeSlotSelection = (date: string, timeSlot: string) => {
+  //   const id = `${date}-${timeSlot}`;
+  //   if (!selectedTimeSlots.some(slot => slot.id === id)) {
+  //     setSelectedTimeSlots(prev => [...prev, { date, timeSlot, id }]);
+  //   }
+  // };
 
   // Helper function to remove a time slot from selections
   const removeTimeSlotSelection = (id: string) => {
@@ -284,6 +288,129 @@ export const BookingSystem: React.FC = () => {
   const isSlotSelected = (date: string, timeSlot: string) => {
     const id = `${date}-${timeSlot}`;
     return selectedTimeSlots.some(slot => slot.id === id);
+  };
+
+  // Helper function to add a complete créneau (multiple consecutive time slots)
+  const addCreneauSelection = (date: string, startTimeSlot: string) => {
+    if (!bookingData) return;
+    
+    const slotsNeeded = formData.duration * 2; // 2 slots per hour (30-minute intervals)
+    const timeSlots = bookingData.timeSlots[new Date(date).getDay() === 0 ? 'sunday' : 'weekdays'];
+    const startIndex = timeSlots.indexOf(startTimeSlot);
+    
+    
+    if (startIndex === -1 || startIndex + slotsNeeded > timeSlots.length) {
+      setAvailabilityCheck({
+        isAvailable: false,
+        message: `Impossible de réserver un créneau de ${formData.duration}h à cette heure. Pas assez de créneaux consécutifs disponibles.`,
+        suggestedSlots: []
+      });
+      return;
+    }
+
+    // Check if any of the required slots are already booked
+    for (let i = 0; i < slotsNeeded; i++) {
+      const timeSlot = timeSlots[startIndex + i];
+      if (isTimeSlotBooked(selectedRoom, date, timeSlot)) {
+        setAvailabilityCheck({
+          isAvailable: false,
+          message: `Créneau de ${formData.duration}h non disponible. Conflit détecté au créneau ${timeSlot}.`,
+          suggestedSlots: []
+        });
+        return;
+      }
+    }
+
+    // Add all consecutive time slots for this créneau
+    const creneauSlots: { date: string; timeSlot: string; id: string }[] = [];
+    for (let i = 0; i < slotsNeeded; i++) {
+      const timeSlot = timeSlots[startIndex + i];
+      const id = `${date}-${timeSlot}`;
+      creneauSlots.push({ date, timeSlot, id });
+    }
+
+    setSelectedTimeSlots(prev => {
+      // Remove any existing slots for this date/time to avoid duplicates
+      const filtered = prev.filter(slot => 
+        !creneauSlots.some(creneauSlot => creneauSlot.id === slot.id)
+      );
+      return [...filtered, ...creneauSlots];
+    });
+  };
+
+  // Helper function to remove a complete créneau
+  const removeCreneauSelection = (date: string, startTimeSlot: string) => {
+    if (!bookingData) return;
+    
+    const slotsNeeded = formData.duration * 2; // 2 slots per hour (30-minute intervals)
+    const timeSlots = bookingData.timeSlots[new Date(date).getDay() === 0 ? 'sunday' : 'weekdays'];
+    const startIndex = timeSlots.indexOf(startTimeSlot);
+    
+    if (startIndex === -1) return;
+
+    // Remove all consecutive time slots for this créneau
+    const slotsToRemove: string[] = [];
+    for (let i = 0; i < slotsNeeded && startIndex + i < timeSlots.length; i++) {
+      const timeSlot = timeSlots[startIndex + i];
+      const id = `${date}-${timeSlot}`;
+      slotsToRemove.push(id);
+    }
+
+    setSelectedTimeSlots(prev => 
+      prev.filter(slot => !slotsToRemove.includes(slot.id))
+    );
+  };
+
+  // Helper function to check if a complete créneau can be booked
+  const checkCreneauAvailability = (roomId: string, date: string, startTimeSlot: string, duration: number) => {
+    if (!bookingData) {
+      return { 
+        isAvailable: false, 
+        message: "Données de réservation non disponibles.",
+        suggestedSlots: []
+      };
+    }
+    
+    const slotsNeeded = duration * 2; // 2 slots per hour (30-minute intervals)
+    const timeSlots = bookingData.timeSlots[new Date(date).getDay() === 0 ? 'sunday' : 'weekdays'];
+    const startIndex = timeSlots.indexOf(startTimeSlot);
+    
+    if (startIndex === -1) {
+      return { 
+        isAvailable: false, 
+        message: "Créneau horaire invalide.",
+        suggestedSlots: []
+      };
+    }
+
+    if (startIndex + slotsNeeded > timeSlots.length) {
+      return { 
+        isAvailable: false, 
+        message: `Impossible de réserver un créneau de ${duration}h à cette heure. Pas assez de créneaux consécutifs disponibles.`,
+        suggestedSlots: []
+      };
+    }
+
+    // Check if all required consecutive slots are available
+    const conflictingSlots = [];
+    for (let i = 0; i < slotsNeeded; i++) {
+      const timeSlot = timeSlots[startIndex + i];
+      const slotAvailability = checkTimeSlotAvailability(roomId, date, timeSlot, 0.5); // Check each 30-minute slot
+      
+      if (!slotAvailability.isAvailable) {
+        conflictingSlots.push(timeSlot);
+      }
+    }
+
+    if (conflictingSlots.length > 0) {
+      return { 
+        isAvailable: false, 
+        message: `Créneau de ${duration}h non disponible. Conflit détecté aux heures: ${conflictingSlots.join(', ')}.`,
+        suggestedSlots: []
+      };
+    }
+    
+    return { isAvailable: true, message: `Créneau de ${duration}h disponible!` };
   };
 
   // Helper function to batch check availability for all selected slots
@@ -334,10 +461,13 @@ export const BookingSystem: React.FC = () => {
     if (!bookingData || !bookingData.bookings) return false;
     
     // Check if this specific time slot is booked by any active booking
+    // IMPORTANT: Exclude cancelled bookings so they appear available to users
     const bookings = Object.values(bookingData.bookings);
     return bookings.some(booking => {
       if (!booking || booking.roomId !== roomId || booking.date !== date) return false;
       
+      // Skip cancelled bookings - they should appear available to users
+      if (booking.paymentStatus === 'cancelled') return false;
       
       // Check if this time slot falls within any existing active booking's duration
       const affectedSlots = getAffectedTimeSlots(booking.timeSlot, booking.duration, date);
@@ -351,13 +481,33 @@ export const BookingSystem: React.FC = () => {
     
     if (!bookingData || !selectedRoom) return;
 
-    // Handle multiple bookings or single booking
-    const bookingsToCreate = selectedTimeSlots.length > 0 ? selectedTimeSlots : 
-      (selectedDate && selectedTimeSlot ? [{ date: selectedDate, timeSlot: selectedTimeSlot, id: `${selectedDate}-${selectedTimeSlot}` }] : []);
+    // Group time slots into créneaux for booking creation
+    const slotsPerCreneau = formData.duration * 2; // 2 slots per hour
+    const creneauxToCreate = [];
+    
+    if (selectedTimeSlots.length > 0) {
+      // Group selected time slots into créneaux
+      for (let i = 0; i < selectedTimeSlots.length; i += slotsPerCreneau) {
+        const creneauSlots = selectedTimeSlots.slice(i, i + slotsPerCreneau);
+        const firstSlot = creneauSlots[0];
+        creneauxToCreate.push({
+          date: firstSlot.date,
+          timeSlot: firstSlot.timeSlot, // Start time of the créneau
+          duration: formData.duration
+        });
+      }
+    } else if (selectedDate && selectedTimeSlot) {
+      // Single créneau
+      creneauxToCreate.push({
+        date: selectedDate,
+        timeSlot: selectedTimeSlot,
+        duration: formData.duration
+      });
+    }
 
-    if (bookingsToCreate.length === 0) return;
+    if (creneauxToCreate.length === 0) return;
 
-    // Final availability check for all slots (only for multiple selections)
+    // Final availability check for all créneaux
     if (selectedTimeSlots.length > 0) {
       const finalCheck = checkBatchAvailability();
       if (finalCheck.hasConflicts) {
@@ -370,36 +520,37 @@ export const BookingSystem: React.FC = () => {
     try {
       const results = [];
 
-      for (const slot of bookingsToCreate) {
+      for (const creneau of creneauxToCreate) {
         const newBooking: Omit<Booking, 'id'> = {
           roomId: selectedRoom,
-          date: slot.date,
-          timeSlot: slot.timeSlot,
+          date: creneau.date,
+          timeSlot: creneau.timeSlot,
           teacherName: formData.teacherName,
           subject: formData.subject,
           studentCount: formData.studentCount,
-          duration: formData.duration,
+          duration: creneau.duration,
           contactInfo: formData.contactInfo,
-          bookingDate: new Date().toISOString()
+          bookingDate: new Date().toISOString(),
+          paymentStatus: 'pending' // New bookings start as pending
         };
 
         try {
           // Save booking to Firebase
           const bookingId = await FirebaseBookingService.createBooking(newBooking);
           if (bookingId) {
-            results.push({ success: true, slot, bookingId });
+            results.push({ success: true, creneau, bookingId });
             successCount++;
           } else {
-            results.push({ success: false, slot, error: 'No booking ID returned' });
+            results.push({ success: false, creneau, error: 'No booking ID returned' });
           }
         } catch (error) {
-          console.error(`Failed to save booking for ${slot.date} ${slot.timeSlot}:`, error);
-          results.push({ success: false, slot, error: error instanceof Error ? error.message : 'Unknown error' });
+          console.error(`Failed to save booking for ${creneau.date} ${creneau.timeSlot}:`, error);
+          results.push({ success: false, creneau, error: error instanceof Error ? error.message : 'Unknown error' });
         }
       }
 
       // Show payment choice modal for successful bookings
-      if (successCount === bookingsToCreate.length) {
+      if (successCount === creneauxToCreate.length) {
         // Calculate total amount for successful bookings
         const feeCalc = calculateFees();
         const totalAmount = feeCalc ? feeCalc.totalTTC : 0;
@@ -408,7 +559,7 @@ export const BookingSystem: React.FC = () => {
         setBookingCount(successCount);
         setShowPaymentChoice(true);
       } else {
-        alert(`⚠️ ${successCount}/${bookingsToCreate.length} réservations créées avec succès. Certaines réservations ont échoué.`);
+        alert(`⚠️ ${successCount}/${creneauxToCreate.length} réservations créées avec succès. Certaines réservations ont échoué.`);
       }
 
       console.log('Booking results:', results);
@@ -421,12 +572,12 @@ export const BookingSystem: React.FC = () => {
     
     // Only reset form and close modals if there were errors
     // For successful bookings, this will be handled by the payment modal's onClose
-    if (successCount !== bookingsToCreate.length) {
+    if (successCount !== creneauxToCreate.length) {
       setFormData({
         teacherName: '',
         subject: '',
         studentCount: 1,
-        duration: 1,
+        duration: 1.5,
         contactInfo: ''
       });
       setShowBookingForm(false);
@@ -447,18 +598,27 @@ export const BookingSystem: React.FC = () => {
   const handleTimeSlotSelection = (timeSlot: string) => {
     if (!selectedDate || !formData.duration) return;
     
-    const id = `${selectedDate}-${timeSlot}`;
+    // Validate créneau duration (1.5h to 3h only)
+    if (formData.duration < 1.5 || formData.duration > 3.0) {
+      setAvailabilityCheck({
+        isAvailable: false,
+        message: "La durée d'un créneau doit être entre 1h30 (minimum) et 3h00 (maximum).",
+        suggestedSlots: []
+      });
+      return;
+    }
+    
     const isSelected = isSlotSelected(selectedDate, timeSlot);
     
     if (isSelected) {
-      // Remove from selection
-      removeTimeSlotSelection(id);
+      // Remove entire créneau from selection
+      removeCreneauSelection(selectedDate, timeSlot);
     } else {
-      // Check availability before adding
-      const availability = checkTimeSlotAvailability(selectedRoom, selectedDate, timeSlot, formData.duration);
+      // Check if we can book a complete créneau starting at this time slot
+      const availability = checkCreneauAvailability(selectedRoom, selectedDate, timeSlot, formData.duration);
       
       if (availability.isAvailable) {
-        addTimeSlotSelection(selectedDate, timeSlot);
+        addCreneauSelection(selectedDate, timeSlot);
       } else {
         setAvailabilityCheck(availability);
       }
@@ -593,7 +753,7 @@ export const BookingSystem: React.FC = () => {
               
               {/* Room Selection */}
               <div className="mb-8">
-                <label className="block text-lg font-semibold text-gray-700 mb-4 text-center">Salle d'Apprentissage</label>
+                <label className="block text-lg font-semibold text-gray-700 mb-4 text-center">Salle de cours</label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {Object.entries(bookingData.rooms).map(([roomId, room]) => (
                     <button
@@ -629,16 +789,15 @@ export const BookingSystem: React.FC = () => {
                     onChange={(e) => setFormData({...formData, duration: parseFloat(e.target.value)})}
                     className="p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
                   >
-                    <option value={0.5}>30 minutes</option>
-                    <option value={1}>1 heure</option>
-                    <option value={1.5}>1h30</option>
-                    <option value={2}>2 heures</option>
+                    <option value={1.5}>1h30 (Créneau minimum)</option>
+                    <option value={2}>2h00</option>
                     <option value={2.5}>2h30</option>
-                    <option value={3}>3 heures</option>
+                    <option value={3}>3h00 (Créneau maximum)</option>
                   </select>
                 </div>
                 <p className="text-center text-sm text-gray-500 mt-2">
-                  Sélectionnez la durée avant de choisir votre créneau
+                  Un créneau = période d'enseignement complète<br/>
+                  <span className="text-blue-600 font-medium">Ex: 2h = 4 plages horaires de 30 min consécutifs (8:00-9:00 puis 9:00-10:00)</span>
                 </p>
               </div>
 
@@ -718,7 +877,7 @@ export const BookingSystem: React.FC = () => {
                   <div className="grid grid-cols-7 gap-2">
                     {weekDates.map((dayInfo) => {
                       const hasBookings = Object.values(bookingData.bookings || {}).some(
-                        booking => booking && booking.roomId === selectedRoom && booking.date === dayInfo.date
+                        booking => booking && booking.roomId === selectedRoom && booking.date === dayInfo.date && booking.paymentStatus !== 'cancelled'
                       );
                       
                       return (
@@ -758,7 +917,7 @@ export const BookingSystem: React.FC = () => {
                   <div className="grid grid-cols-7 gap-2">
                     {monthDates.map((dayInfo) => {
                       const hasBookings = Object.values(bookingData.bookings || {}).some(
-                        booking => booking && booking.roomId === selectedRoom && booking.date === dayInfo.date
+                        booking => booking && booking.roomId === selectedRoom && booking.date === dayInfo.date && booking.paymentStatus !== 'cancelled'
                       );
                       
                       return (
@@ -798,7 +957,7 @@ export const BookingSystem: React.FC = () => {
             <div className="p-8">
               <div className="flex justify-between items-center mb-6">
                 <div>
-                  <h3 className="text-2xl font-bold text-gray-900">Sélectionnez vos Créneaux</h3>
+                  <h3 className="text-2xl font-bold text-gray-900">Sélectionnez vos Plages Horaires</h3>
                   <p className="text-gray-600">
                     {selectedDate && new Date(selectedDate).toLocaleDateString('fr-FR', { 
                       weekday: 'long', 
@@ -808,7 +967,7 @@ export const BookingSystem: React.FC = () => {
                     })} - Durée: {formData.duration}h
                   </p>
                   <p className="text-sm text-blue-600 mt-2">
-                    {selectedTimeSlots.length} créneau(x) sélectionné(s) - Cliquez pour ajouter/retirer
+                    {Math.ceil(selectedTimeSlots.length / (formData.duration * 2))} plage{Math.ceil(selectedTimeSlots.length / (formData.duration * 2)) > 1 ? 's' : ''} horaire{Math.ceil(selectedTimeSlots.length / (formData.duration * 2)) > 1 ? 's' : ''} sélectionnée{Math.ceil(selectedTimeSlots.length / (formData.duration * 2)) > 1 ? 's' : ''} - Cliquez pour ajouter/retirer
                   </p>
                 </div>
                 <button
@@ -822,7 +981,7 @@ export const BookingSystem: React.FC = () => {
               {/* Selected Slots Summary */}
               {selectedTimeSlots.length > 0 && (
                 <div className="mb-6 p-4 bg-blue-50 rounded-xl">
-                  <h4 className="font-semibold text-blue-900 mb-2">Créneaux Sélectionnés:</h4>
+                  <h4 className="font-semibold text-blue-900 mb-2">Plages Horaires Sélectionnées:</h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedTimeSlots.map((slot) => (
                       <span
@@ -843,20 +1002,49 @@ export const BookingSystem: React.FC = () => {
               )}
 
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-6">
-                {availableTimeSlots.map((timeSlot) => {
+                {availableTimeSlots.map((timeSlot, index) => {
                   const isSelected = isSlotSelected(selectedDate, timeSlot);
+                  const isBooked = isTimeSlotBooked(selectedRoom, selectedDate, timeSlot);
+                  
                   return (
                     <button
                       key={timeSlot}
                       onClick={() => handleTimeSlotSelection(timeSlot)}
-                      className={`p-4 rounded-xl border-2 transition-all duration-200 flex items-center justify-center font-semibold ${
-                        isSelected
+                      disabled={isBooked}
+                      className={`p-4 rounded-xl border-2 transition-all duration-200 flex flex-col items-center justify-center font-semibold ${
+                        isBooked
+                          ? 'border-red-200 bg-red-50 text-red-400 cursor-not-allowed opacity-50'
+                          : isSelected
                           ? 'border-green-400 bg-green-50 text-green-700'
                           : 'border-blue-200 bg-blue-50 text-blue-700 hover:border-blue-400 hover:bg-blue-100'
                       }`}
                     >
-                      <Clock className="w-4 h-4 mr-2" />
-                      {timeSlot}
+                      <Clock className="w-4 h-4 mb-1" />
+                      <div className="text-sm">
+                        {(() => {
+                          const nextTimeSlot = availableTimeSlots[index + 1];
+                          if (nextTimeSlot) {
+                            return `${timeSlot}-${nextTimeSlot}`;
+                          } else {
+                            // Calculate next 30-minute slot for the last slot
+                            const [hours, minutes] = timeSlot.split(':').map(Number);
+                            const nextHour = minutes === 30 ? hours + 1 : hours;
+                            const nextMinutes = minutes === 30 ? 0 : 30;
+                            const endTime = `${nextHour.toString().padStart(2, '0')}:${nextMinutes.toString().padStart(2, '0')}`;
+                            return `${timeSlot}-${endTime}`;
+                          }
+                        })()}
+                      </div>
+                      {isSelected && (
+                        <div className="text-xs text-green-600 mt-1">
+                          ✓ Sélectionné
+                        </div>
+                      )}
+                      {isBooked && (
+                        <div className="text-xs text-red-400 mt-1">
+                          Occupé
+                        </div>
+                      )}
                     </button>
                   );
                 })}
@@ -884,7 +1072,7 @@ export const BookingSystem: React.FC = () => {
                     disabled={selectedTimeSlots.length === 0}
                     className="px-6 py-3 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Confirmer {selectedTimeSlots.length} Créneau(x)
+                    Confirmer {Math.ceil(selectedTimeSlots.length / (formData.duration * 2))} Créneau{Math.ceil(selectedTimeSlots.length / (formData.duration * 2)) > 1 ? 'x' : ''}
                   </button>
                 </div>
               </div>
@@ -957,7 +1145,7 @@ export const BookingSystem: React.FC = () => {
                 <div>
                   <h3 className="text-2xl font-bold text-gray-900">Confirmer vos Réservations</h3>
                   <p className="text-gray-600">
-                    {selectedTimeSlots.length} créneaux sélectionnés dans {bookingData.rooms[selectedRoom].name}
+                    {Math.ceil(selectedTimeSlots.length / (formData.duration * 2))} plage{Math.ceil(selectedTimeSlots.length / (formData.duration * 2)) > 1 ? 's' : ''} horaire{Math.ceil(selectedTimeSlots.length / (formData.duration * 2)) > 1 ? 's' : ''} sélectionnée{Math.ceil(selectedTimeSlots.length / (formData.duration * 2)) > 1 ? 's' : ''} dans {bookingData.rooms[selectedRoom].name}
                   </p>
                 </div>
                 <button
@@ -971,7 +1159,7 @@ export const BookingSystem: React.FC = () => {
               {/* Selected Slots Summary with Fees */}
               <div className="mb-6 p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl">
                 <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-bold text-lg text-gray-900">Récapitulatif des Créneaux</h4>
+                  <h4 className="font-bold text-lg text-gray-900">Récapitulatif des Plages Horaires</h4>
                   <button
                     onClick={() => setShowCalculator(true)}
                     className="px-4 py-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg text-sm font-semibold transition-colors flex items-center"
@@ -982,26 +1170,54 @@ export const BookingSystem: React.FC = () => {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  {selectedTimeSlots.map((slot, index) => (
-                    <div key={slot.id} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
-                      <div>
-                        <div className="font-semibold text-gray-900">
-                          Créneau #{index + 1}
+                  {(() => {
+                    // Group time slots into créneaux based on duration
+                    const slotsPerCreneau = formData.duration * 2; // 2 slots per hour
+                    const creneaux = [];
+                    
+                    for (let i = 0; i < selectedTimeSlots.length; i += slotsPerCreneau) {
+                      const creneauSlots = selectedTimeSlots.slice(i, i + slotsPerCreneau);
+                      const firstSlot = creneauSlots[0];
+                      
+                      // Calculate end time for the créneau
+                      const startTime = firstSlot.timeSlot;
+                      const [hours, minutes] = startTime.split(':').map(Number);
+                      const totalMinutes = hours * 60 + minutes + (formData.duration * 60);
+                      const endHours = Math.floor(totalMinutes / 60);
+                      const endMinutes = totalMinutes % 60;
+                      const endTime = `${endHours.toString().padStart(2, '0')}:${endMinutes.toString().padStart(2, '0')}`;
+                      
+                      creneaux.push({
+                        id: `creneau-${i}`,
+                        date: firstSlot.date,
+                        startTime,
+                        endTime,
+                        duration: formData.duration,
+                        slotCount: creneauSlots.length
+                      });
+                    }
+                    
+                    return creneaux.map((creneau, index) => (
+                      <div key={creneau.id} className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                        <div>
+                          <div className="font-semibold text-gray-900">
+                            Créneau #{index + 1}
+                          </div>
+                          <div className="text-sm text-gray-600">
+                            {new Date(creneau.date).toLocaleDateString('fr-FR', { 
+                              weekday: 'long', 
+                              day: 'numeric', 
+                              month: 'long' 
+                            })}
+                          </div>
+                          <div className="text-sm font-medium text-blue-600">
+                            {creneau.startTime} - {creneau.endTime} ({creneau.duration}h)
+                          </div>
                         </div>
-                        <div className="text-sm text-gray-600">
-                          {new Date(slot.date).toLocaleDateString('fr-FR', { 
-                            weekday: 'long', 
-                            day: 'numeric', 
-                            month: 'long' 
-                          })}
-                        </div>
-                        <div className="text-sm font-medium text-blue-600">
-                          {slot.timeSlot} - {formData.duration}h
-                        </div>
+                        <Clock className="w-5 h-5 text-blue-500" />
                       </div>
-                      <Clock className="w-5 h-5 text-blue-500" />
-                    </div>
-                  ))}
+                    ));
+                  })()}
                 </div>
 
                 {/* Fees Preview */}
@@ -1118,7 +1334,7 @@ export const BookingSystem: React.FC = () => {
                     className="px-6 py-3 text-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 flex items-center"
                   >
                     <Save className="w-5 h-5 mr-2" />
-                    Confirmer {selectedTimeSlots.length} Réservation(s)
+                    Confirmer {Math.ceil(selectedTimeSlots.length / (formData.duration * 2))} Créneau{Math.ceil(selectedTimeSlots.length / (formData.duration * 2)) > 1 ? 'x' : ''}
                   </button>
                 </div>
               </form>
@@ -1231,8 +1447,8 @@ export const BookingSystem: React.FC = () => {
                           <span className="font-bold text-purple-600">{calculation.totalHours}h</span>
                         </div>
                         <div className="flex justify-between items-center p-3 bg-white rounded-lg">
-                          <span className="text-gray-700">Créneaux Sélectionnés:</span>
-                          <span className="font-bold text-orange-600">{calculation.slotCount}</span>
+                          <span className="text-gray-700">Créneaux Réservés:</span>
+                          <span className="font-bold text-orange-600">{calculation.slotCount} créneau{calculation.slotCount > 1 ? 'x' : ''}</span>
                         </div>
                       </div>
                       
@@ -1340,6 +1556,22 @@ export const BookingSystem: React.FC = () => {
                 </div>
 
                 <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Durée du Créneau *</label>
+                  <select
+                    required
+                    value={formData.duration}
+                    onChange={(e) => setFormData({...formData, duration: parseFloat(e.target.value)})}
+                    className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg"
+                  >
+                    <option value={1.5}>1h30 (90 minutes) - Minimum</option>
+                    <option value={2.0}>2h00 (120 minutes)</option>
+                    <option value={2.5}>2h30 (150 minutes)</option>
+                    <option value={3.0}>3h00 (180 minutes) - Maximum</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">Un créneau = période d'enseignement (minimum 1h30, maximum 3h00)</p>
+                </div>
+
+                <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">Contact (Téléphone/Email) *</label>
                   <input
                     type="text"
@@ -1384,7 +1616,7 @@ export const BookingSystem: React.FC = () => {
             teacherName: '',
             subject: '',
             studentCount: 1,
-            duration: 1,
+            duration: 1.5,
             contactInfo: ''
           });
           setShowBookingForm(false);
