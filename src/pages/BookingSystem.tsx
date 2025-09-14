@@ -413,25 +413,51 @@ export const BookingSystem: React.FC = () => {
     return { isAvailable: true, message: `Créneau de ${duration}h disponible!` };
   };
 
-  // Helper function to batch check availability for all selected slots
+  // Helper function to batch check availability for all créneaux to be created
   const checkBatchAvailability = () => {
     const conflicts: { date: string; timeSlot: string; message: string }[] = [];
-    
-    selectedTimeSlots.forEach(slot => {
-      const availability = checkTimeSlotAvailability(selectedRoom, slot.date, slot.timeSlot, formData.duration);
+
+    // Group time slots into créneaux for proper validation
+    const slotsPerCreneau = formData.duration * 2; // 2 slots per hour
+    const creneauxToCheck = [];
+
+    if (selectedTimeSlots.length > 0) {
+      // Group selected time slots into créneaux
+      for (let i = 0; i < selectedTimeSlots.length; i += slotsPerCreneau) {
+        const creneauSlots = selectedTimeSlots.slice(i, i + slotsPerCreneau);
+        const firstSlot = creneauSlots[0];
+        creneauxToCheck.push({
+          date: firstSlot.date,
+          timeSlot: firstSlot.timeSlot, // Start time of the créneau
+          duration: formData.duration
+        });
+      }
+    } else if (selectedDate && selectedTimeSlot) {
+      // Single créneau selection
+      creneauxToCheck.push({
+        date: selectedDate,
+        timeSlot: selectedTimeSlot,
+        duration: formData.duration
+      });
+    }
+
+    // Check availability for each créneau properly
+    creneauxToCheck.forEach(creneau => {
+      const availability = checkCreneauAvailability(selectedRoom, creneau.date, creneau.timeSlot, creneau.duration);
       if (!availability.isAvailable) {
         conflicts.push({
-          date: slot.date,
-          timeSlot: slot.timeSlot,
+          date: creneau.date,
+          timeSlot: creneau.timeSlot,
           message: availability.message
         });
       }
     });
-    
+
     return {
       hasConflicts: conflicts.length > 0,
       conflicts,
-      availableCount: selectedTimeSlots.length - conflicts.length
+      availableCount: creneauxToCheck.length - conflicts.length,
+      totalCreneaux: creneauxToCheck.length
     };
   };
 
@@ -633,7 +659,7 @@ export const BookingSystem: React.FC = () => {
     if (batchCheck.hasConflicts) {
       setAvailabilityCheck({
         isAvailable: false,
-        message: `${batchCheck.conflicts.length} créneaux ne sont plus disponibles. ${batchCheck.availableCount} créneaux restent disponibles.`,
+        message: `${batchCheck.conflicts.length}/${batchCheck.totalCreneaux} créneaux ne sont plus disponibles. ${batchCheck.availableCount} créneaux restent disponibles.`,
         suggestedSlots: []
       });
     } else {

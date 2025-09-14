@@ -62,10 +62,25 @@ export const Home = () => {
               </span>
             </h1>
             
-            <p className="text-xl md:text-2xl text-blue-100 mb-12 text-center max-w-5xl mx-auto leading-relaxed">
-              Centre éducatif premium au cœur de Tunis qui connecte des enseignants compétents avec des étudiants sérieux. 
+            <p className="text-xl md:text-2xl text-blue-100 mb-8 text-center max-w-5xl mx-auto leading-relaxed">
+              Centre éducatif premium au cœur de Tunis qui connecte des enseignants compétents avec des étudiants sérieux.
               Nous offrons des espaces d'apprentissage modernes et une sélection rigoureuse pour une expérience d'enseignement exceptionnelle.
             </p>
+
+            <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 backdrop-blur-sm rounded-2xl p-6 mb-12 border border-yellow-400/20 max-w-4xl mx-auto">
+              <p className="text-lg text-yellow-100 mb-4">
+                <span className="font-semibold">Enseignants :</span> Pourquoi accepter des tarifs imposés quand vous pouvez développer votre activité indépendante ?
+                Chez SmartHub, vous fixez vos tarifs, gérez vos étudiants, et bénéficiez de notre support complet.
+              </p>
+              <Link to="/teacher-entrepreneurship">
+                <Button
+                  variant="outline"
+                  className="border-2 border-yellow-400 text-yellow-300 hover:bg-yellow-400 hover:text-gray-900 px-6 py-3 rounded-xl transition-all duration-200 font-semibold"
+                >
+                  Savoir comment → L'Alternative Indépendante
+                </Button>
+              </Link>
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <Link to="/rooms">

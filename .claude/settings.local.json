@@ -44,7 +44,9 @@
       "Bash(git remote set-url:*)",
       "Bash(start test-enhanced-booking.html)",
       "Bash(cat:*)",
-      "Bash(start migrate-creneau-system.html)"
+      "Bash(start migrate-creneau-system.html)",
+      "Bash(netstat:*)",
+      "Bash(kill:*)"
     ],
     "deny": [],
     "ask": []
