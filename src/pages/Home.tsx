@@ -311,8 +311,8 @@ export const Home = () => {
                 <div className="text-center">
                   <h3 className="text-2xl font-bold text-white mb-4">Horaires</h3>
                   <p className="text-blue-100 text-lg leading-relaxed">
-                    Lundi - Samedi : 9h00 - 13h00, 15h00 - 18h00<br/>
-                    Dimanche : 10h00 - 13h00
+                    Lundi - Samedi : 8:00 - 20:00<br/>
+                    Dimanche : 9:00 - 13:00
                   </p>
                 </div>
               </div>

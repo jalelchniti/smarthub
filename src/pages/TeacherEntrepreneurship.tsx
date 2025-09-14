@@ -1,58 +1,17 @@
-import { Calculator, TrendingUp, Shield, Users, MessageCircle, DollarSign, Target, UserPlus } from 'lucide-react';
+import { Calculator, TrendingUp, Shield, Users, DollarSign, Target, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const TeacherEntrepreneurship = () => {
-  const handleWhatsAppContact = () => {
-    const message = `Bonjour! Je suis intéressé(e) par l'activité indépendante d'enseignement chez SmartHub.`;
-    window.open(`https://wa.me/21699456059?text=${encodeURIComponent(message)}`, '_blank');
-  };
-
-  const comparisonData = [
-    {
-      criteria: "Revenu Max/Mois",
-      center: "1,200 TND",
-      smarthub: "2,000+ TND",
-      centerColor: "text-red-600",
-      smarthubColor: "text-green-600"
-    },
-    {
-      criteria: "Contrôle Tarifs",
-      center: "❌ Aucun",
-      smarthub: "✅ Total",
-      centerColor: "text-red-600",
-      smarthubColor: "text-green-600"
-    },
-    {
-      criteria: "Flexibilité Horaires",
-      center: "❌ Imposés",
-      smarthub: "✅ Libre choix",
-      centerColor: "text-red-600",
-      smarthubColor: "text-green-600"
-    },
-    {
-      criteria: "Croissance Revenus",
-      center: "❌ Plafonnée",
-      smarthub: "✅ Progressive",
-      centerColor: "text-red-600",
-      smarthubColor: "text-green-600"
-    },
-    {
-      criteria: "Vacances Payées",
-      center: "❌ Non",
-      smarthub: "✅ Oui (par étudiants)",
-      centerColor: "text-red-600",
-      smarthubColor: "text-green-600"
-    },
-    {
-      criteria: "Sécurité Emploi",
-      center: "⚠️ Licenciement possible",
-      smarthub: "✅ Activité propre",
-      centerColor: "text-yellow-600",
-      smarthubColor: "text-green-600"
-    }
-  ];
 
   const revenueExamples = [
+    {
+      title: "6 étudiants × 80 TND",
+      subtitle: "4h/semaine",
+      netIncome: "208 TND/mois",
+      hourlyRate: "12.0 TND/h",
+      description: "Minimum garanti SmartHub",
+      color: "from-orange-500 to-red-500"
+    },
     {
       title: "6 étudiants × 100 TND",
       subtitle: "4h/semaine",
@@ -76,35 +35,27 @@ const TeacherEntrepreneurship = () => {
       hourlyRate: "44.9 TND/h",
       description: "Groupe complet",
       color: "from-purple-500 to-pink-500"
-    },
-    {
-      title: "6 étudiants × 80 TND",
-      subtitle: "4h/semaine",
-      netIncome: "208 TND/mois",
-      hourlyRate: "12.0 TND/h",
-      description: "Minimum garanti SmartHub",
-      color: "from-orange-500 to-red-500"
     }
   ];
 
   const growthScenarios = [
     {
-      students: "9 étudiants × 120 TND",
-      revenue: "642 TND",
-      hourlyRate: "22-25 TND/h",
-      multiplier: "2x minimum"
+      students: "6 étudiants × 100 TND",
+      revenue: "209 TND",
+      hourlyRate: "12.0 TND/h",
+      multiplier: "Minimum garanti"
     },
     {
-      students: "15 étudiants × 120 TND",
-      revenue: "1,135 TND",
-      hourlyRate: "45-50 TND/h",
-      multiplier: "4x minimum"
+      students: "9 étudiants × 100 TND",
+      revenue: "385 TND",
+      hourlyRate: "22.2 TND/h",
+      multiplier: "1.9x minimum"
     },
     {
-      students: "2 groupes (18 total)",
-      revenue: "1,550 TND",
-      hourlyRate: "45+ TND/h",
-      multiplier: "4x minimum"
+      students: "15 étudiants × 100 TND",
+      revenue: "779 TND",
+      hourlyRate: "44.9 TND/h",
+      multiplier: "3.7x minimum"
     }
   ];
 
@@ -148,7 +99,7 @@ const TeacherEntrepreneurship = () => {
               Centre Standard vs SmartHub Indépendant
             </h2>
             <p className="text-xl text-gray-600">
-              Comparaison réaliste des deux modèles de travail
+              Étude de cas : 1 groupe, 9 étudiants, 2 séances de 2 heures par semaine.
             </p>
           </div>
 
@@ -158,28 +109,45 @@ const TeacherEntrepreneurship = () => {
               <h3 className="text-2xl font-bold text-red-800 mb-6 text-center">
                 🏢 Centre Standard (Employé)
               </h3>
+
+              <div className="bg-white rounded-lg p-4 mb-6 border border-red-300">
+                <h4 className="font-bold text-gray-900 mb-3 text-center">Exemple Concret:</h4>
+                <div className="text-sm text-gray-700 space-y-2">
+                  <div className="flex justify-between">
+                    <span>Heures/semaine imposées</span>
+                    <span className="font-medium">4h minimum</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Heures/mois travaillées</span>
+                    <span className="font-medium">16h/mois</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Tarif horaire fixe</span>
+                    <span className="font-medium">12 TND/heure</span>
+                  </div>
+                  <div className="flex justify-between border-t pt-2">
+                    <span className="font-bold">Salaire mensuel:</span>
+                    <span className="font-bold text-red-600">192 TND/mois</span>
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700">Salaire fixe:</span>
-                  <span className="font-bold text-red-600">800-1,200 TND/mois</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700">Heures imposées:</span>
-                  <span className="text-red-600">20-25h/semaine minimum</span>
+                  <span className="font-medium text-gray-700">Salaire horaire:</span>
+                  <span className="font-bold text-red-600">12 TND/heure fixe</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-gray-700">Contrôle tarifs:</span>
                   <span className="text-red-600">❌ Aucun</span>
                 </div>
                 <div className="flex items-center justify-between">
+                  <span className="font-medium text-gray-700">Environnement:</span>
+                  <span className="text-red-600">Classes surchargées</span>
+                </div>
+                <div className="flex items-center justify-between">
                   <span className="font-medium text-gray-700">Évolution:</span>
                   <span className="text-red-600">Augmentations rares</span>
-                </div>
-                <div className="bg-red-100 rounded-lg p-4 mt-6">
-                  <div className="text-center">
-                    <span className="text-lg font-bold text-red-800">Revenu mensuel plafonné:</span>
-                    <div className="text-2xl font-bold text-red-600">800-1,200 TND</div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -189,60 +157,45 @@ const TeacherEntrepreneurship = () => {
               <h3 className="text-2xl font-bold text-green-800 mb-6 text-center">
                 🚀 SmartHub (Indépendant)
               </h3>
+
+              <div className="bg-white rounded-lg p-4 mb-6 border border-green-300">
+                <h4 className="font-bold text-gray-900 mb-3 text-center">Même Groupe - Plus d'Heures:</h4>
+                <div className="text-sm text-gray-700 space-y-2">
+                  <div className="flex justify-between">
+                    <span>9 étudiants × 120 TND</span>
+                    <span className="font-medium">1,080 TND</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Heures/mois travaillées</span>
+                    <span className="font-medium">16h/mois</span>
+                  </div>
+                  <div className="text-sm font-semibold text-green-700 text-center mt-3 bg-green-50 rounded-lg p-2 border border-green-200">
+                    32.6 TND/heure net - Après la déduction de nos frais mensuels
+                  </div>
+                </div>
+              </div>
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-gray-700">Revenus variables:</span>
                   <span className="font-bold text-green-600">Selon vos efforts</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-gray-700">Horaires libres:</span>
-                  <span className="text-green-600">Votre choix</span>
-                </div>
-                <div className="flex items-center justify-between">
                   <span className="font-medium text-gray-700">Contrôle tarifs:</span>
                   <span className="text-green-600">✅ Total</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-gray-700">Environnement:</span>
+                  <span className="text-green-600">Premium & confortable</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-gray-700">Évolution:</span>
                   <span className="text-green-600">Progressive et méritée</span>
                 </div>
-                <div className="bg-green-100 rounded-lg p-4 mt-6">
-                  <div className="text-center">
-                    <span className="text-lg font-bold text-green-800">Potentiel mensuel:</span>
-                    <div className="text-2xl font-bold text-green-600">200-2,000+ TND</div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
 
-          {/* Comparison Table */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-lg font-semibold text-gray-900">Critère</th>
-                    <th className="px-6 py-4 text-center text-lg font-semibold text-red-600">Centre Standard</th>
-                    <th className="px-6 py-4 text-center text-lg font-semibold text-green-600">SmartHub Indépendant</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {comparisonData.map((item, index) => (
-                    <tr key={index} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-medium text-gray-900">{item.criteria}</td>
-                      <td className={`px-6 py-4 text-center font-semibold ${item.centerColor}`}>
-                        {item.center}
-                      </td>
-                      <td className={`px-6 py-4 text-center font-semibold ${item.smarthubColor}`}>
-                        {item.smarthub}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -421,13 +374,6 @@ const TeacherEntrepreneurship = () => {
               </button>
             </Link>
 
-            <button
-              onClick={handleWhatsAppContact}
-              className="inline-flex items-center px-8 py-4 bg-green-500 hover:bg-green-600 text-white text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-xl"
-            >
-              <MessageCircle className="w-6 h-6 mr-3" />
-              Candidature Enseignant
-            </button>
 
             <Link to="/register/teacher">
               <button className="inline-flex items-center px-8 py-4 bg-transparent border-2 border-white text-white hover:bg-white hover:text-blue-600 text-lg font-semibold rounded-lg transition-all duration-300">

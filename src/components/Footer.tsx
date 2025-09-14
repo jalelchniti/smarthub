@@ -64,12 +64,11 @@ const Footer = () => {
             <div className="space-y-3">
               <div className="text-gray-300">
                 <div className="font-medium text-white mb-2">Lundi - Samedi</div>
-                <div className="text-sm">9:00 - 13:00</div>
-                <div className="text-sm">15:00 - 18:00</div>
+                <div className="text-sm">8:00 - 20:00</div>
               </div>
               <div className="text-gray-300">
                 <div className="font-medium text-white mb-2">Dimanche</div>
-                <div className="text-sm">10:00 - 13:00</div>
+                <div className="text-sm">9:00 - 13:00</div>
               </div>
             </div>
           </div>
