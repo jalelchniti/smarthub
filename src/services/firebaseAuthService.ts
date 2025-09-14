@@ -1,7 +1,7 @@
 // Firebase Authentication Service for SmartHub Admin
 // Enterprise-grade authentication using Firebase Auth
 
-import { auth, initializeFirebase } from '../config/firebase';
+import { auth, getFirebaseInitialization, isFirebaseReady } from '../config/firebase';
 
 interface AdminUser {
   uid: string;
@@ -37,24 +37,56 @@ export class FirebaseAuthService {
    * Initialize Firebase Auth and set up auth state listener
    */
   static async initialize(): Promise<boolean> {
-    if (!initializeFirebase() || !auth) {
-      console.error('Firebase Auth not available');
-      return false;
-    }
-
     try {
+      // Wait for Firebase initialization to complete
+      console.log('🔐 Initializing Firebase Auth Service...');
+      const firebaseReady = await getFirebaseInitialization();
+
+      if (!firebaseReady) {
+        console.error('❌ Firebase initialization failed - Auth service cannot start');
+        this.updateAuthState({
+          isAuthenticated: false,
+          user: null,
+          loading: false
+        });
+        return false;
+      }
+
+      if (!auth) {
+        console.error('❌ Firebase Auth service not available after initialization');
+        this.updateAuthState({
+          isAuthenticated: false,
+          user: null,
+          loading: false
+        });
+        return false;
+      }
+
+      console.log('✅ Firebase Auth service initialized successfully');
+
       // Set up auth state listener
       auth.onAuthStateChanged(async (firebaseUser) => {
-        if (firebaseUser) {
-          // User is signed in
-          const adminUser = await this.createAdminUserFromFirebaseUser(firebaseUser);
-          this.updateAuthState({
-            isAuthenticated: true,
-            user: adminUser,
-            loading: false
-          });
-        } else {
-          // User is signed out
+        try {
+          if (firebaseUser) {
+            console.log('👤 User signed in:', firebaseUser.email);
+            // User is signed in
+            const adminUser = await this.createAdminUserFromFirebaseUser(firebaseUser);
+            this.updateAuthState({
+              isAuthenticated: true,
+              user: adminUser,
+              loading: false
+            });
+          } else {
+            console.log('👤 User signed out');
+            // User is signed out
+            this.updateAuthState({
+              isAuthenticated: false,
+              user: null,
+              loading: false
+            });
+          }
+        } catch (error) {
+          console.error('❌ Auth state change error:', error);
           this.updateAuthState({
             isAuthenticated: false,
             user: null,
@@ -65,7 +97,7 @@ export class FirebaseAuthService {
 
       return true;
     } catch (error) {
-      console.error('Firebase Auth initialization failed:', error);
+      console.error('❌ Firebase Auth initialization failed:', error);
       this.updateAuthState({
         isAuthenticated: false,
         user: null,
@@ -79,10 +111,30 @@ export class FirebaseAuthService {
    * Sign in admin user with email and password
    */
   static async signIn(email: string, password: string): Promise<LoginResult> {
-    if (!auth) {
+    try {
+      // Check if Firebase is ready
+      if (!isFirebaseReady()) {
+        console.error('❌ Firebase not ready for sign in');
+        return {
+          success: false,
+          message: 'Erreur: Firebase initialization failed. Veuillez rafraîchir la page.'
+        };
+      }
+
+      if (!auth) {
+        console.error('❌ Firebase Auth service not available');
+        return {
+          success: false,
+          message: 'Service d\'authentification non disponible. Veuillez vérifier la configuration Firebase.'
+        };
+      }
+
+      console.log('🔐 Attempting sign in for:', email);
+    } catch (error) {
+      console.error('❌ Pre-signin validation failed:', error);
       return {
         success: false,
-        message: 'Service d\'authentification non disponible'
+        message: 'Erreur de validation. Veuillez réessayer.'
       };
     }
 
@@ -319,18 +371,34 @@ export class FirebaseAuthService {
 
   private static getErrorMessage(errorCode: string): string {
     const errorMessages: Record<string, string> = {
-      'auth/user-not-found': 'Utilisateur non trouvé',
-      'auth/wrong-password': 'Mot de passe incorrect',
-      'auth/invalid-email': 'Adresse email invalide',
-      'auth/user-disabled': 'Compte utilisateur désactivé',
-      'auth/too-many-requests': 'Trop de tentatives. Réessayez plus tard',
-      'auth/network-request-failed': 'Erreur de connexion réseau',
-      'auth/invalid-credential': 'Identifiants invalides',
-      'auth/operation-not-allowed': 'Opération non autorisée',
-      'auth/weak-password': 'Mot de passe trop faible'
+      'auth/user-not-found': 'Utilisateur non trouvé. Vérifiez votre adresse email.',
+      'auth/wrong-password': 'Mot de passe incorrect. Vérifiez votre mot de passe.',
+      'auth/invalid-email': 'Adresse email invalide. Vérifiez le format de votre email.',
+      'auth/user-disabled': 'Compte utilisateur désactivé. Contactez l\'administrateur.',
+      'auth/too-many-requests': 'Trop de tentatives de connexion. Réessayez dans quelques minutes.',
+      'auth/network-request-failed': 'Erreur de connexion réseau. Vérifiez votre connexion internet.',
+      'auth/invalid-credential': 'Identifiants invalides. Vérifiez votre email et mot de passe.',
+      'auth/operation-not-allowed': 'Opération non autorisée. Vérifiez la configuration Firebase.',
+      'auth/weak-password': 'Mot de passe trop faible. Utilisez un mot de passe plus complexe.',
+      'auth/missing-email': 'Adresse email requise.',
+      'auth/missing-password': 'Mot de passe requis.',
+      'auth/invalid-api-key': 'Clé API Firebase invalide. Vérifiez la configuration.',
+      'auth/app-not-authorized': 'Application non autorisée. Vérifiez la configuration Firebase.',
+      'auth/configuration-not-found': 'Configuration Firebase introuvable.',
+      // Firebase initialization specific errors
+      'firebase/initialization-failed': 'Erreur d\'initialisation Firebase. Veuillez rafraîchir la page.',
+      'firebase/cdn-not-loaded': 'Scripts Firebase non chargés. Vérifiez votre connexion internet.',
+      'firebase/config-missing': 'Configuration Firebase manquante. Vérifiez le fichier .env.'
     };
 
-    return errorMessages[errorCode] || 'Erreur d\'authentification inconnue';
+    // Enhanced error message with troubleshooting hints
+    const baseMessage = errorMessages[errorCode] || 'Erreur d\'authentification inconnue';
+
+    if (errorCode.includes('network') || errorCode.includes('failed')) {
+      return baseMessage + ' Si le problème persiste, vérifiez votre connexion internet et rafraîchissez la page.';
+    }
+
+    return baseMessage;
   }
 
   /**

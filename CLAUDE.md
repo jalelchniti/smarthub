@@ -52,6 +52,7 @@ npm run preview # Preview the production build locally
 ```
 
 **Testing**: Manual testing only (no automated test framework configured)
+**Development Server**: Background process may be running - check with BashOutput tool if needed
 
 **Key npm Scripts**:
 - `npm run dev` - Start Vite development server with HMR
@@ -889,6 +890,8 @@ if (booking.paymentStatus === 'cancelled') return false;
 npm install                  # First-time setup
 npm run dev                 # Start development (localhost:5173)
 ```
+
+**Note**: Development server may already be running in background. Check with `BashOutput` tool or `ps` command before starting new instance.
 
 ### Firebase Admin Setup (First Time)
 ```bash

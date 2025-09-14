@@ -32,10 +32,28 @@ export const FirebaseAdminLogin: React.FC = () => {
   // Initialize Firebase Auth and check authentication state
   useEffect(() => {
     const initAuth = async () => {
-      await FirebaseAuthService.initialize();
-      
-      // Check if demo setup is needed (removed automatic popup - user can manually access setup instructions)
-      await FirebaseAuthService.checkDemoSetup();
+      try {
+        console.log('🔐 Starting Firebase Auth initialization...');
+        setLoading(true);
+        setError('');
+
+        const initialized = await FirebaseAuthService.initialize();
+
+        if (!initialized) {
+          setError('Erreur: Firebase initialization failed. Veuillez vérifier la configuration et rafraîchir la page.');
+          setLoading(false);
+          return;
+        }
+
+        // Check if demo setup is needed (removed automatic popup - user can manually access setup instructions)
+        await FirebaseAuthService.checkDemoSetup();
+        console.log('✅ Firebase Auth initialization completed');
+
+      } catch (error) {
+        console.error('❌ Firebase Auth initialization error:', error);
+        setError('Erreur d\'initialisation. Veuillez rafraîchir la page.');
+        setLoading(false);
+      }
     };
 
     initAuth();
@@ -43,10 +61,15 @@ export const FirebaseAdminLogin: React.FC = () => {
     // Subscribe to auth state changes
     const unsubscribe = FirebaseAuthService.onAuthStateChanged((state) => {
       setAuthState(state);
-      
+
       // Redirect if already authenticated
       if (state.isAuthenticated && !state.loading) {
         navigate('/admin/firebase-bookings');
+      }
+
+      // Update loading state
+      if (!state.loading) {
+        setLoading(false);
       }
     });
 

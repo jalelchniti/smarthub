@@ -1,0 +1,136 @@
+{
+  "rules": {
+    ".read": true,
+    ".write": false,
+
+    "rooms": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')"
+    },
+
+    "timeSlots": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')"
+    },
+
+    "weekDays": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')"
+    },
+
+    "startDate": {
+      ".read": true,
+      ".write": "auth != null && auth.token.email_verified == true && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')"
+    },
+
+    "bookings": {
+      ".read": true,
+
+      "$bookingId": {
+        ".write": "!data.exists() || (auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com'))",
+
+        ".validate": "newData.hasChildren(['roomId', 'date', 'timeSlot', 'teacherName', 'subject', 'studentCount', 'duration', 'contactInfo'])",
+
+        "roomId": {
+          ".validate": "newData.isString() && (newData.val() == '1' || newData.val() == '2' || newData.val() == '3')"
+        },
+
+        "date": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}$/)"
+        },
+
+        "timeSlot": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{2}:\\d{2}$/)"
+        },
+
+        "teacherName": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+        },
+
+        "subject": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
+        },
+
+        "studentCount": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 15"
+        },
+
+        "duration": {
+          ".validate": "newData.isNumber() && newData.val() >= 1.5 && newData.val() <= 3.0 && (newData.val() * 2) % 1 == 0"
+        },
+
+        "contactInfo": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+        },
+
+        "paymentStatus": {
+          ".write": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+          ".validate": "newData.isString() && (newData.val() == 'pending' || newData.val() == 'paid' || newData.val() == 'cancelled')"
+        },
+
+        "paymentMethod": {
+          ".write": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+          ".validate": "newData.isString() && (newData.val() == 'online' || newData.val() == 'offline')"
+        },
+
+        "paymentTransactionId": {
+          ".write": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+          ".validate": "newData.isString()"
+        },
+
+        "paymentTimestamp": {
+          ".write": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/)"
+        },
+
+        "feeCalculation": {
+          ".write": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+
+          "subtotalHT": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "vatAmount": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "totalTTC": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "hourlyRate": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "vatRate": {
+            ".validate": "newData.isNumber() && newData.val() == 0.19"
+          }
+        },
+
+        "createdAt": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/)"
+        },
+
+        "updatedAt": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/)"
+        },
+
+        "createdBy": {
+          ".validate": "newData.isString()"
+        }
+      }
+    },
+
+    "lastUpdated": {
+      ".read": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+      ".write": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+      ".validate": "newData.isString()"
+    },
+
+    "adminUsers": {
+      ".read": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+      ".write": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')"
+    },
+
+    "statistics": {
+      ".read": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')",
+      ".write": "auth != null && (auth.token.email == 'jalel.chniti@smarthub.com.tn' || auth.token.email == 'jalel.chniti@gmail.com')"
+    }
+  }
+}

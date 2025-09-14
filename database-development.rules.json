@@ -1,0 +1,144 @@
+{
+  "rules": {
+    // DEVELOPMENT RULES - More permissive for initialization and testing
+    // Note: These rules prioritize functionality over security for development
+    // Use production rules (database.rules.json) for deployment
+
+    // Allow basic read access for Firebase initialization
+    ".read": true,
+    ".write": false,
+
+    // System configuration - Public read, controlled write
+    "rooms": {
+      ".read": true,
+      ".write": true
+    },
+
+    "timeSlots": {
+      ".read": true,
+      ".write": true
+    },
+
+    "weekDays": {
+      ".read": true,
+      ".write": true
+    },
+
+    "startDate": {
+      ".read": true,
+      ".write": true
+    },
+
+    // Bookings - Permissive for development and testing
+    "bookings": {
+      ".read": true,
+      ".write": true,
+
+      "$bookingId": {
+        // Validate required fields but allow flexible access
+        ".validate": "newData.hasChildren(['roomId', 'date', 'timeSlot', 'teacherName', 'subject', 'studentCount', 'duration', 'contactInfo'])",
+
+        // Core booking fields validation
+        "roomId": {
+          ".validate": "newData.isString() && (newData.val() == '1' || newData.val() == '2' || newData.val() == '3')"
+        },
+
+        "date": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}$/)"
+        },
+
+        "timeSlot": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{2}:\\d{2}$/)"
+        },
+
+        "teacherName": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 100"
+        },
+
+        "subject": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
+        },
+
+        "studentCount": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 15"
+        },
+
+        "duration": {
+          ".validate": "newData.isNumber() && newData.val() >= 1.5 && newData.val() <= 3.0 && (newData.val() * 2) % 1 == 0"
+        },
+
+        "contactInfo": {
+          ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 200"
+        },
+
+        // Payment fields - Permissive for development
+        "paymentStatus": {
+          ".validate": "newData.isString() && (newData.val() == 'pending' || newData.val() == 'paid' || newData.val() == 'cancelled')"
+        },
+
+        "paymentMethod": {
+          ".validate": "newData.isString() && (newData.val() == 'online' || newData.val() == 'offline')"
+        },
+
+        "paymentTransactionId": {
+          ".validate": "newData.isString()"
+        },
+
+        "paymentTimestamp": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/)"
+        },
+
+        // Fee calculation validation
+        "feeCalculation": {
+          "subtotalHT": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "vatAmount": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "totalTTC": {
+            ".validate": "newData.isNumber() && newData.val() >= 0"
+          },
+          "hourlyRate": {
+            ".validate": "newData.isNumber() && newData.val() > 0"
+          },
+          "vatRate": {
+            ".validate": "newData.isNumber() && newData.val() == 0.19"
+          }
+        },
+
+        // Timestamp fields
+        "createdAt": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/)"
+        },
+
+        "updatedAt": {
+          ".validate": "newData.isString() && newData.val().matches(/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}/)"
+        },
+
+        "createdBy": {
+          ".validate": "newData.isString()"
+        }
+      }
+    },
+
+    // System metadata - Permissive for development
+    "lastUpdated": {
+      ".read": true,
+      ".write": true,
+      ".validate": "newData.isString()"
+    },
+
+    // Admin data - Open for development
+    "adminUsers": {
+      ".read": true,
+      ".write": true
+    },
+
+    // Statistics - Open for development
+    "statistics": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
