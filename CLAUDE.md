@@ -71,40 +71,8 @@ npm run preview # Preview the production build locally
 ### Deployment Configuration
 **Server configuration files** (CRITICAL for SPA routing):
 - `.htaccess` - Apache server configuration with MIME types and SPA routing
-- `web.config` - IIS server configuration with URL rewrite rules  
-- `netlify.toml` - Netlify hosting configuration with redirects and headers
-- `public/_redirects` - Netlify-specific redirects (takes precedence over netlify.toml)
-
-### Resolved Deployment Issues (September 2025)
-
-#### MIME Type Error - RESOLVED ✅
-**Previous Issue**: Assets served as HTML instead of correct MIME types on production server.
-
-**Root Cause Identified**: 
-1. **Vite Configuration**: `base: './'` created relative asset paths that broke on nested routes
-2. **Apache Rewrite Rules**: SPA redirect rules were catching asset requests
-
-**Solutions Applied**:
-- ✅ **Fixed Vite Config**: Changed `base: './'` to `base: '/'` for absolute asset paths
-- ✅ **Enhanced .htaccess**: Added explicit asset protection rules before SPA routing
-- ✅ **Rebuilt Application**: All assets now use absolute `/assets/` paths
-
-**Current Working Configuration** (`.htaccess`):
-```apache
-# Explicitly serve static files with correct MIME types
-RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ [NC]
-RewriteRule ^.*$ - [L]
-
-# Protect assets directory specifically
-RewriteRule ^assets/ - [L]
-
-# Then handle SPA routing for everything else
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.html [L]
-```
-
-**Result**: All production routes including `/admin/firebase-login` now load correctly with proper MIME types.
+- `web.config` - IIS server configuration with URL rewrite rules
+- Configurations handle React Router properly with correct MIME types
 
 ## Critical Development Rules
 
@@ -195,15 +163,9 @@ src/
 - `VITE_FIREBASE_APP_ID` - Firebase app ID
 
 **OVH Hosting Configuration** (production deployment):
-- `OVH_FTP_Login` - OVH FTP username for file uploads
-- `OVH_FTP_Folder` - Target folder on OVH server (./smarthub)
-- `OVH_FTP_Password` - FTP access password
-- `OVH_FTP_URL` - FTP server URL for file transfers
-- `OVH_SSH_URL` - SSH access for server management
-- `OVH_MAILING_LIST_NEWSLETTER` - Newsletter mailing list address
-- `OVH_MAILING_LIST_OWNER` - Admin email for mailing list management
-- `OVH_MAILING_LIST_SUBSCRIBE` - Subscription endpoint
-- `OVH_MAILING_LIST_UNSUBSCRIBE` - Unsubscription endpoint
+- **FTP Deployment**: Manual upload of dist/ contents to domain root
+- **Server Configuration**: Apache .htaccess for SPA routing and MIME types
+- **Domain Root**: Files deployed directly to document root for https://www.smarthub.com.tn access
 
 **Future environment variables**:
 - `VITE_USE_BACKEND=false` - Backend feature flag
@@ -285,16 +247,15 @@ Teacher: https://e631d0f7.sibforms.com/serve/MUIFACcBK_aC-0JXT6lhpKFd8xYgm8CkGlX
 # Build production version
 npm run build
 
-# Deploy dist/ contents to any static hosting provider
-# Primary: OVH shared hosting via manual FTP upload to domain root
-# Files deployed at root level (/) for direct access at www.smarthub.com.tn
-# Supported platforms: Netlify, Vercel, GitHub Pages, Apache servers, IIS servers, AWS S3, etc.
+# Deploy dist/ contents to domain root via FTP
+# All files uploaded directly to document root for https://www.smarthub.com.tn
+# Supported platforms: OVH, Apache servers, Netlify, Vercel, GitHub Pages, AWS S3, etc.
 ```
 
 ### Server Configuration Files
 - **Apache**: `.htaccess` with SPA routing, MIME types, security headers
 - **IIS**: `web.config` with URL rewrite rules, compression, font support
-- **Both configurations handle React Router properly and resolve deployment issues**
+- **Production-tested**: Configurations handle React Router and static assets correctly
 
 ## Email Marketing Integration
 
@@ -917,16 +878,15 @@ npm run lint                # Must pass without warnings
 - Firebase Console access required for admin user management
 - All modern hosting platforms supported (Netlify, Vercel, GitHub Pages, Firebase, Apache, IIS)
 
-### Deployment Status (Updated January 2025)
+### Deployment Status (Current - September 2025)
 - ✅ **Production Deployed**: https://www.smarthub.com.tn
-- ✅ **All Files Uploaded**: Root level deployment (index.html, assets/, images/)
-- ✅ **Server Configuration**: Enhanced .htaccess with asset protection rules
-- ✅ **Static Assets**: All CSS, JS bundles, and images properly served with correct MIME types
-- ✅ **SPA Routing**: All routes including `/admin/firebase-login` load correctly
-- ✅ **MIME Type Issues**: Resolved through Vite config and Apache configuration fixes
-- ✅ **Firebase Integration**: Ready for testing on production (configuration popup removed)
-- ✅ **Payment Choice Enhancement**: Deployed September 11, 2025 with new payment flow components
-- ✅ **Créneau System**: Complete migration and bug fixes deployed January 2025
+- ✅ **All Files Uploaded**: Root level deployment with proper directory structure
+- ✅ **Server Configuration**: Apache .htaccess with SPA routing and MIME types
+- ✅ **Static Assets**: All CSS, JS bundles, and images served correctly
+- ✅ **SPA Routing**: All routes including admin authentication work properly
+- ✅ **Firebase Integration**: Production-ready with enterprise authentication
+- ✅ **Payment System**: Complete booking and payment choice flow implemented
+- ✅ **Créneau System**: Full teaching period system with validation
 
 ### Recent Development Sessions
 
