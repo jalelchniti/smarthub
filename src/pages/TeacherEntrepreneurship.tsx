@@ -1,4 +1,4 @@
-import { Calculator, TrendingUp, Shield, Users, CheckCircle, ArrowRight, MessageCircle, DollarSign, Clock, Target, BookOpen, UserPlus } from 'lucide-react';
+import { Calculator, TrendingUp, Shield, Users, MessageCircle, DollarSign, Target, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const TeacherEntrepreneurship = () => {
@@ -11,7 +11,7 @@ const TeacherEntrepreneurship = () => {
     {
       criteria: "Revenu Max/Mois",
       center: "1,200 TND",
-      smarthub: "3,900+ TND",
+      smarthub: "2,000+ TND",
       centerColor: "text-red-600",
       smarthubColor: "text-green-600"
     },
@@ -56,55 +56,55 @@ const TeacherEntrepreneurship = () => {
     {
       title: "6 étudiants × 100 TND",
       subtitle: "4h/semaine",
-      netIncome: "481 TND/mois",
-      hourlyRate: "30.1 TND/h",
-      description: "Groupe intermédiaire",
+      netIncome: "209 TND/mois",
+      hourlyRate: "12.0 TND/h",
+      description: "Minimum garanti SmartHub",
       color: "from-blue-500 to-indigo-500"
     },
     {
       title: "9 étudiants × 100 TND",
       subtitle: "4h/semaine",
-      netIncome: "782 TND/mois",
-      hourlyRate: "48.9 TND/h",
-      description: "Groupe optimisé",
+      netIncome: "385 TND/mois",
+      hourlyRate: "22.2 TND/h",
+      description: "Groupe intermédiaire",
       color: "from-green-500 to-teal-500"
     },
     {
       title: "15 étudiants × 100 TND",
       subtitle: "4h/semaine",
-      netIncome: "1,349 TND/mois",
-      hourlyRate: "84.3 TND/h",
+      netIncome: "779 TND/mois",
+      hourlyRate: "44.9 TND/h",
       description: "Groupe complet",
       color: "from-purple-500 to-pink-500"
     },
     {
       title: "6 étudiants × 80 TND",
       subtitle: "4h/semaine",
-      netIncome: "289 TND/mois",
-      hourlyRate: "18.1 TND/h",
-      description: "Tarif accessible",
+      netIncome: "208 TND/mois",
+      hourlyRate: "12.0 TND/h",
+      description: "Minimum garanti SmartHub",
       color: "from-orange-500 to-red-500"
     }
   ];
 
   const growthScenarios = [
     {
-      students: "9 étudiants",
-      revenue: "1,080 TND",
-      hourlyRate: "18-20 TND/h",
-      multiplier: "1.5x minimum"
+      students: "9 étudiants × 120 TND",
+      revenue: "642 TND",
+      hourlyRate: "22-25 TND/h",
+      multiplier: "2x minimum"
     },
     {
-      students: "15 étudiants",
-      revenue: "2,100 TND",
-      hourlyRate: "35-40 TND/h",
-      multiplier: "3x minimum"
+      students: "15 étudiants × 120 TND",
+      revenue: "1,135 TND",
+      hourlyRate: "45-50 TND/h",
+      multiplier: "4x minimum"
     },
     {
-      students: "2 groupes (24 total)",
-      revenue: "3,840 TND",
-      hourlyRate: "60+ TND/h",
-      multiplier: "5x minimum"
+      students: "2 groupes (18 total)",
+      revenue: "1,550 TND",
+      hourlyRate: "45+ TND/h",
+      multiplier: "4x minimum"
     }
   ];
 
@@ -126,8 +126,8 @@ const TeacherEntrepreneurship = () => {
             </span>
           </h1>
           <p className="text-xl text-blue-100 mb-8 max-w-4xl mx-auto">
-            Pourquoi accepter un salaire fixe quand vous pouvez développer votre activité d'enseignement indépendante ?
-            Chez SmartHub, vous fixez vos tarifs, gérez vos étudiants, et bénéficiez de notre support complet.
+            Pourquoi accepter des tarifs imposés quand vous pouvez développer votre activité d'enseignement indépendante ?
+            Chez SmartHub, vous fixez vos tarifs, gérez vos étudiants, et bénéficiez de notre protection minimum garantie.
           </p>
 
           <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 inline-block border border-white border-opacity-20">
@@ -209,7 +209,7 @@ const TeacherEntrepreneurship = () => {
                 <div className="bg-green-100 rounded-lg p-4 mt-6">
                   <div className="text-center">
                     <span className="text-lg font-bold text-green-800">Potentiel mensuel:</span>
-                    <div className="text-2xl font-bold text-green-600">600-3,900+ TND</div>
+                    <div className="text-2xl font-bold text-green-600">200-2,000+ TND</div>
                   </div>
                 </div>
               </div>
@@ -254,7 +254,7 @@ const TeacherEntrepreneurship = () => {
               Exemples Réels du Simulateur de Revenus
             </h2>
             <p className="text-xl text-gray-600">
-              Votre protection SmartHub en action selon différents tarifs
+              Calculs réels incluant frais de salle et TVA - Protection 12 TND/heure garantie
             </p>
           </div>
 
