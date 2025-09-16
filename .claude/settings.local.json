@@ -51,7 +51,8 @@
       "Bash(ftp:*)",
       "Bash(nslookup:*)",
       "Bash(ping:*)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []
