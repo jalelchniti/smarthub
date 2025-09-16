@@ -88,7 +88,7 @@ npm run preview      # Aperçu du build de production
 ### Configuration Build
 - **Output**: `dist/` directory
 - **Assets**: `assets/` subdirectory
-- **Base Path**: Relatif (`./`) pour compatibilité universelle
+- **Base Path**: Absolue (`/`) pour déploiement /smarthub/
 
 ### Configurations Serveur Incluses
 - **Apache**: `.htaccess` avec routage SPA et types MIME
@@ -180,13 +180,13 @@ docs/
 - **✅ Sécurité Renforcée**: Remplacement des mots de passe codés en dur par Firebase Auth
 - **✅ Session Management**: Gestion automatique des tokens et état d'authentification
 
-### Résolution Complète des Problèmes de Déploiement
+### Configuration Déploiement Production
 - **✅ Types MIME**: Configuration correcte pour tous fichiers (.js, .css, .svg, .mjs)
 - **✅ Routage SPA**: Gestion serveur des routes React Router
-- **✅ Chargement Modules**: Résolution conflits ES modules
-- **✅ Scripts Brevo**: Chargement optimisé sans conflit avec React
-- **✅ Chemins Assets**: Base path relative pour compatibilité universelle
-- **✅ Navigation React**: Replacement window.location.href par useNavigate() pour SPA
+- **✅ Chargement Modules**: Optimisation ES modules
+- **✅ Scripts Brevo**: Chargement optimisé avec React
+- **✅ Chemins Assets**: Base path absolue pour déploiement /smarthub/
+- **✅ Navigation React**: Utilisation useNavigate() pour SPA
 
 ### Configuration Multi-Plateforme
 - **Apache**: `.htaccess` avec compression, sécurité, cache

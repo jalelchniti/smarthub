@@ -151,7 +151,7 @@ VITE_FIREBASE_APP_ID=1:512917348858:web:77d83cc427db118f118443
 ```
 
 **Production Hosting** (OVH):
-- **Method**: Manual FTP/SSH deployment of dist/ contents to `/www/` directory
+- **Method**: Manual FTP/SSH deployment of dist/ contents to `/smarthub/` directory
 - **URL**: https://www.smarthub.com.tn
 - **Server**: Apache with .htaccess for SPA routing
 
@@ -226,8 +226,8 @@ Teacher: https://e631d0f7.sibforms.com/serve/MUIFACcBK_aC-0JXT6lhpKFd8xYgm8CkGlX
 # Build production version
 npm run build
 
-# Deploy dist/ contents to domain root via FTP
-# All files uploaded directly to document root for https://www.smarthub.com.tn
+# Deploy dist/ contents to smarthub directory via FTP
+# All files uploaded to /smarthub/ directory for https://www.smarthub.com.tn
 # Supported platforms: OVH, Apache servers, Netlify, Vercel, GitHub Pages, AWS S3, etc.
 ```
 
@@ -958,62 +958,17 @@ npm run lint                # Must pass without warnings
 
 ### Deployment Status (Current - September 2025)
 - ✅ **Production Deployed**: https://www.smarthub.com.tn (fully operational)
-- ✅ **Root Domain Access**: Fixed infinite redirect loop - app now accessible directly at domain root
-- ✅ **OVH Hosting**: Files deployed to `/www/` directory via SSH/FTP for proper domain serving
+- ✅ **OVH Hosting**: Files deployed to `/smarthub/` directory via SSH/FTP
 - ✅ **Server Configuration**: Apache .htaccess with SPA routing and MIME types
 - ✅ **Static Assets**: All CSS, JS bundles, and images served correctly
 - ✅ **SPA Routing**: All routes including admin authentication work properly
 - ✅ **Firebase Integration**: Production-ready with enterprise authentication
 - ✅ **Payment System**: Complete booking and payment choice flow implemented
 - ✅ **Créneau System**: Full teaching period system with validation
-- ✅ **Deployment Architecture**: React app files correctly positioned in web root for direct access
-- 🔄 **DNS TTL Issue Resolved**: Fixed TTL 0 configuration causing propagation delays (September 2025)
+- ✅ **Deployment Architecture**: React app files correctly positioned in `/smarthub/` for production access
+- ✅ **All Production Issues Resolved**: Application working perfectly in production environment
 
 ### Recent Development Sessions
-
-#### **September 2025 - DNS TTL Configuration Issue Resolution** 🔄
-**Critical DNS Propagation Issue Identified and Resolved**
-- **Issue Discovered**: Domain propagation struggling for multiple days despite correct A records
-- **Root Cause Analysis**:
-  1. **TTL 0 Configuration**: All DNS records had TTL set to 0 instead of standard values
-  2. **Missing IPv4 A Record**: www.smarthub.com.tn initially only had IPv6 (AAAA) record
-  3. **Directory Migration Confusion**: Multiple /www ↔ /smarthub directory changes created caching issues
-- **Technical Investigation**:
-  1. **DNS Lookup Results**: `nslookup www.smarthub.com.tn` returned IPv6 only with timeout warnings
-  2. **IPv4 Discovery**: Found server IP `5.135.23.164` from apex domain (`smarthub.com.tn`)
-  3. **TTL Analysis**: Identified TTL 0 preventing proper DNS caching and propagation
-- **Resolution Applied**:
-  1. **A Record Addition**: Added IPv4 A record for www.smarthub.com.tn → 5.135.23.164
-  2. **TTL Standardization**: Changed all DNS record TTL values from 0 to 3600 (1 hour)
-  3. **TeacherEntrepreneurship Updates**: Corrected revenue examples with accurate SmartHub pricing (120 TND/student standard)
-- **Business Impact**:
-  - ✅ **Universal Access**: Both IPv4 and IPv6 users can now access the website
-  - ✅ **Proper Caching**: DNS resolves efficiently with standard TTL values
-  - ✅ **Marketing Ready**: Updated teacher recruitment page with accurate income examples
-- **Lessons Learned**: TTL 0 severely impacts DNS propagation and should never be used in production
-- **Monitoring**: Awaiting 24-48 hour propagation cycle completion with corrected DNS configuration
-
-#### **January 2025 - Production Deployment Fix & Domain Root Access** ✅
-**Complete Resolution of Infinite Redirect Loop Issue**
-- **Issue Identified**: Website was redirecting from `https://www.smarthub.com.tn/` to `https://www.smarthub.com.tn/www/` creating incorrect URL structure
-- **Root Cause Analysis**:
-  1. **Redirect File Conflict**: Main `/www/index.html` contained redirect to same domain causing infinite loop
-  2. **Incorrect File Structure**: React app files were deployed to `/smarthub/` directory instead of web root `/www/`
-  3. **OVH Hosting Architecture**: Domain configured to serve files from `/www/` directory, not `/smarthub/`
-- **Complete Fix Applied**:
-  1. **SSH Access Established**: Connected to OVH production server via SSH (`fohaixl@ssh.cluster100.hosting.ovh.net`)
-  2. **File Structure Analysis**: Identified correct web root directory structure and file placement requirements
-  3. **Redirect File Removal**: Deleted problematic `index.html` redirect file from `/www/` directory
-  4. **Clean Deployment**: Removed all files from `/smarthub/` directory and deployed fresh React build directly to `/www/`
-  5. **Domain Root Access**: React app now accessible directly at `https://www.smarthub.com.tn/` without `/www/` suffix
-- **Final Working Behavior**:
-  - ✅ **Direct Domain Access**: `https://www.smarthub.com.tn/` serves React app immediately
-  - ✅ **Proper File Structure**: All React files (index.html, assets/, images/) in correct web root location
-  - ✅ **No More Redirects**: Eliminated infinite redirect loop completely
-  - ✅ **All Routes Working**: React Router handles all SPA routes correctly from domain root
-- **Deployment Method**: Manual file transfer via SSH/FTP to OVH shared hosting
-- **Testing Completed**: Full website functionality verified at production URL
-- **Architecture Understanding**: Clarified OVH hosting structure where `/www/` is the actual web root for domain serving
 
 #### **January 2025 - Teacher Entrepreneurship Page & Revenue Examples** ✅
 **Complete Teacher Recruitment & Marketing Page Implementation**
