@@ -5,34 +5,34 @@ const TeacherEntrepreneurship = () => {
 
   const revenueExamples = [
     {
-      title: "6 étudiants × 80 TND",
+      title: "4 étudiants",
       subtitle: "4h/semaine",
       netIncome: "208 TND/mois",
       hourlyRate: "12.0 TND/h",
-      description: "Minimum garanti SmartHub",
+      description: "Protection SmartHub 35%",
       color: "from-orange-500 to-red-500"
     },
     {
-      title: "6 étudiants × 100 TND",
+      title: "6 étudiants",
       subtitle: "4h/semaine",
-      netIncome: "209 TND/mois",
+      netIncome: "208 TND/mois",
       hourlyRate: "12.0 TND/h",
-      description: "Minimum garanti SmartHub",
+      description: "Protection SmartHub 2%",
       color: "from-blue-500 to-indigo-500"
     },
     {
-      title: "9 étudiants × 100 TND",
+      title: "9 étudiants",
       subtitle: "4h/semaine",
-      netIncome: "385 TND/mois",
-      hourlyRate: "22.2 TND/h",
+      netIncome: "462 TND/mois",
+      hourlyRate: "26.7 TND/h",
       description: "Groupe intermédiaire",
       color: "from-green-500 to-teal-500"
     },
     {
-      title: "15 étudiants × 100 TND",
+      title: "15 étudiants",
       subtitle: "4h/semaine",
-      netIncome: "779 TND/mois",
-      hourlyRate: "44.9 TND/h",
+      netIncome: "1,079 TND/mois",
+      hourlyRate: "62.3 TND/h",
       description: "Groupe complet",
       color: "from-purple-500 to-pink-500"
     }
@@ -40,22 +40,22 @@ const TeacherEntrepreneurship = () => {
 
   const growthScenarios = [
     {
-      students: "6 étudiants × 100 TND",
-      revenue: "209 TND",
+      students: "6 étudiants",
+      revenue: "208 TND",
       hourlyRate: "12.0 TND/h",
       multiplier: "Minimum garanti"
     },
     {
-      students: "9 étudiants × 100 TND",
-      revenue: "385 TND",
-      hourlyRate: "22.2 TND/h",
-      multiplier: "1.9x minimum"
+      students: "9 étudiants",
+      revenue: "462 TND",
+      hourlyRate: "26.7 TND/h",
+      multiplier: "2.2x minimum"
     },
     {
-      students: "15 étudiants × 100 TND",
-      revenue: "779 TND",
-      hourlyRate: "44.9 TND/h",
-      multiplier: "3.7x minimum"
+      students: "15 étudiants",
+      revenue: "1,079 TND",
+      hourlyRate: "62.3 TND/h",
+      multiplier: "5.2x minimum"
     }
   ];
 

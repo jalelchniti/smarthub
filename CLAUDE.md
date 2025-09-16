@@ -37,42 +37,28 @@ npm run build  # TypeScript + Vite build - catches TypeScript errors
 npm run lint   # ESLint checks - catches code quality issues
 ```
 
-**Git Operations**:
-```bash
-git status     # Check current changes
-git diff       # View unstaged changes
-git add .      # Stage all changes
-git commit -m "commit message"  # Commit with descriptive message
-```
-
-**Production Build & Preview**:
+**Production Build & Testing**:
 ```bash
 npm run build   # Creates dist/ folder for deployment
 npm run preview # Preview the production build locally
 ```
 
 **Testing**: Manual testing only (no automated test framework configured)
-**Development Server**: Background process may be running - check with BashOutput tool if needed
-
-**Key npm Scripts**:
-- `npm run dev` - Start Vite development server with HMR
-- `npm run build` - TypeScript compilation + Vite production build
-- `npm run lint` - ESLint with TypeScript and React rules
-- `npm run preview` - Preview production build locally
+**Production URL**: https://www.smarthub.com.tn
+**Development Note**: Background dev server may be running - check with BashOutput tool if needed
 
 **Common Development Tasks**:
 - **Add new page**: Create component in `src/pages/`, add route in `src/App.tsx`
 - **Add new UI component**: Create in `src/components/ui/`, follow existing patterns
-- **Update Firebase rules**: Use `update-firebase.html` utility or Firebase Console
-- **Add new form field**: Remember uppercase names for Brevo compatibility (`NOM`, `PRENOM`, `EMAIL`)
-- **Debug Firebase**: Check browser console and Firebase Console for auth/database errors
-- **Debug build errors**: Run `npm run build` to catch TypeScript errors before deployment
+- **Firebase debugging**: Check browser console and Firebase Console for auth/database errors
+- **Form fields**: MUST use uppercase names for Brevo (`NOM`, `PRENOM`, `EMAIL`)
+- **Build debugging**: Run `npm run build` to catch TypeScript errors before deployment
 
 ### Deployment Configuration
 **Server configuration files** (CRITICAL for SPA routing):
-- `.htaccess` - Apache server configuration with MIME types and SPA routing
-- `web.config` - IIS server configuration with URL rewrite rules
-- Configurations handle React Router properly with correct MIME types
+- `.htaccess` - Apache server configuration
+- `web.config` - IIS server configuration
+- Both handle React Router properly with correct MIME types
 
 ## Critical Development Rules
 
@@ -89,10 +75,11 @@ npm run preview # Preview the production build locally
 - **Service Pattern**: Use `FirebaseBookingService` and `FirebaseAuthService` classes
 
 ### SmartHub Business Logic
-- **Créneau System**: Teaching periods with strict duration rules (1.5h minimum, 3h maximum, 30-minute increments)
-- **Income Protection**: 12 TND/hour minimum guaranteed for teachers (automatic discount up to 35%)
+- **Créneau System**: Teaching periods 1.5h-3h only (never individual 30-minute slots)
+- **Income Protection**: 12 TND/hour minimum guaranteed (automatic discount up to 35%)
 - **VAT Calculation**: 19% Tunisia rate applied to room costs only, not teacher revenue
 - **Room Pricing**: Synchronized between `RevenueSimulator.tsx` and `firebaseBookingService.ts`
+- **Admin Access**: Firebase Authentication for jalel.chniti@smarthub.com.tn and jalel.chniti@gmail.com
 - **Contact Integration**: WhatsApp +216 99 456 059 for all CTAs
 
 ## Architecture & Tech Stack
@@ -144,34 +131,29 @@ src/
 
 ## Key Configuration Files
 
-- **`vite.config.ts`**: Build configuration with absolute base path (`/`) for proper asset serving, asset file naming with hashes, CORS headers for dev server
-- **`package.json`**: Dependencies - React 19.1, TypeScript 5.8, Vite 7.1, Firebase 10.7.1 (npm + CDN hybrid), Tailwind CSS 3.4, React Router DOM 7.8
-- **`tsconfig.json`**: Project references architecture with separate app/node configs
-- **`tailwind.config.js`**: Custom design system with primary/secondary colors (blue/purple gradients), Inter font family
+- **`vite.config.ts`**: Build configuration with absolute base path (`/`), asset hashing, CORS headers
+- **`package.json`**: React 19.1 + TypeScript 5.8 + Vite 7.1 + Firebase 10.7.1 + Tailwind CSS 3.4
 - **`eslint.config.js`**: TypeScript-ESLint flat config with React hooks and refresh plugins
-- **`firebase.json`**: Firebase hosting config with SPA rewrites (all routes → /index.html)
-- **`index.html`**: Firebase CDN scripts (10.7.1), Brevo forms CSS/JS, meta tags for SEO
+- **`index.html`**: Firebase CDN scripts (10.7.1), Brevo forms CSS/JS, meta tags
+- **`.htaccess/.web.config`**: Server configs for SPA routing and MIME types
 
 ## Environment Configuration
 
-**Firebase Environment Variables** (`.env` file required for booking system and admin authentication):
-- `VITE_FIREBASE_API_KEY` - Firebase project API key
-- `VITE_FIREBASE_AUTH_DOMAIN` - Firebase auth domain
-- `VITE_FIREBASE_DATABASE_URL` - Firebase Realtime Database URL
-- `VITE_FIREBASE_PROJECT_ID` - Firebase project ID
-- `VITE_FIREBASE_STORAGE_BUCKET` - Firebase storage bucket
-- `VITE_FIREBASE_MESSAGING_SENDER_ID` - Firebase messaging sender ID
-- `VITE_FIREBASE_APP_ID` - Firebase app ID
+**Firebase Environment Variables** (`.env` file required):
+```bash
+VITE_FIREBASE_API_KEY=AIzaSyBnjZRrhG7qmJqcZcJWO7FnN2LznNSk07k
+VITE_FIREBASE_AUTH_DOMAIN=u-smart-booking.firebaseapp.com
+VITE_FIREBASE_DATABASE_URL=https://u-smart-booking-default-rtdb.asia-southeast1.firebasedatabase.app
+VITE_FIREBASE_PROJECT_ID=u-smart-booking
+VITE_FIREBASE_STORAGE_BUCKET=u-smart-booking.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=512917348858
+VITE_FIREBASE_APP_ID=1:512917348858:web:77d83cc427db118f118443
+```
 
-**OVH Hosting Configuration** (production deployment):
-- **FTP Deployment**: Manual upload of dist/ contents to domain root
-- **Server Configuration**: Apache .htaccess for SPA routing and MIME types
-- **Domain Root**: Files deployed directly to document root for https://www.smarthub.com.tn access
-
-**Future environment variables**:
-- `VITE_USE_BACKEND=false` - Backend feature flag
-- `VITE_API_URL` - Backend API endpoint
-- `VITE_EMAIL_VERIFICATION=false` - Email verification feature flag
+**Production Hosting** (OVH):
+- **Method**: Manual FTP/SSH deployment of dist/ contents to `/www/` directory
+- **URL**: https://www.smarthub.com.tn
+- **Server**: Apache with .htaccess for SPA routing
 
 ## Critical Development Rules
 
@@ -195,17 +177,13 @@ src/
 - **React Router**: Always use `useNavigate()` hook, never `window.location.href`
 - **Form Redirects**: Local thank you pages (`/thank-you/student`, `/thank-you/teacher`)
 
-### Common Development Pitfalls to Avoid
-- **TypeScript Build Errors**: Unclosed JSX elements, unused imports (ESLint fails build)
-- **Navigation Issues**: Never use `window.location.href`, always `useNavigate()` from React Router
-- **Firebase CDN Issues**: Firebase scripts are in index.html (CDN), not npm packages - don't install via npm
-- **Form Field Names**: MUST be uppercase for Brevo (`NOM`, `PRENOM`, `EMAIL`) - lowercase will fail
-- **Route Confusion**: Use public routes `/revenue-simulator`, `/booking-system` for user access (not legacy `/simulation`)
-- **Missing Dependencies**: Include all dependencies in useEffect hooks to avoid warnings
-- **Vite Base Path**: Keep `base: '/'` in vite.config.ts for absolute asset paths - don't change to relative
-- **Créneau Duration Logic**: Always use créneau business rules (1.5h-3h) - never allow individual 30-minute slot bookings
-- **Brevo Script Loading**: Only load Brevo scripts conditionally to avoid console errors on pages without forms
-- **Debug Code Cleanup**: Remove all console.log debugging statements before production deployment
+### Critical Development Pitfalls to Avoid
+- **Navigation**: NEVER use `window.location.href` - always use `useNavigate()` from React Router
+- **Form Fields**: MUST be uppercase for Brevo (`NOM`, `PRENOM`, `EMAIL`) - lowercase will fail
+- **Firebase**: Scripts loaded via CDN in index.html, NOT via npm install
+- **Créneau System**: Teaching periods must be 1.5h-3h only, never individual 30-minute slots
+- **Build Path**: Keep `base: '/'` in vite.config.ts - don't change to relative paths
+- **Production Code**: Remove all console.log debugging before deployment
 
 ## Brevo Form Integration Architecture
 
@@ -979,16 +957,63 @@ npm run lint                # Must pass without warnings
 - All modern hosting platforms supported (Netlify, Vercel, GitHub Pages, Firebase, Apache, IIS)
 
 ### Deployment Status (Current - September 2025)
-- ✅ **Production Deployed**: https://www.smarthub.com.tn
-- ✅ **All Files Uploaded**: Root level deployment with proper directory structure
+- ✅ **Production Deployed**: https://www.smarthub.com.tn (fully operational)
+- ✅ **Root Domain Access**: Fixed infinite redirect loop - app now accessible directly at domain root
+- ✅ **OVH Hosting**: Files deployed to `/www/` directory via SSH/FTP for proper domain serving
 - ✅ **Server Configuration**: Apache .htaccess with SPA routing and MIME types
 - ✅ **Static Assets**: All CSS, JS bundles, and images served correctly
 - ✅ **SPA Routing**: All routes including admin authentication work properly
 - ✅ **Firebase Integration**: Production-ready with enterprise authentication
 - ✅ **Payment System**: Complete booking and payment choice flow implemented
 - ✅ **Créneau System**: Full teaching period system with validation
+- ✅ **Deployment Architecture**: React app files correctly positioned in web root for direct access
+- 🔄 **DNS TTL Issue Resolved**: Fixed TTL 0 configuration causing propagation delays (September 2025)
 
 ### Recent Development Sessions
+
+#### **September 2025 - DNS TTL Configuration Issue Resolution** 🔄
+**Critical DNS Propagation Issue Identified and Resolved**
+- **Issue Discovered**: Domain propagation struggling for multiple days despite correct A records
+- **Root Cause Analysis**:
+  1. **TTL 0 Configuration**: All DNS records had TTL set to 0 instead of standard values
+  2. **Missing IPv4 A Record**: www.smarthub.com.tn initially only had IPv6 (AAAA) record
+  3. **Directory Migration Confusion**: Multiple /www ↔ /smarthub directory changes created caching issues
+- **Technical Investigation**:
+  1. **DNS Lookup Results**: `nslookup www.smarthub.com.tn` returned IPv6 only with timeout warnings
+  2. **IPv4 Discovery**: Found server IP `5.135.23.164` from apex domain (`smarthub.com.tn`)
+  3. **TTL Analysis**: Identified TTL 0 preventing proper DNS caching and propagation
+- **Resolution Applied**:
+  1. **A Record Addition**: Added IPv4 A record for www.smarthub.com.tn → 5.135.23.164
+  2. **TTL Standardization**: Changed all DNS record TTL values from 0 to 3600 (1 hour)
+  3. **TeacherEntrepreneurship Updates**: Corrected revenue examples with accurate SmartHub pricing (120 TND/student standard)
+- **Business Impact**:
+  - ✅ **Universal Access**: Both IPv4 and IPv6 users can now access the website
+  - ✅ **Proper Caching**: DNS resolves efficiently with standard TTL values
+  - ✅ **Marketing Ready**: Updated teacher recruitment page with accurate income examples
+- **Lessons Learned**: TTL 0 severely impacts DNS propagation and should never be used in production
+- **Monitoring**: Awaiting 24-48 hour propagation cycle completion with corrected DNS configuration
+
+#### **January 2025 - Production Deployment Fix & Domain Root Access** ✅
+**Complete Resolution of Infinite Redirect Loop Issue**
+- **Issue Identified**: Website was redirecting from `https://www.smarthub.com.tn/` to `https://www.smarthub.com.tn/www/` creating incorrect URL structure
+- **Root Cause Analysis**:
+  1. **Redirect File Conflict**: Main `/www/index.html` contained redirect to same domain causing infinite loop
+  2. **Incorrect File Structure**: React app files were deployed to `/smarthub/` directory instead of web root `/www/`
+  3. **OVH Hosting Architecture**: Domain configured to serve files from `/www/` directory, not `/smarthub/`
+- **Complete Fix Applied**:
+  1. **SSH Access Established**: Connected to OVH production server via SSH (`fohaixl@ssh.cluster100.hosting.ovh.net`)
+  2. **File Structure Analysis**: Identified correct web root directory structure and file placement requirements
+  3. **Redirect File Removal**: Deleted problematic `index.html` redirect file from `/www/` directory
+  4. **Clean Deployment**: Removed all files from `/smarthub/` directory and deployed fresh React build directly to `/www/`
+  5. **Domain Root Access**: React app now accessible directly at `https://www.smarthub.com.tn/` without `/www/` suffix
+- **Final Working Behavior**:
+  - ✅ **Direct Domain Access**: `https://www.smarthub.com.tn/` serves React app immediately
+  - ✅ **Proper File Structure**: All React files (index.html, assets/, images/) in correct web root location
+  - ✅ **No More Redirects**: Eliminated infinite redirect loop completely
+  - ✅ **All Routes Working**: React Router handles all SPA routes correctly from domain root
+- **Deployment Method**: Manual file transfer via SSH/FTP to OVH shared hosting
+- **Testing Completed**: Full website functionality verified at production URL
+- **Architecture Understanding**: Clarified OVH hosting structure where `/www/` is the actual web root for domain serving
 
 #### **January 2025 - Teacher Entrepreneurship Page & Revenue Examples** ✅
 **Complete Teacher Recruitment & Marketing Page Implementation**

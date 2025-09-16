@@ -47,7 +47,11 @@
       "Bash(start migrate-creneau-system.html)",
       "Bash(netstat:*)",
       "Bash(kill:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(ftp:*)",
+      "Bash(nslookup:*)",
+      "Bash(ping:*)",
+      "Bash(git fetch:*)"
     ],
     "deny": [],
     "ask": []
