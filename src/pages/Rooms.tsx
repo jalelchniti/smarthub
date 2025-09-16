@@ -16,13 +16,31 @@ interface Room {
   pricing: { capacity: string; rate: number }[];
   availability: string;
   image: string;
+  images?: string[]; // Optional array for multiple images
 }
 
 export const Rooms: React.FC = () => {
   const [showMap, setShowMap] = useState(false);
+  const [roomImageStates, setRoomImageStates] = useState<{[key: string]: number}>({});
   const navigate = useNavigate();
-  
+
   const mapSrc = 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3194.927527841475!2d10.17702587640448!3d36.79628796791918!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd3472cdcd2081%3A0x6e5339efe27057be!2s13%20Rue%20de%20Belgique%2C%20Tunis!5e0!3m2!1sfr!2stn!4v1756241843416!5m2!1sfr!2stn';
+
+  const handleImageClick = (roomId: string, totalImages: number) => {
+    setRoomImageStates(prev => {
+      const currentIndex = prev[roomId] || 0;
+      const nextIndex = (currentIndex + 1) % totalImages;
+      return { ...prev, [roomId]: nextIndex };
+    });
+  };
+
+  const getCurrentImage = (room: Room) => {
+    if (!room.images || room.images.length <= 1) {
+      return room.image;
+    }
+    const currentIndex = roomImageStates[room.id] || 0;
+    return room.images[currentIndex];
+  };
 
   // Static room data
   const rooms: Room[] = [
@@ -47,7 +65,8 @@ export const Rooms: React.FC = () => {
         { capacity: '10-15 personnes', rate: 35 }
       ],
       availability: '78 hours/week',
-      image: '/images/room-1.jpg'
+      image: '/images/salle-1-1.jpg',
+      images: ['/images/salle-1-1.jpg', '/images/salle-1-2.jpg']
     },
     {
       id: '2',
@@ -69,7 +88,8 @@ export const Rooms: React.FC = () => {
         { capacity: '8-9 personnes', rate: 25 }
       ],
       availability: '78 hours/week',
-      image: '/images/room-2.jpg'
+      image: '/images/salle2-1.jpg',
+      images: ['/images/salle2-1.jpg', '/images/salle2-2.jpg']
     },
     {
       id: '3',
@@ -91,7 +111,8 @@ export const Rooms: React.FC = () => {
         { capacity: '8-9 personnes', rate: 25 }
       ],
       availability: '78 hours/week',
-      image: '/images/room-3.jpg'
+      image: '/images/salle3-1.jpg',
+      images: ['/images/salle3-1.jpg', '/images/salle3-2.jpg']
     }
   ];
 
@@ -184,13 +205,28 @@ export const Rooms: React.FC = () => {
                 
                 <div className="relative p-8 flex flex-col h-full">
                   {/* Room Image */}
-                  <div className="w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-6 relative overflow-hidden">
-                    <img 
-                      src={room.image} 
-                      alt={room.name}
+                  <div
+                    className={`w-full h-48 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl mb-6 relative overflow-hidden ${
+                      room.images && room.images.length > 1 ? 'cursor-pointer hover:scale-105 transition-transform duration-200' : ''
+                    }`}
+                    onClick={() => room.images && room.images.length > 1 && handleImageClick(room.id, room.images.length)}
+                  >
+                    <img
+                      src={getCurrentImage(room)}
+                      alt={`${room.name} - Image ${room.images && room.images.length > 1 ? (roomImageStates[room.id] || 0) + 1 : '1'}`}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-br from-green-400/10 to-blue-400/10"></div>
+                    {room.images && room.images.length > 1 && (
+                      <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-lg text-sm">
+                        {(roomImageStates[room.id] || 0) + 1}/{room.images.length}
+                      </div>
+                    )}
+                    {room.images && room.images.length > 1 && (
+                      <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded-lg text-xs">
+                        Cliquez pour voir plus
+                      </div>
+                    )}
                   </div>
 
                   {/* Room Info */}
