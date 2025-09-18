@@ -1311,7 +1311,7 @@ export const BookingSystem: React.FC = () => {
                     <option value="Physique">Physique</option>
                     <option value="Français">Français</option>
                     <option value="Anglais">Anglais</option>
-                    <option value="Sciences Naturelles">Sciences Naturelles</option>
+                    <option value="Sciences de la Vie et de la Terre">Sciences de la Vie et de la Terre</option>
                     <option value="Arabe">Arabe</option>
                     <option value="Informatique">Informatique</option>
                     <option value="Économie & Gestion">Économie & Gestion</option>
@@ -1558,7 +1558,7 @@ export const BookingSystem: React.FC = () => {
                     <option value="Physique">Physique</option>
                     <option value="Français">Français</option>
                     <option value="Anglais">Anglais</option>
-                    <option value="Sciences Naturelles">Sciences Naturelles</option>
+                    <option value="Sciences de la Vie et de la Terre">Sciences de la Vie et de la Terre</option>
                     <option value="Arabe">Arabe</option>
                     <option value="Informatique">Informatique</option>
                     <option value="Économie & Gestion">Économie & Gestion</option>

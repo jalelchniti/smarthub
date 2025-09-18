@@ -16,7 +16,7 @@ export const LearnMore: React.FC = () => {
     { name: 'Physique', teachers: 4, icon: Target, color: 'from-blue-500 to-indigo-500' },
     { name: 'Français', teachers: 4, icon: Languages, color: 'from-green-500 to-teal-500' },
     { name: 'Anglais', teachers: 3, icon: Globe, color: 'from-orange-500 to-red-500' },
-    { name: 'Sciences Naturelles', teachers: 4, icon: BookOpen, color: 'from-emerald-500 to-green-500' },
+    { name: 'Sciences de la Vie et de la Terre', teachers: 4, icon: BookOpen, color: 'from-emerald-500 to-green-500' },
     { name: 'Arabe', teachers: 2, icon: Settings, color: 'from-cyan-500 to-blue-500' },
     { name: 'Informatique', teachers: 3, icon: Laptop, color: 'from-violet-500 to-purple-500' },
     { name: 'Économie & Gestion', teachers: 2, icon: TrendingUp, color: 'from-rose-500 to-pink-500' },
@@ -119,15 +119,6 @@ export const LearnMore: React.FC = () => {
                 </div>
               );
             })}
-          </div>
-          
-          <div className="text-center">
-            <Link to="/register">
-              <Button size="lg" className="flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-200 mx-auto">
-                <UserPlus className="w-6 h-6" />
-                <span>S'inscrire pour Voir Tous les Enseignants</span>
-              </Button>
-            </Link>
           </div>
         </div>
       </section>

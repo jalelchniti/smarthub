@@ -56,7 +56,10 @@
       "Bash(convert:*)",
       "Bash(magick convert:*)",
       "Bash(python:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(yarn --version)",
+      "Bash(yarn install)"
     ],
     "deny": [],
     "ask": []

@@ -171,7 +171,7 @@ VITE_FIREBASE_APP_ID=1:512917348858:web:77d83cc427db118f118443
 ### Styling Requirements
 - **Center Alignment**: Global `text-center` on all content (except interactive elements)
 - **Design System**: Blue/purple gradients, glassmorphism effects, Inter font
-- **9 Standardized Subjects**: Mathématiques, Physique, Français, Anglais, Sciences Naturelles, Arabe, Informatique, Économie & Gestion, ESP
+- **9 Standardized Subjects**: Mathématiques, Physique, Français, Anglais, Sciences de la Vie et de la Terre, Arabe, Informatique, Économie & Gestion, ESP
 
 ### Navigation Rules
 - **React Router**: Always use `useNavigate()` hook, never `window.location.href`

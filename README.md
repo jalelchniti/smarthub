@@ -51,7 +51,7 @@ Visitez `http://localhost:5173`
 - **Intégration WhatsApp**: Contact direct via +216 99 456 059
 - **Formulaires Brevo**: Collecte de leads avec autorépondeurs email
 - **Carte Interactive**: Localisation Google Maps intégrée
-- **9 Matières**: Mathématiques, Physique, Français, Anglais, Sciences Naturelles, Arabe, Informatique, Économie & Gestion, ESP
+- **9 Matières**: Mathématiques, Physique, Français, Anglais, Sciences de la Vie et de la Terre, Arabe, Informatique, Économie & Gestion, ESP
 
 ### 🆕 Nouvelles Fonctionnalités (Décembre 2025 - Janvier 2025)
 - **🛡️ Garantie de Revenu**: 12 TND/heure minimum pour enseignants avec remise automatique jusqu'à 35%

@@ -6,7 +6,7 @@ const Teachers = () => {
     { name: 'Physique', icon: Target, color: 'from-blue-500 to-indigo-500' },
     { name: 'Français', icon: Languages, color: 'from-green-500 to-teal-500' },
     { name: 'Anglais', icon: Globe, color: 'from-orange-500 to-red-500' },
-    { name: 'Sciences Naturelles', icon: BookOpen, color: 'from-emerald-500 to-green-500' },
+    { name: 'Sciences de la Vie et de la Terre', icon: BookOpen, color: 'from-emerald-500 to-green-500' },
     { name: 'Arabe', icon: Settings, color: 'from-cyan-500 to-blue-500' },
     { name: 'Informatique', icon: Laptop, color: 'from-violet-500 to-purple-500' },
     { name: 'Économie & Gestion', icon: TrendingUp, color: 'from-rose-500 to-pink-500' },
