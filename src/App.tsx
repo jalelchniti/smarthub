@@ -13,7 +13,7 @@ import { RevenueSimulator } from './pages/RevenueSimulator';
 import { BookingSystem } from './pages/BookingSystem';
 import { BookingThankYou } from './pages/BookingThankYou';
 import { PaymentOnlineComingSoon } from './pages/PaymentOnlineComingSoon';
-import TeacherEntrepreneurship from './pages/TeacherEntrepreneurship';
+import { OurMission } from './pages/Our_Mission';
 import { AdminBookings } from './pages/AdminBookings';
 import { AdminLogin } from './pages/AdminLogin';
 import { SecureAdminBookings } from './pages/SecureAdminBookings';
@@ -61,7 +61,7 @@ function App() {
                 <Route path="/teachers" element={<Teachers />} />
                 <Route path="/learn-more" element={<LearnMore />} />
                 <Route path="/subjects" element={<LearnMore />} />
-                <Route path="/teacher-entrepreneurship" element={<TeacherEntrepreneurship />} />
+                <Route path="/our-mission" element={<OurMission />} />
                 <Route path="/revenue-simulator" element={<RevenueSimulator />} />
                 <Route path="/booking-system" element={<BookingSystem />} />
                 <Route path="*" element={<Home />} />

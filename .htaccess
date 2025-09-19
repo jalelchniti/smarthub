@@ -49,15 +49,22 @@ AddType font/eot .eot
     ExpiresByType font/woff2 "access plus 1 year"
 </IfModule>
 
-# CRITICAL: Handle React Router SPA routing
+# CRITICAL: Handle React Router SPA routing for /smarthub/ deployment
 # This MUST be at the end to avoid interfering with static assets
-# First, explicitly handle assets directory
-RewriteRule ^assets/ - [L]
+# First, explicitly handle assets directory (allow direct access)
+RewriteRule ^smarthub/assets/ - [L]
 
-# Then handle SPA routing for everything else
+# Handle static files (images, fonts, etc.)
+RewriteRule ^smarthub/images/ - [L]
+RewriteRule ^smarthub/.*\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|json)$ - [L]
+
+# Then handle SPA routing for everything else under /smarthub/
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule . /index.html [L]
+RewriteRule ^smarthub/(.*)$ /smarthub/index.html [L]
+
+# Redirect root to /smarthub/ (optional - if you want root to redirect)
+RewriteRule ^$ /smarthub/ [R=301,L]
 
 # Fallback for missing MIME type module
 <IfModule !mod_mime.c>

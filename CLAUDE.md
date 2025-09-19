@@ -60,6 +60,19 @@ npm run preview # Preview the production build locally
 - `web.config` - IIS server configuration
 - Both handle React Router properly with correct MIME types
 
+### Vite Configuration (CRITICAL)
+**Conditional Base Path Setup**:
+```typescript
+// vite.config.ts - DO NOT MODIFY this conditional logic
+export default defineConfig(({ command }) => ({
+  base: command === 'build' ? '/smarthub/' : '/',
+  // ... other config
+}))
+```
+- **Development**: `base: '/'` - localhost serves from root
+- **Production Build**: `base: '/smarthub/'` - assets referenced with /smarthub/ prefix for OVH deployment
+- **Why**: Prevents localhost redirecting to /smarthub/ while maintaining correct production paths
+
 ## Critical Development Rules
 
 ### Navigation & Form Patterns
@@ -131,7 +144,7 @@ src/
 
 ## Key Configuration Files
 
-- **`vite.config.ts`**: Build configuration with absolute base path (`/`), asset hashing, CORS headers
+- **`vite.config.ts`**: Build configuration with conditional base path (`/` for dev, `/smarthub/` for build), asset hashing, CORS headers
 - **`package.json`**: React 19.1 + TypeScript 5.8 + Vite 7.1 + Firebase 10.7.1 + Tailwind CSS 3.4
 - **`eslint.config.js`**: TypeScript-ESLint flat config with React hooks and refresh plugins
 - **`index.html`**: Firebase CDN scripts (10.7.1), Brevo forms CSS/JS, meta tags
@@ -154,6 +167,7 @@ VITE_FIREBASE_APP_ID=1:512917348858:web:77d83cc427db118f118443
 - **Method**: Manual FTP/SSH deployment of dist/ contents to `/smarthub/` directory
 - **URL**: https://www.smarthub.com.tn
 - **Server**: Apache with .htaccess for SPA routing
+- **Base Path**: `/smarthub/` (configured in vite.config.ts)
 
 ## Critical Development Rules
 
@@ -182,7 +196,7 @@ VITE_FIREBASE_APP_ID=1:512917348858:web:77d83cc427db118f118443
 - **Form Fields**: MUST be uppercase for Brevo (`NOM`, `PRENOM`, `EMAIL`) - lowercase will fail
 - **Firebase**: Scripts loaded via CDN in index.html, NOT via npm install
 - **Créneau System**: Teaching periods must be 1.5h-3h only, never individual 30-minute slots
-- **Build Path**: Keep `base: '/'` in vite.config.ts - don't change to relative paths
+- **Build Path**: vite.config.ts uses conditional base path - `/` for development, `/smarthub/` for production build - DO NOT change this logic
 - **Production Code**: Remove all console.log debugging before deployment
 
 ## Brevo Form Integration Architecture

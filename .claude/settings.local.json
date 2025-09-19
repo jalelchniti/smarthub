@@ -59,7 +59,8 @@
       "Bash(mv:*)",
       "Bash(npm cache clean:*)",
       "Bash(yarn --version)",
-      "Bash(yarn install)"
+      "Bash(yarn install)",
+      "Bash(timeout 5 sleep 5)"
     ],
     "deny": [],
     "ask": []
