@@ -61,17 +61,18 @@ npm run preview # Preview the production build locally
 - Both handle React Router properly with correct MIME types
 
 ### Vite Configuration (CRITICAL)
-**Conditional Base Path Setup**:
+**Base Path Setup for OVH Deployment**:
 ```typescript
-// vite.config.ts - DO NOT MODIFY this conditional logic
+// vite.config.ts - Current configuration for OVH deployment
 export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/smarthub/' : '/',
+  base: command === 'build' ? '/' : '/',
   // ... other config
 }))
 ```
 - **Development**: `base: '/'` - localhost serves from root
-- **Production Build**: `base: '/smarthub/'` - assets referenced with /smarthub/ prefix for OVH deployment
-- **Why**: Prevents localhost redirecting to /smarthub/ while maintaining correct production paths
+- **Production Build**: `base: '/'` - assets referenced from root of deployed /smarthub/ directory
+- **OVH Deployment**: Files uploaded to `/smarthub/` directory, assets served relative to that location
+- **Why**: When deployed to `/smarthub/` directory, `/assets/...` resolves to `/smarthub/assets/...` automatically
 
 ## Critical Development Rules
 
@@ -107,7 +108,7 @@ export default defineConfig(({ command }) => ({
 ### Application Architecture
 
 **Route Structure** (`src/App.tsx`):
-- **Public with Navigation**: `/` (Home), `/rooms`, `/teachers`, `/learn-more`, `/teacher-entrepreneurship`, `/revenue-simulator`, `/booking-system` - with Navigation + Footer
+- **Public with Navigation**: `/` (Home), `/rooms`, `/teachers`, `/learn-more`, `/our-mission`, `/revenue-simulator`, `/booking-system` - with Navigation + Footer
 - **Registration Pages**: `/register/student`, `/register/teacher` - standalone pages with custom navigation
 - **Thank You Pages**: `/thank-you/student`, `/thank-you/teacher` - standalone without navigation/footer
 - **Payment Pages**: `/booking/thank-you`, `/payment/online-coming-soon` - standalone without navigation/footer
@@ -133,7 +134,7 @@ src/
 │   └── GoogleMapEmbed.tsx      # Embedded Google Maps component
 ├── pages/                       # 18 page components
 │   ├── Home.tsx, Rooms.tsx, Teachers.tsx, LearnMore.tsx    # Public pages
-│   ├── TeacherEntrepreneurship.tsx                        # Teacher recruitment & income protection
+│   ├── Our_Mission.tsx                                    # Educational facility mission & services
 │   ├── RevenueSimulator.tsx                               # Income calculator
 │   ├── BookingSystem.tsx                                 # Room booking system
 │   ├── FirebaseAdminLogin.tsx, FirebaseAdminBookings.tsx # Admin system
@@ -144,7 +145,7 @@ src/
 
 ## Key Configuration Files
 
-- **`vite.config.ts`**: Build configuration with conditional base path (`/` for dev, `/smarthub/` for build), asset hashing, CORS headers
+- **`vite.config.ts`**: Build configuration with base path `/` for OVH deployment, asset hashing, CORS headers
 - **`package.json`**: React 19.1 + TypeScript 5.8 + Vite 7.1 + Firebase 10.7.1 + Tailwind CSS 3.4
 - **`eslint.config.js`**: TypeScript-ESLint flat config with React hooks and refresh plugins
 - **`index.html`**: Firebase CDN scripts (10.7.1), Brevo forms CSS/JS, meta tags
@@ -167,7 +168,7 @@ VITE_FIREBASE_APP_ID=1:512917348858:web:77d83cc427db118f118443
 - **Method**: Manual FTP/SSH deployment of dist/ contents to `/smarthub/` directory
 - **URL**: https://www.smarthub.com.tn
 - **Server**: Apache with .htaccess for SPA routing
-- **Base Path**: `/smarthub/` (configured in vite.config.ts)
+- **Base Path**: Files deployed to `/smarthub/` directory on server
 
 ## Critical Development Rules
 
@@ -196,7 +197,7 @@ VITE_FIREBASE_APP_ID=1:512917348858:web:77d83cc427db118f118443
 - **Form Fields**: MUST be uppercase for Brevo (`NOM`, `PRENOM`, `EMAIL`) - lowercase will fail
 - **Firebase**: Scripts loaded via CDN in index.html, NOT via npm install
 - **Créneau System**: Teaching periods must be 1.5h-3h only, never individual 30-minute slots
-- **Build Path**: vite.config.ts uses conditional base path - `/` for development, `/smarthub/` for production build - DO NOT change this logic
+- **Build Path**: vite.config.ts uses base path `/` for both development and production - files deployed to `/smarthub/` directory on server
 - **Production Code**: Remove all console.log debugging before deployment
 
 ## Brevo Form Integration Architecture
@@ -334,104 +335,44 @@ npm run build
 - **Final calculation**: New TTC cost = (OriginalHT - Discount) × 1.19
 - **UI display**: Shows original vs discounted costs with percentage saved
 
-## Teacher Entrepreneurship Page (✅ NEW - January 2025)
+## Our Mission Page (✅ IMPLEMENTED - January 2025)
 
-### Purpose & Marketing Strategy
-- **Route**: `/teacher-entrepreneurship` - Public page with full navigation and footer
-- **Target Audience**: Teachers working in traditional centers considering independent teaching
-- **Function**: Alternative business model presentation and income protection demonstration
-- **Marketing Integration**: Referenced from Home page hero section with prominent CTA
+### Purpose & Business Identity
+- **Route**: `/our-mission` - Public page with full navigation and footer
+- **Target Audience**: Parents, students, and teachers seeking educational hosting services
+- **Function**: Educational facility mission presentation and service overview
+- **Business Focus**: SmartHub as educational host and bienveillant facilitator
 
 ### Technical Implementation
-- **Location**: `src/pages/TeacherEntrepreneurship.tsx`
+- **Location**: `src/pages/Our_Mission.tsx`
 - **Route Type**: Public page with Navigation + Footer
 - **Design System**: Consistent SmartHub blue/purple gradients and glassmorphism effects
-- **Multiple CTAs**: Strategic join/registration buttons throughout the page
+- **9-Section Structure**: Comprehensive educational hosting presentation
 
 ### Content Structure & Business Messaging
-1. **Hero Section**: Alternative independent teaching model introduction
-2. **Comparison Table**: Traditional center employment vs SmartHub independent model
-3. **Revenue Examples**: Real-world income scenarios with SmartHub pricing
-4. **Growth Potential**: Scalable income examples from small to large groups
-5. **Support System**: SmartHub services and protection policies
-6. **Multiple Join CTAs**: Registration and contact opportunities throughout
+1. **Hero Section**: Educational hosting identity and mission introduction
+2. **Security Section**: Parent peace of mind with building security and surveillance
+3. **Dual Mission**: Services for both teachers and parents/students
+4. **Teacher Dignity**: Recognition and support for teaching professionals
+5. **Educational Levels**: Remedial support and excellence development
+6. **Learning Environment**: Conducive spaces and professional equipment
+7. **Community Values**: Bienveillant hosting and educational partnership
+8. **Contact Integration**: WhatsApp contact and facility information
+9. **Final Mission**: Educational hosting commitment and SmartHub branding
 
-### Revenue Examples Implementation (✅ UPDATED - January 2025)
-**Calculation Methodology**: Behind-the-scenes room cost calculations with clean user display
-- **Student Group Sizes**: 6, 9, 15 students (realistic class sizes)
-- **Weekly Commitment**: 4 hours per week (standard teaching load)
-- **Room Cost Integration**: Accurate SmartHub room pricing with VAT included in calculations
-- **Net Income Display**: Shows final teacher earnings after all expenses
-- **Income Protection**: Examples demonstrate 12 TND/hour minimum guarantee
+### Navigation Integration
+- **Header Menu**: "Notre Mission" accessible from main navigation
+- **Footer Link**: Quick access via footer navigation
+- **Business Alignment**: Shifted from teacher recruitment to educational hosting identity
+- **Contact Integration**: WhatsApp contact with facility-focused messaging
 
-**Current Revenue Examples**:
-```typescript
-// Example calculations (background only - not displayed)
-// 6 students × 100 TND = 600 TND revenue
-// Salle 1: 25 TND/h × 4h/week × 4.33 weeks × 1.19 VAT = 119 TND room cost
-// Net income: 600 - 119 = 481 TND/month (30.1 TND/h)
-
-const revenueExamples = [
-  {
-    title: "6 étudiants × 100 TND",
-    subtitle: "4h/semaine",
-    netIncome: "481 TND/mois",
-    hourlyRate: "30.1 TND/h",
-    description: "Groupe intermédiaire"
-  },
-  {
-    title: "9 étudiants × 100 TND",
-    subtitle: "4h/semaine",
-    netIncome: "782 TND/mois",
-    hourlyRate: "48.9 TND/h",
-    description: "Groupe optimisé"
-  },
-  {
-    title: "15 étudiants × 100 TND",
-    subtitle: "4h/semaine",
-    netIncome: "1,349 TND/mois",
-    hourlyRate: "84.3 TND/h",
-    description: "Groupe complet"
-  },
-  {
-    title: "6 étudiants × 80 TND",
-    subtitle: "4h/semaine",
-    netIncome: "289 TND/mois",
-    hourlyRate: "18.1 TND/h",
-    description: "Tarif accessible"
-  }
-];
-```
-
-### Business Logic Integration
-- **Monthly Revenue Calculations**: Based on actual SmartHub room pricing structure
-- **Room Cost Background Calculation**:
-  - Salle 1: 20-35 TND/hour depending on group size
-  - Salle 2/3: 15-25 TND/hour depending on group size
-  - VAT: 19% Tunisia standard rate applied to room costs
-- **Income Protection**: Automatic discount application when hourly rate < 12 TND
-- **Comparison Data**: Traditional center (800-1,200 TND/month) vs SmartHub (600-3,900+ TND/month)
-
-### Home Page Integration (✅ IMPLEMENTED - January 2025)
-- **Hero Section CTA**: Prominent teacher-focused call-to-action box
-- **Updated Messaging**: Changed from "salaire fixe" to "tarifs imposés" (more accurate for hourly workers)
-- **Direct Navigation**: "Savoir comment → L'Alternative Indépendante" button linking to `/teacher-entrepreneurship`
-
-### User Experience & CTAs
-- **Multiple Join Opportunities**:
-  - Revenue examples section: "Rejoindre Maintenant" button
-  - Support section: "Commencer Mon Activité Indépendante" prominent CTA
-  - Final section: "Rejoindre SmartHub" with registration link
-- **WhatsApp Integration**: Direct contact with personalized teacher recruitment message
-- **Revenue Simulator Link**: Direct access to income calculation tool
-- **Registration Integration**: All CTAs route to `/register/teacher` for seamless conversion
-
-### Marketing Message Positioning
-- **Value Proposition**: "Pourquoi accepter des tarifs imposés quand vous pouvez développer votre activité indépendante ?"
-- **Key Benefits**: Full pricing control, flexible schedules, progressive income growth, SmartHub support
-- **Risk Mitigation**: 12 TND/hour minimum guarantee, up to 35% room discount protection
-- **Success Metrics**: Real examples showing 2x to 7x income potential vs traditional centers
-- **Professional Support**: Infrastructure, administration, student acquisition handled by SmartHub
+### Key Business Messages
+- **Educational Host Identity**: SmartHub as bienveillant educational facilitator
+- **Security Emphasis**: Building security, cameras, concierge for parent peace of mind
+- **Dual Service Mission**: Supporting both teachers and parents/students
+- **Teacher Dignity**: Professional recognition and support for educators
+- **Educational Excellence**: Both remedial support and excellence development
+- **Community Partnership**: Collaborative educational environment
 
 ## SmartHub Créneau (Teaching Period) System ✅ (NEW - January 2025)
 
@@ -970,7 +911,7 @@ npm run lint                # Must pass without warnings
 - Firebase Console access required for admin user management
 - All modern hosting platforms supported (Netlify, Vercel, GitHub Pages, Firebase, Apache, IIS)
 
-### Deployment Status (Current - September 2025)
+### Deployment Status (Current - January 2025)
 - ✅ **Production Deployed**: https://www.smarthub.com.tn (fully operational)
 - ✅ **OVH Hosting**: Files deployed to `/smarthub/` directory via SSH/FTP
 - ✅ **Server Configuration**: Apache .htaccess with SPA routing and MIME types
@@ -979,7 +920,9 @@ npm run lint                # Must pass without warnings
 - ✅ **Firebase Integration**: Production-ready with enterprise authentication
 - ✅ **Payment System**: Complete booking and payment choice flow implemented
 - ✅ **Créneau System**: Full teaching period system with validation
-- ✅ **Deployment Architecture**: React app files correctly positioned in `/smarthub/` for production access
+- ✅ **Our Mission Page**: Educational hosting identity implementation complete
+- ✅ **Room Image Galleries**: Interactive multi-view galleries for all 3 rooms
+- ✅ **Python Image Optimization**: Automated processing pipeline with 800x600 standard dimensions
 - ✅ **All Production Issues Resolved**: Application working perfectly in production environment
 
 ## Room Image Gallery System (✅ NEW - January 2025)
@@ -1063,28 +1006,28 @@ Room 3: ['/images/salle3-1.jpg', '/images/salle3-2.jpg']
 - **User Experience Enhancement**: Professional image galleries provide comprehensive room previews
 - **Deployment Status**: Ready for production with complete interactive room gallery system
 
-#### **January 2025 - Teacher Entrepreneurship Page & Revenue Examples** ✅
-**Complete Teacher Recruitment & Marketing Page Implementation**
-- **New Page Added**: `/teacher-entrepreneurship` - Full marketing page for teacher recruitment
-- **Home Page Integration**: Added prominent teacher-focused CTA in hero section linking to new page
-- **Route Configuration**: Added TeacherEntrepreneurship to public routes with full navigation and footer
-- **Revenue Examples Enhancement**:
-  1. **Realistic Student Groups**: Updated examples to use 6, 9, 15 students (practical class sizes)
-  2. **Weekly Commitment**: Standardized to 4 hours per week across all examples
-  3. **Room Cost Integration**: Accurate calculations using SmartHub pricing structure with VAT
-  4. **Clean Display**: Hidden room rental fee breakdown, showing only final net income to teachers
-  5. **Income Protection**: Examples demonstrate SmartHub's 12 TND/hour minimum guarantee
-- **Marketing Message Updates**:
-  1. **Language Precision**: Changed "salaire fixe" to "tarifs imposés" (more accurate for hourly workers)
-  2. **Value Proposition**: Clear positioning of SmartHub independent model vs traditional centers
-  3. **Multiple CTAs**: Strategic join buttons throughout the page for conversion optimization
-- **Business Logic Accuracy**:
-  1. **Room Pricing**: Based on actual SmartHub room rates (15-35 TND/hour)
-  2. **VAT Compliance**: 19% Tunisia rate applied to room costs in background calculations
-  3. **Monthly Comparisons**: Traditional centers (800-1,200 TND) vs SmartHub (600-3,900+ TND)
-  4. **Income Protection**: Automatic discount application for teachers earning below 12 TND/hour
-- **Testing Completed**: All revenue calculations verified against SmartHub pricing structure
-- **Deployment Status**: Ready for production with complete teacher recruitment marketing flow
+#### **January 2025 - Our Mission Page Implementation** ✅
+**Complete Educational Hosting Identity Implementation**
+- **New Page Added**: `/our-mission` - Full educational facility mission page
+- **Replaced**: TeacherEntrepreneurship.tsx with Our_Mission.tsx (business realignment)
+- **Route Configuration**: Updated routing from `/teacher-entrepreneurship` to `/our-mission` with full navigation and footer
+- **Business Identity Transformation**:
+  1. **Educational Hosting Focus**: Shifted from teacher recruitment to facility hosting identity
+  2. **9-Section Structure**: Comprehensive mission presentation with security, dual mission, teacher dignity
+  3. **Parent-Focused Messaging**: Building security, cameras, concierge for peace of mind
+  4. **Professional Recognition**: Teacher dignity and professional support emphasis
+- **Navigation Updates**:
+  1. **Header Menu**: Added "Notre Mission" to main navigation
+  2. **Footer Integration**: Replaced "Location de salles" with "Notre Mission" link
+  3. **Home Page**: Removed teacher-focused CTA from hero section
+  4. **Business Alignment**: SmartHub identity as educational host and bienveillant facilitator
+- **Content Implementation**:
+  1. **Security Section**: Building security features for parent confidence
+  2. **Dual Mission**: Services for both teachers and parents/students
+  3. **Educational Levels**: Remedial support and excellence development
+  4. **Community Values**: Bienveillant hosting and educational partnership
+- **Testing Completed**: All navigation links and page functionality verified
+- **Deployment Status**: Ready for production with complete educational hosting identity
 
 #### **September 2025 - Booking Synchronization Fix** ✅
 **Complete Resolution of Admin-User Booking Display Issue**
