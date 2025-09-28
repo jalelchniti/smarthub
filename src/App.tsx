@@ -9,7 +9,8 @@ import StudentThankYou from './pages/StudentThankYou';
 import TeacherThankYou from './pages/TeacherThankYou';
 import StudentRegistration from './pages/StudentRegistration';
 import TeacherRegistration from './pages/TeacherRegistration';
-import { RevenueSimulator } from './pages/RevenueSimulator';
+import TeacherRevenueCalculator from './pages/RevenueSimulator';
+import ParentCostCalculator from './pages/parent-cost-simulator';
 import { BookingSystem } from './pages/BookingSystem';
 import { BookingThankYou } from './pages/BookingThankYou';
 import { PaymentOnlineComingSoon } from './pages/PaymentOnlineComingSoon';
@@ -33,8 +34,8 @@ function App() {
         <Route path="/payment/online-coming-soon" element={<PaymentOnlineComingSoon />} />
         
         {/* Private Revenue Simulator page - hidden from public navigation */}
-        <Route path="/simulation" element={<RevenueSimulator />} />
-        
+        <Route path="/simulation" element={<TeacherRevenueCalculator />} />
+
         {/* Admin Login pages - secure authentication */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/firebase-login" element={<FirebaseAdminLogin />} />
@@ -62,7 +63,8 @@ function App() {
                 <Route path="/learn-more" element={<LearnMore />} />
                 <Route path="/subjects" element={<LearnMore />} />
                 <Route path="/our-mission" element={<OurMission />} />
-                <Route path="/revenue-simulator" element={<RevenueSimulator />} />
+                <Route path="/revenue-simulator" element={<TeacherRevenueCalculator />} />
+                <Route path="/parentsimulator" element={<ParentCostCalculator />} />
                 <Route path="/booking-system" element={<BookingSystem />} />
                 <Route path="*" element={<Home />} />
               </Routes>

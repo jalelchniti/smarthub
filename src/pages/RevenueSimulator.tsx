@@ -1,587 +1,401 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, Users, Clock, DollarSign, TrendingUp, Building, AlertCircle, CheckCircle, Calendar } from 'lucide-react';
+import { Calculator, Users, Clock, DollarSign, Shield, AlertTriangle, CheckCircle, TrendingUp, Building } from 'lucide-react';
 
-interface Room {
-  id: string;
-  name: string;
-  capacity: number;
-  pricing: { capacity: string; rate: number }[];
-}
+const TeacherRevenueCalculator = () => {
+  const [formData, setFormData] = useState({
+    roomId: '2',
+    studentCount: 6,
+    sessionHours: 2,
+    sessionsPerWeek: 2,
+    studentFee: 120
+  });
 
-interface SimulationResult {
-  monthlyRevenue: number;
-  monthlyRoomCostHT: number;
-  monthlyRoomCostTTC: number;
-  vatAmount: number;
-  netMonthlyIncome: number;
-  weeklyHours: number;
-  totalStudents: number;
-  hourlyIncome: number;
-  minimumHourlyIncome: number;
-  roomDiscount: number;
-  discountedRoomCostHT: number;
-  discountedRoomCostTTC: number;
-  discountedVatAmount: number;
-  discountApplied: boolean;
-}
+  const [results, setResults] = useState(null);
+  const [isCalculating, setIsCalculating] = useState(false);
 
-// Room data from Rooms.tsx
-const rooms: Room[] = [
-    {
-      id: '1',
-      name: 'Salle 1',
+  // Room pricing data
+  const rooms = {
+    '1': {
+      name: 'Salle 1 (Premium)',
       capacity: 15,
+      equipment: 'Projecteur Interactif, Climatisation, WiFi',
       pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 20 },
-        { capacity: '2-6 personnes', rate: 25 },
-        { capacity: '7-9 personnes', rate: 30 },
-        { capacity: '10-15 personnes', rate: 35 }
+        { min: 1, max: 1, rate: 20 },
+        { min: 2, max: 6, rate: 25 },
+        { min: 7, max: 9, rate: 30 },
+        { min: 10, max: 15, rate: 35 }
       ]
     },
-    {
-      id: '2',
-      name: 'Salle 2',
+    '2': {
+      name: 'Salle 2 (Standard)',
       capacity: 9,
+      equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 15 },
-        { capacity: '2-7 personnes', rate: 20 },
-        { capacity: '8-9 personnes', rate: 25 }
+        { min: 1, max: 1, rate: 15 },
+        { min: 2, max: 7, rate: 20 },
+        { min: 8, max: 9, rate: 25 }
       ]
     },
-    {
-      id: '3',
-      name: 'Salle 3',
+    '3': {
+      name: 'Salle 3 (Standard)',
       capacity: 9,
+      equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 15 },
-        { capacity: '2-7 personnes', rate: 20 },
-        { capacity: '8-9 personnes', rate: 25 }
+        { min: 1, max: 1, rate: 15 },
+        { min: 2, max: 7, rate: 20 },
+        { min: 8, max: 9, rate: 25 }
       ]
     }
-];
-
-export const RevenueSimulator: React.FC = () => {
-  const [selectedRoom, setSelectedRoom] = useState<string>('');
-  const [studentsPerGroup, setStudentsPerGroup] = useState<string>('1');
-  const [sessionHours, setSessionHours] = useState<string>('1.5'); // Minimum créneau duration
-  const [sessionsPerWeek, setSessionsPerWeek] = useState<string>('1');
-  const [feePerStudent, setFeePerStudent] = useState<string>('120');
-  const [result, setResult] = useState<SimulationResult | null>(null);
-
-  // Calculate simulation results
-  useEffect(() => {
-    // Get room hourly rate based on number of students
-    const getRoomRate = (roomId: string, students: number): number => {
-      const room = rooms.find(r => r.id === roomId);
-      if (!room) return 0;
-
-      if (students === 1) return room.pricing[0].rate;
-      
-      for (const tier of room.pricing) {
-        if (tier.capacity.includes('-')) {
-          const [min, max] = tier.capacity.match(/(\d+)-(\d+)/)?.slice(1, 3).map(Number) || [0, 0];
-          if (students >= min && students <= max) {
-            return tier.rate;
-          }
-        }
-      }
-      
-      return room.pricing[room.pricing.length - 1].rate;
-    };
-
-    // Parse string inputs to numbers
-    const studentsNum = parseInt(studentsPerGroup) || 0;
-    const sessionHoursNum = parseFloat(sessionHours) || 0;
-    const sessionsPerWeekNum = parseInt(sessionsPerWeek) || 0;
-    const feePerStudentNum = parseInt(feePerStudent) || 0;
-
-    // Check room capacity validation
-    const currentRoom = rooms.find(r => r.id === selectedRoom);
-    const isCapacityExceeded = currentRoom && studentsNum > currentRoom.capacity;
-    
-    // Validate créneau duration (1.5h to 3h only)
-    const isValidCreneauDuration = sessionHoursNum >= 1.5 && sessionHoursNum <= 3.0;
-
-    if (selectedRoom && studentsNum > 0 && sessionHoursNum > 0 && sessionsPerWeekNum > 0 && feePerStudentNum > 0 && !isCapacityExceeded && isValidCreneauDuration) {
-      const roomRate = getRoomRate(selectedRoom, studentsNum);
-      const weeklyHours = sessionHoursNum * sessionsPerWeekNum;
-      const monthlyHours = weeklyHours * 4.33; // Average weeks per month
-      
-      // Prevent division by zero
-      if (monthlyHours <= 0) {
-        setResult(null);
-        return;
-      }
-      
-      const monthlyRevenue = feePerStudentNum * studentsNum;
-      const monthlyRoomCostHT = roomRate * monthlyHours; // HT = VAT excluded
-      const vatAmount = monthlyRoomCostHT * 0.19; // VAT on room cost
-      const monthlyRoomCostTTC = monthlyRoomCostHT + vatAmount; // TTC = VAT included
-      const netMonthlyIncome = monthlyRevenue - monthlyRoomCostTTC; // Revenue minus TTC room cost
-      
-      // Calculate teacher's net hourly income (after room costs)
-      // This is what the teacher actually takes home per hour worked
-      const teacherNetHourlyIncome = netMonthlyIncome / monthlyHours;
-      const minimumHourlyIncome = 12; // TND per hour - SmartHub policy (net take-home)
-      
-      let roomDiscount = 0;
-      let discountedRoomCostHT = monthlyRoomCostHT;
-      let discountedVatAmount = vatAmount;
-      let discountedRoomCostTTC = monthlyRoomCostTTC;
-      let finalNetIncome = netMonthlyIncome;
-      let discountApplied = false;
-      
-      // If teacher's net hourly income is below minimum, apply discount up to 35%
-      if (teacherNetHourlyIncome < minimumHourlyIncome) {
-        const requiredAdditionalIncome = (minimumHourlyIncome - teacherNetHourlyIncome) * monthlyHours;
-        const maxDiscountAmountHT = monthlyRoomCostHT * 0.35; // Maximum 35% discount on HT cost
-        
-        // Calculate the required HT discount to achieve the target additional income
-        // Since VAT is 19%, reducing HT by X saves teacher X * 1.19 total
-        const requiredHTDiscount = requiredAdditionalIncome / 1.19; // Account for VAT savings
-        
-        // Apply discount (limited to maximum 35% of HT cost)
-        const discountAmountHT = Math.min(requiredHTDiscount, maxDiscountAmountHT);
-        
-        // Only apply discount if it's meaningful (> 0.01 TND)
-        if (discountAmountHT > 0.01 && monthlyRoomCostHT > 0) {
-          roomDiscount = (discountAmountHT / monthlyRoomCostHT) * 100; // Percentage
-          discountedRoomCostHT = monthlyRoomCostHT - discountAmountHT;
-          discountedVatAmount = discountedRoomCostHT * 0.19;
-          discountedRoomCostTTC = discountedRoomCostHT + discountedVatAmount;
-          finalNetIncome = monthlyRevenue - discountedRoomCostTTC;
-          discountApplied = true;
-        }
-      }
-
-      setResult({
-        monthlyRevenue,
-        monthlyRoomCostHT,
-        monthlyRoomCostTTC,
-        vatAmount,
-        netMonthlyIncome: finalNetIncome,
-        weeklyHours,
-        totalStudents: studentsNum,
-        hourlyIncome: finalNetIncome / monthlyHours,
-        minimumHourlyIncome,
-        roomDiscount,
-        discountedRoomCostHT,
-        discountedRoomCostTTC,
-        discountedVatAmount,
-        discountApplied
-      });
-    } else {
-      setResult(null);
-    }
-  }, [selectedRoom, studentsPerGroup, sessionHours, sessionsPerWeek, feePerStudent]);
-
-  const selectedRoomData = rooms.find(r => r.id === selectedRoom);
-  
-  // Helper function for getting room rate (duplicate of the one in useEffect)
-  const getCurrentRoomRate = (roomId: string, students: number): number => {
-    const room = rooms.find(r => r.id === roomId);
-    if (!room) return 0;
-
-    if (students === 1) return room.pricing[0].rate;
-    
-    for (const tier of room.pricing) {
-      if (tier.capacity.includes('-')) {
-        const [min, max] = tier.capacity.match(/(\d+)-(\d+)/)?.slice(1, 3).map(Number) || [0, 0];
-        if (students >= min && students <= max) {
-          return tier.rate;
-        }
-      }
-    }
-    
-    return room.pricing[room.pricing.length - 1].rate;
   };
-  
-  const currentRoomRate = selectedRoom ? getCurrentRoomRate(selectedRoom, parseInt(studentsPerGroup) || 1) : 0;
+
+  // Get room hourly rate based on student count
+  const getRoomRate = (roomId, studentCount) => {
+    const room = rooms[roomId];
+    if (!room) return 0;
+    
+    const tier = room.pricing.find(p => studentCount >= p.min && studentCount <= p.max);
+    return tier ? tier.rate : 0;
+  };
+
+  // Calculate teacher protection
+  const calculateProtectedRevenue = (roomId, studentCount, hours, studentFee, sessionsPerWeek) => {
+    const roomRateHTVA = getRoomRate(roomId, studentCount);
+    const weeklyHours = hours * sessionsPerWeek;
+    const monthlyHours = weeklyHours * 4;
+    const monthlyStudentRevenue = studentFee * studentCount;
+    const monthlyRoomCostHTVA = roomRateHTVA * monthlyHours;
+    const monthlyRoomCostTTC = monthlyRoomCostHTVA * 1.19;
+    
+    const baseTeacherIncome = monthlyStudentRevenue - monthlyRoomCostTTC;
+    const baseTeacherRate = baseTeacherIncome / monthlyHours;
+    
+    let finalRoomCostTTC = monthlyRoomCostTTC;
+    let discountApplied = false;
+    let discountPercentage = 0;
+    let teacherFinalRate = baseTeacherRate;
+    
+    if (baseTeacherRate < 12) {
+      const targetTeacherIncome = 12 * monthlyHours;
+      const requiredRoomCost = monthlyStudentRevenue - targetTeacherIncome;
+      const discountAmount = monthlyRoomCostTTC - requiredRoomCost;
+      discountPercentage = (discountAmount / monthlyRoomCostTTC) * 100;
+      
+      if (discountPercentage <= 35) {
+        finalRoomCostTTC = requiredRoomCost;
+        teacherFinalRate = 12.00;
+        discountApplied = true;
+      } else {
+        const maxDiscountAmount = monthlyRoomCostTTC * 0.35;
+        finalRoomCostTTC = monthlyRoomCostTTC - maxDiscountAmount;
+        teacherFinalRate = (monthlyStudentRevenue - finalRoomCostTTC) / monthlyHours;
+        discountPercentage = 35.0;
+        discountApplied = true;
+      }
+    }
+    
+    return {
+      monthlyStudentRevenue,
+      baseRoomCostTTC: monthlyRoomCostTTC,
+      finalRoomCostTTC,
+      discountApplied,
+      discountPercentage: Math.min(discountPercentage, 35),
+      discountAmount: monthlyRoomCostTTC - finalRoomCostTTC,
+      teacherFinalRate,
+      teacherMonthlyIncome: monthlyStudentRevenue - finalRoomCostTTC,
+      monthlyHours,
+      roomRateHTVA
+    };
+  };
+
+  // Handle form changes
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  // Calculate results
+  useEffect(() => {
+    setIsCalculating(true);
+    const timer = setTimeout(() => {
+      const selectedRoom = rooms[formData.roomId];
+      if (formData.studentCount > selectedRoom.capacity) {
+        setResults({ error: `Capacité dépassée! Maximum ${selectedRoom.capacity} étudiants pour cette salle.` });
+      } else {
+        const calculation = calculateProtectedRevenue(
+          formData.roomId,
+          formData.studentCount,
+          formData.sessionHours,
+          formData.studentFee,
+          formData.sessionsPerWeek
+        );
+        setResults(calculation);
+      }
+      setIsCalculating(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [formData]);
+
+  const selectedRoom = rooms[formData.roomId];
 
   return (
-    <div className="text-center">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-purple-900 via-blue-800 to-indigo-900 text-white section-padding overflow-hidden">
-        <div className="absolute inset-0 bg-black bg-opacity-20"></div>
-        <div className="absolute inset-0">
-          <div className="absolute top-20 left-20 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex items-center justify-center mb-4">
+            <Building className="w-8 h-8 text-blue-600 mr-3" />
+            <h1 className="text-4xl font-bold text-gray-800">ELMAOUIA ET.CO</h1>
+          </div>
+          <h2 className="text-2xl font-semibold text-gray-700 mb-2">Simulateur de Revenus Enseignants</h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Calculez vos revenus nets avec notre système de protection enseignant garantissant un minimum de 12 TND/heure
+          </p>
         </div>
-        
-        <div className="relative w-full px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-center mb-16">
-            <div className="flex items-center justify-center mb-6">
-              <div className="p-4 bg-white bg-opacity-10 rounded-2xl backdrop-blur-sm">
-                <Calculator className="w-16 h-16 text-white" />
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Input Panel */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+              <Calculator className="w-6 h-6 mr-3 text-blue-600" />
+              Configuration
+            </h2>
+
+            <div className="space-y-6">
+              {/* Room Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">
+                  <Building className="w-4 h-4 inline mr-2" />
+                  Sélection de la salle
+                </label>
+                <div className="grid gap-3">
+                  {Object.entries(rooms).map(([id, room]) => (
+                    <div
+                      key={id}
+                      className={`p-4 border-2 rounded-xl cursor-pointer transition-all ${
+                        formData.roomId === id
+                          ? 'border-blue-500 bg-blue-50 shadow-md'
+                          : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                      }`}
+                      onClick={() => handleInputChange('roomId', id)}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-semibold text-gray-800">{room.name}</h3>
+                          <p className="text-sm text-gray-600">{room.equipment}</p>
+                          <p className="text-xs text-blue-600 mt-1">Capacité: {room.capacity} étudiants</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-green-600">
+                            {getRoomRate(id, formData.studentCount)} TND/h
+                          </div>
+                          <div className="text-xs text-gray-500">HTVA</div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 text-center tracking-tight leading-normal">
-              Simulateur de Revenus
-              <span className="block text-yellow-300">
-                Enseignants
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-purple-100 max-w-4xl mx-auto text-center leading-relaxed">
-              Calculez vos <span className="font-semibold text-yellow-300">revenus nets mensuels</span> en utilisant nos espaces d'apprentissage. 
-              Outil exclusif pour planifier votre activité d'enseignement à SmartHub.
-            </p>
-            <div className="mt-8 bg-yellow-400 bg-opacity-20 border border-yellow-300 rounded-2xl p-4 max-w-2xl mx-auto">
-              <div className="flex items-center justify-center space-x-2 text-yellow-200">
-                <AlertCircle className="w-5 h-5" />
-                <span className="text-center text-sm">Outil confidentiel - Usage interne uniquement</span>
+
+              {/* Student Count */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Users className="w-4 h-4 inline mr-2" />
+                  Nombre d'étudiants
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max={selectedRoom.capacity}
+                  value={formData.studentCount}
+                  onChange={(e) => handleInputChange('studentCount', parseInt(e.target.value) || 1)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Maximum: {selectedRoom.capacity} étudiants pour {selectedRoom.name}
+                </p>
+              </div>
+
+              {/* Session Hours */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <Clock className="w-4 h-4 inline mr-2" />
+                  Durée par session (heures)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="4"
+                  step="0.5"
+                  value={formData.sessionHours}
+                  onChange={(e) => handleInputChange('sessionHours', parseFloat(e.target.value) || 1)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+              </div>
+
+              {/* Sessions Per Week */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <TrendingUp className="w-4 h-4 inline mr-2" />
+                  Sessions par semaine
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  max="7"
+                  value={formData.sessionsPerWeek}
+                  onChange={(e) => handleInputChange('sessionsPerWeek', parseInt(e.target.value) || 1)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
+              </div>
+
+              {/* Student Fee */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <DollarSign className="w-4 h-4 inline mr-2" />
+                  Frais par étudiant (TND/mois)
+                </label>
+                <input
+                  type="number"
+                  min="50"
+                  value={formData.studentFee}
+                  onChange={(e) => handleInputChange('studentFee', parseInt(e.target.value) || 120)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                />
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* Simulator Section */}
-      <section className="section-padding bg-gray-50 text-center">
-        <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-              
-              {/* Input Form */}
-              <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl">
-                    <TrendingUp className="w-8 h-8 text-white" />
+          {/* Results Panel */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+              <Shield className="w-6 h-6 mr-3 text-green-600" />
+              Résultats Financiers
+            </h2>
+
+            {isCalculating ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              </div>
+            ) : results?.error ? (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start">
+                <AlertTriangle className="w-5 h-5 text-red-500 mr-3 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-red-800">Erreur de Configuration</h3>
+                  <p className="text-red-700">{results.error}</p>
+                </div>
+              </div>
+            ) : results && (
+              <div className="space-y-6">
+                {/* Teacher Protection Status */}
+                <div className={`p-4 rounded-xl border-2 ${
+                  results.discountApplied 
+                    ? 'border-orange-200 bg-orange-50' 
+                    : 'border-green-200 bg-green-50'
+                }`}>
+                  <div className="flex items-center mb-2">
+                    {results.discountApplied ? (
+                      <Shield className="w-5 h-5 text-orange-600 mr-2" />
+                    ) : (
+                      <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                    )}
+                    <h3 className={`font-semibold ${
+                      results.discountApplied ? 'text-orange-800' : 'text-green-800'
+                    }`}>
+                      {results.discountApplied ? 'Protection Enseignant Activée' : 'Revenus Standards'}
+                    </h3>
+                  </div>
+                  <p className={`text-sm ${
+                    results.discountApplied ? 'text-orange-700' : 'text-green-700'
+                  }`}>
+                    {results.discountApplied 
+                      ? `Remise de ${results.discountPercentage.toFixed(1)}% appliquée pour garantir 12 TND/heure minimum`
+                      : 'Vos revenus dépassent déjà le minimum garanti'
+                    }
+                  </p>
+                </div>
+
+                {/* Key Metrics */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-blue-50 p-4 rounded-xl border border-blue-200">
+                    <div className="text-2xl font-bold text-blue-800">
+                      {results.teacherFinalRate.toFixed(2)} TND
+                    </div>
+                    <div className="text-sm text-blue-600">Taux horaire final</div>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-xl border border-green-200">
+                    <div className="text-2xl font-bold text-green-800">
+                      {results.teacherMonthlyIncome.toFixed(0)} TND
+                    </div>
+                    <div className="text-sm text-green-600">Revenu mensuel net</div>
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-                  Paramètres de Simulation
-                </h2>
 
-                <div className="space-y-6 text-center">
-                  {/* Room Selection */}
-                  <div>
-                    <label className="block text-lg font-bold text-gray-800 mb-4 text-center">
-                      <Building className="w-6 h-6 inline mr-2 text-blue-600" />
-                      Salle de cours
-                    </label>
-                    <select
-                      value={selectedRoom}
-                      onChange={(e) => setSelectedRoom(e.target.value)}
-                      autoComplete="off"
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center bg-white text-lg font-medium touch-manipulation"
-                    >
-                      <option value="">Sélectionnez une salle</option>
-                      {rooms.map((room) => (
-                        <option key={room.id} value={room.id}>
-                          {room.name} (Capacité: {room.capacity} personnes)
-                        </option>
-                      ))}
-                    </select>
+                {/* Detailed Breakdown */}
+                <div className="space-y-3">
+                  <h4 className="font-semibold text-gray-800 border-b pb-2">Détail des Calculs</h4>
+                  
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Revenus étudiants/mois:</span>
+                    <span className="font-semibold">{results.monthlyStudentRevenue.toFixed(0)} TND</span>
                   </div>
-
-                  {/* Students per Group */}
-                  <div>
-                    <label className="block text-lg font-bold text-gray-800 mb-4 text-center">
-                      <Users className="w-6 h-6 inline mr-2 text-purple-600" />
-                      Nombre d'Étudiants par Groupe
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min="1"
-                      max={selectedRoomData?.capacity || 15}
-                      value={studentsPerGroup}
-                      onChange={(e) => setStudentsPerGroup(e.target.value)}
-                      onInput={(e) => setStudentsPerGroup((e.target as HTMLInputElement).value)}
-                      onBlur={(e) => {
-                        const value = parseInt(e.target.value) || 1;
-                        const max = selectedRoomData?.capacity || 15;
-                        setStudentsPerGroup(Math.min(Math.max(value, 1), max).toString());
-                      }}
-                      placeholder="1-15"
-                      autoComplete="off"
-                      enterKeyHint="next"
-                      spellCheck="false"
-                      className={`w-full p-4 border rounded-xl focus:ring-2 focus:border-transparent text-center text-lg font-medium touch-manipulation ${
-                        selectedRoomData && parseInt(studentsPerGroup) > selectedRoomData.capacity 
-                          ? 'border-red-500 bg-red-50 focus:ring-red-500 text-red-700' 
-                          : 'border-gray-300 focus:ring-blue-500'
-                      }`}
-                    />
-                    {selectedRoomData && (
-                      <div className="mt-3 text-center">
-                        {parseInt(studentsPerGroup) > selectedRoomData.capacity ? (
-                          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                            <p className="text-base text-red-700 font-bold flex items-center justify-center space-x-2">
-                              <AlertCircle className="w-5 h-5" />
-                              <span>⚠️ Capacité dépassée! Maximum: {selectedRoomData.capacity} étudiants</span>
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-base text-gray-600 font-medium">
-                            Maximum: {selectedRoomData.capacity} étudiants
-                          </p>
-                        )}
-                      </div>
-                    )}
+                  
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Coût salle (base):</span>
+                    <span className="font-semibold">{results.baseRoomCostTTC.toFixed(0)} TND TTC</span>
                   </div>
-
-                  {/* Session Hours */}
-                  <div>
-                    <label className="block text-lg font-bold text-gray-800 mb-4 text-center">
-                      <Clock className="w-6 h-6 inline mr-2 text-green-600" />
-                      Durée d'un Créneau (heures)
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="decimal"
-                      min="1.5"
-                      max="3"
-                      step="0.5"
-                      value={sessionHours}
-                      onChange={(e) => setSessionHours(e.target.value)}
-                      onInput={(e) => setSessionHours((e.target as HTMLInputElement).value)}
-                      onBlur={(e) => {
-                        const value = parseFloat(e.target.value) || 1.5;
-                        setSessionHours(Math.min(Math.max(value, 1.5), 3).toString());
-                      }}
-                      placeholder="1.0"
-                      autoComplete="off"
-                      enterKeyHint="next"
-                      spellCheck="false"
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium touch-manipulation"
-                    />
-                  </div>
-
-                  {/* Sessions per Week */}
-                  <div>
-                    <label className="block text-lg font-bold text-gray-800 mb-4 text-center">
-                      <Calendar className="w-6 h-6 inline mr-2 text-orange-600" />
-                      Nombre de Créneaux par Semaine
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min="1"
-                      max="20"
-                      value={sessionsPerWeek}
-                      onChange={(e) => setSessionsPerWeek(e.target.value)}
-                      onInput={(e) => setSessionsPerWeek((e.target as HTMLInputElement).value)}
-                      onBlur={(e) => {
-                        const value = parseInt(e.target.value) || 1;
-                        setSessionsPerWeek(Math.min(Math.max(value, 1), 20).toString());
-                      }}
-                      placeholder="1-20"
-                      autoComplete="off"
-                      enterKeyHint="next"
-                      spellCheck="false"
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium touch-manipulation"
-                    />
-                  </div>
-
-                  {/* Fee per Student */}
-                  <div>
-                    <label className="block text-lg font-bold text-gray-800 mb-4 text-center">
-                      <DollarSign className="w-6 h-6 inline mr-2 text-indigo-600" />
-                      Frais par Étudiant (TND/mois)
-                    </label>
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min="0"
-                      value={feePerStudent}
-                      onChange={(e) => setFeePerStudent(e.target.value)}
-                      onInput={(e) => setFeePerStudent((e.target as HTMLInputElement).value)}
-                      onBlur={(e) => {
-                        const value = parseInt(e.target.value) || 0;
-                        setFeePerStudent(Math.max(value, 0).toString());
-                      }}
-                      placeholder="120"
-                      autoComplete="off"
-                      enterKeyHint="done"
-                      spellCheck="false"
-                      className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-medium touch-manipulation"
-                    />
-                    <div className="mt-3 text-center bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <p className="text-base text-blue-700 font-bold">
-                        💡 Recommandé: 120 TND/mois par étudiant
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Current Room Rate Display */}
-                  {selectedRoom && (
-                    <div className="bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200 rounded-xl p-4 text-center">
-                      <div className="flex items-center justify-center space-x-3">
-                        <Building className="w-6 h-6 text-blue-600" />
-                        <span className="text-lg font-bold text-gray-800">
-                          Tarif salle: <span className="text-blue-600">{currentRoomRate} TND/heure</span>
-                        </span>
-                      </div>
+                  
+                  {results.discountApplied && (
+                    <div className="flex justify-between py-2 border-b border-gray-100">
+                      <span className="text-orange-600">Remise protection:</span>
+                      <span className="font-semibold text-orange-600">-{results.discountAmount.toFixed(0)} TND</span>
                     </div>
                   )}
-                </div>
-              </div>
-
-              {/* Results */}
-              <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
-                <div className="flex items-center justify-center mb-6">
-                  <div className="p-3 bg-gradient-to-r from-green-500 to-blue-500 rounded-2xl">
-                    <TrendingUp className="w-8 h-8 text-white" />
+                  
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Coût salle final:</span>
+                    <span className="font-semibold">{results.finalRoomCostTTC.toFixed(0)} TND TTC</span>
+                  </div>
+                  
+                  <div className="flex justify-between py-2 border-b border-gray-100">
+                    <span className="text-gray-600">Heures mensuelles:</span>
+                    <span className="font-semibold">{results.monthlyHours}h</span>
+                  </div>
+                  
+                  <div className="flex justify-between py-3 bg-gray-50 px-3 rounded-lg font-semibold text-lg">
+                    <span>Revenu enseignant:</span>
+                    <span className="text-green-600">{results.teacherMonthlyIncome.toFixed(0)} TND</span>
                   </div>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-                  Résultats de la Simulation
-                </h2>
 
-                {/* Check for capacity exceeded first */}
-                {selectedRoom && parseInt(studentsPerGroup) > 0 && (rooms.find(r => r.id === selectedRoom)?.capacity || 0) < parseInt(studentsPerGroup) ? (
-                  <div className="text-center py-12">
-                    <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-8 mb-6">
-                      <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-                      <h3 className="text-2xl font-bold text-red-700 mb-4">🚫 Capacité Dépassée</h3>
-                      <div className="space-y-3 text-red-600">
-                        <p className="text-lg font-medium">
-                          Le nombre d'étudiants ({parseInt(studentsPerGroup) || 0}) dépasse la capacité maximale de la salle sélectionnée.
-                        </p>
-                        <div className="bg-red-100 rounded-lg p-4">
-                          <p className="font-bold text-red-800">
-                            📋 {rooms.find(r => r.id === selectedRoom)?.name}: Maximum {rooms.find(r => r.id === selectedRoom)?.capacity} personnes
-                          </p>
-                        </div>
-                        <p className="text-sm text-red-500">
-                          Veuillez réduire le nombre d'étudiants ou choisir une salle plus grande.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ) : result ? (
-                  <div className="space-y-6 text-center">
-                    {/* Summary Stats */}
-                    <div className="grid grid-cols-2 gap-4 mb-8">
-                      <div className="bg-blue-50 rounded-xl p-4 text-center">
-                        <div className="text-2xl font-bold text-blue-600">{result.weeklyHours}h</div>
-                        <div className="text-sm text-gray-600">par semaine</div>
-                      </div>
-                      <div className="bg-purple-50 rounded-xl p-4 text-center">
-                        <div className="text-2xl font-bold text-purple-600">{result.totalStudents}</div>
-                        <div className="text-sm text-gray-600">étudiants</div>
-                      </div>
-                    </div>
-
-                    {/* Revenue Breakdown - Hidden per user request */}
-                    <div className="space-y-4">
-                      {/* Hidden: Revenus Mensuels Bruts, Coût Location Salle HT, TVA, Coût TTC, Revenu Net */}
-                      
-                      {/* SmartHub Discount Section - Keep visible */}
-                      {result.discountApplied && (
-                        <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-xl p-4">
-                          <div className="text-center mb-3">
-                            <span className="text-lg font-bold text-blue-700">🎁 Remise SmartHub Appliquée</span>
-                          </div>
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-gray-600">Tarif salle original HT:</span>
-                              <span className="line-through text-gray-500">{result.monthlyRoomCostHT.toFixed(0)} TND</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-blue-700 font-medium">Remise appliquée ({result.roomDiscount.toFixed(1)}%):</span>
-                              <span className="text-blue-700 font-bold">-{(result.monthlyRoomCostHT - result.discountedRoomCostHT).toFixed(0)} TND</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Hourly Income Display */}
-                      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-200 rounded-xl p-4">
-                        <div className="flex justify-between items-center">
-                          <span className="text-lg font-bold text-gray-800">Revenu Horaire</span>
-                          <span className="text-2xl font-bold text-orange-600">
-                            {result.hourlyIncome.toFixed(1)} TND/h
-                          </span>
-                        </div>
-                        <div className="text-center mt-2">
-                          <span className="text-sm text-gray-600">
-                            Minimum garanti SmartHub: {result.minimumHourlyIncome} TND/h
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Profitability Indicator */}
-                    <div className="mt-6">
-                      {result.netMonthlyIncome > 0 ? (
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-center space-x-2 text-green-600 bg-green-50 rounded-xl p-4">
-                            <CheckCircle className="w-6 h-6" />
-                            <span className="font-semibold">Configuration Profitable</span>
-                          </div>
-                          {result.hourlyIncome >= result.minimumHourlyIncome ? (
-                            <div className="flex items-center justify-center space-x-2 text-blue-600 bg-blue-50 rounded-xl p-3">
-                              <CheckCircle className="w-5 h-5" />
-                              <span className="font-medium">Revenu horaire optimal atteint</span>
-                            </div>
-                          ) : result.discountApplied ? (
-                            <div className="flex items-center justify-center space-x-2 text-purple-600 bg-purple-50 rounded-xl p-3">
-                              <CheckCircle className="w-5 h-5" />
-                              <span className="font-medium">SmartHub vous soutient avec une remise</span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center justify-center space-x-2 text-orange-600 bg-orange-50 rounded-xl p-3">
-                              <AlertCircle className="w-5 h-5" />
-                              <span className="font-medium">Revenu horaire en dessous du minimum</span>
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center space-x-2 text-red-600 bg-red-50 rounded-xl p-4">
-                          <AlertCircle className="w-6 h-6" />
-                          <span className="font-semibold">Ajustez les paramètres</span>
-                        </div>
-                      )}
-                    </div>
-
-                  </div>
-                ) : (
-                  <div className="text-center py-12">
-                    <Calculator className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Remplissez tous les champs pour voir les résultats</p>
-                  </div>
-                )}
+                {/* Room Info */}
+                <div className="bg-gray-50 p-4 rounded-xl">
+                  <h4 className="font-semibold text-gray-800 mb-2">Information Salle</h4>
+                  <p className="text-sm text-gray-600 mb-1">{selectedRoom.name}</p>
+                  <p className="text-sm text-gray-600 mb-1">{selectedRoom.equipment}</p>
+                  <p className="text-sm font-semibold text-blue-600">
+                    {results.roomRateHTVA} TND/h HTVA pour {formData.studentCount} étudiant{formData.studentCount > 1 ? 's' : ''}
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
-      </section>
 
-      {/* Additional Info Section */}
-      <section className="section-padding bg-gray-900 text-white text-center">
-        <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-4xl mx-auto text-center">
-            <h3 className="text-3xl font-bold mb-6 text-center">
-              Informations Importantes
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
-              <div className="bg-white bg-opacity-10 rounded-2xl p-6 backdrop-blur-sm">
-                <h4 className="font-bold text-xl mb-4 text-center text-yellow-300">Calculs Utilisés</h4>
-                <ul className="text-sm text-gray-200 space-y-2 text-center">
-                  <li>• Mois = 4.33 semaines en moyenne</li>
-                  <li>• TVA = 19% sur coût location salle</li>
-                  <li>• Coût final = Location TTC (HT + TVA)</li>
-                  <li>• Tarifs salles selon capacité</li>
-                  <li>• Remise SmartHub jusqu'à 35% si nécessaire</li>
-                </ul>
-              </div>
-              <div className="bg-white bg-opacity-10 rounded-2xl p-6 backdrop-blur-sm">
-                <h4 className="font-bold text-xl mb-4 text-center text-green-300">Politique SmartHub</h4>
-                <ul className="text-sm text-gray-200 space-y-2 text-center">
-                  <li>• Revenu minimum garanti: 12 TND/heure</li>
-                  <li>• Remise automatique si revenu insuffisant</li>
-                  <li>• Frais étudiants recommandés: 120 TND/mois</li>
-                  <li>• Groupes 6-8 étudiants optimal</li>
-                  <li>• Contactez-nous pour réserver</li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        {/* Footer */}
+        <div className="text-center mt-8 text-gray-500">
+          <p className="text-sm">
+            ELMAOUIA ET.CO - Espaces d'Excellence pour l'Enseignement Indépendant
+          </p>
+          <p className="text-xs mt-1">
+            Système de protection enseignant garantissant un minimum de 12 TND/heure
+          </p>
         </div>
-      </section>
+      </div>
     </div>
   );
 };
+
+export default TeacherRevenueCalculator;
