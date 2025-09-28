@@ -167,20 +167,16 @@ const ParentCostCalculator = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navigation />
       <main className="max-w-6xl mx-auto p-6">
-        {/* Header */}
+        {/* Page Title */}
         <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Building className="w-8 h-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-800">SmartHub</h1>
-          </div>
-          <p className="text-lg text-gray-600 mb-2">Simulateur de Coûts pour Parents</p>
-          <p className="text-sm text-gray-500 max-w-2xl mx-auto">
+          <h1 className="text-3xl font-bold text-gray-800 mb-4">Simulateur de Coûts pour Parents</h1>
+          <p className="text-gray-600 max-w-2xl mx-auto">
             Découvrez combien vous paierez mensuellement selon le tarif horaire choisi par votre enseignant.
             Transparence totale dans notre écosystème éducatif.
           </p>
         </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Input Form */}
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center gap-2 mb-6">
