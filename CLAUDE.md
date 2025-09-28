@@ -39,7 +39,7 @@ The application uses a unique nested routing structure in `App.tsx:54-72` where 
 /simulation (private revenue simulator)
 
 // Regular pages (with nav/footer)
-/, /rooms, /teachers, /learn-more, /our-mission, /booking-system
+/, /rooms, /teachers, /learn-more, /our-mission, /booking-system, /parentsimulator
 ```
 
 ### Firebase Integration
@@ -63,7 +63,7 @@ The application uses a unique nested routing structure in `App.tsx:54-72` where 
 
 ### Component Structure
 - UI components in `src/components/ui/` (Button, Card, Input, etc.)
-- Page-specific components in `src/pages/`
+- Page-specific components in `src/pages/` (including RevenueSimulator.tsx and parent-cost-simulator.tsx)
 - Shared components in `src/components/` (Navigation, Footer, GoogleMapEmbed)
 
 ### State Management
@@ -128,6 +128,14 @@ The application uses a unique nested routing structure in `App.tsx:54-72` where 
 - All pricing includes 19% Tunisia VAT
 - Firebase uses CDN scripts, not npm dependencies
 - Admin authentication requires specific email domains
+
+### Special Tools and Simulators
+- **Revenue Simulator** (`/simulation`): Private teacher revenue calculator (hidden route)
+- **Parent Cost Simulator** (`/parentsimulator`): Public parent cost calculator with Navigation/Footer
+  - Teacher hourly rate range: 10-80 TND/hour
+  - Transparent cost breakdown for parents
+  - Includes SmartHub teacher protection policy visualization
+  - Real-time cost calculations based on group size and room selection
 
 ### When Working with Bookings
 - Always validate créneau duration before database operations
