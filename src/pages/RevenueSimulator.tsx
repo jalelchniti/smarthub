@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Calculator, Users, Clock, DollarSign, Shield, AlertTriangle, CheckCircle, TrendingUp, Building } from 'lucide-react';
 
 const TeacherRevenueCalculator = () => {
@@ -10,7 +10,7 @@ const TeacherRevenueCalculator = () => {
     studentFee: 120
   });
 
-  const [results, setResults] = useState(null);
+  const [results, setResults] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
   // Room pricing data
@@ -49,16 +49,16 @@ const TeacherRevenueCalculator = () => {
   };
 
   // Get room hourly rate based on student count
-  const getRoomRate = (roomId, studentCount) => {
-    const room = rooms[roomId];
+  const getRoomRate = (roomId: string, studentCount: number) => {
+    const room = rooms[roomId as keyof typeof rooms];
     if (!room) return 0;
     
-    const tier = room.pricing.find(p => studentCount >= p.min && studentCount <= p.max);
+    const tier = room.pricing.find((p: any) => studentCount >= p.min && studentCount <= p.max);
     return tier ? tier.rate : 0;
   };
 
   // Calculate teacher protection
-  const calculateProtectedRevenue = (roomId, studentCount, hours, studentFee, sessionsPerWeek) => {
+  const calculateProtectedRevenue = (roomId: string, studentCount: number, hours: number, studentFee: number, sessionsPerWeek: number) => {
     const roomRateHTVA = getRoomRate(roomId, studentCount);
     const weeklyHours = hours * sessionsPerWeek;
     const monthlyHours = weeklyHours * 4;
@@ -108,7 +108,7 @@ const TeacherRevenueCalculator = () => {
   };
 
   // Handle form changes
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -119,9 +119,9 @@ const TeacherRevenueCalculator = () => {
   useEffect(() => {
     setIsCalculating(true);
     const timer = setTimeout(() => {
-      const selectedRoom = rooms[formData.roomId];
+      const selectedRoom = rooms[formData.roomId as keyof typeof rooms];
       if (formData.studentCount > selectedRoom.capacity) {
-        setResults({ error: `Capacité dépassée! Maximum ${selectedRoom.capacity} étudiants pour cette salle.` });
+        setResults({ error: `Capacité dépassée! Maximum ${selectedRoom.capacity} étudiants pour cette salle.` } as any);
       } else {
         const calculation = calculateProtectedRevenue(
           formData.roomId,
@@ -130,7 +130,7 @@ const TeacherRevenueCalculator = () => {
           formData.studentFee,
           formData.sessionsPerWeek
         );
-        setResults(calculation);
+        setResults(calculation as any);
       }
       setIsCalculating(false);
     }, 800);
@@ -138,7 +138,7 @@ const TeacherRevenueCalculator = () => {
     return () => clearTimeout(timer);
   }, [formData]);
 
-  const selectedRoom = rooms[formData.roomId];
+  const selectedRoom = rooms[formData.roomId as keyof typeof rooms];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Calculator, Users, Clock, DollarSign, BookOpen, CheckCircle, AlertTriangle, Building, Heart } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
@@ -12,7 +12,7 @@ const ParentCostCalculator = () => {
     roomPreference: '2'
   });
 
-  const [results, setResults] = useState(null);
+  const [results, setResults] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
   // Room data matching ELMAOUIA's facilities
@@ -51,11 +51,11 @@ const ParentCostCalculator = () => {
   };
 
   // Get room rate based on group size
-  const getRoomRate = (roomId, groupSize) => {
-    const room = rooms[roomId];
+  const getRoomRate = (roomId: string, groupSize: number) => {
+    const room = rooms[roomId as keyof typeof rooms];
     if (!room) return 0;
     
-    const tier = room.pricing.find(p => groupSize >= p.min && groupSize <= p.max);
+    const tier = room.pricing.find((p: any) => groupSize >= p.min && groupSize <= p.max);
     return tier ? tier.rate : 0;
   };
 
@@ -63,7 +63,7 @@ const ParentCostCalculator = () => {
   const calculateParentCosts = () => {
     const { teacherHourlyRate, sessionHours, sessionsPerWeek, groupSize, roomPreference } = formData;
     
-    const selectedRoom = rooms[roomPreference];
+    const selectedRoom = rooms[roomPreference as keyof typeof rooms];
     if (groupSize > selectedRoom.capacity) {
       return { error: `Capacité dépassée! La ${selectedRoom.name} ne peut accueillir que ${selectedRoom.capacity} étudiants.` };
     }
@@ -139,12 +139,12 @@ const ParentCostCalculator = () => {
   };
 
   // Format currency
-  const formatCurrency = (amount) => {
+  const formatCurrency = (amount: number) => {
     return `${amount.toFixed(2)} TND`;
   };
 
   // Handle form changes
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -199,7 +199,7 @@ const ParentCostCalculator = () => {
                 <input
                   type="range"
                   min="10"
-                  max="30"
+                  max="80"
                   step="1"
                   value={formData.teacherHourlyRate}
                   onChange={(e) => handleInputChange('teacherHourlyRate', parseInt(e.target.value))}
@@ -264,7 +264,7 @@ const ParentCostCalculator = () => {
                 <input
                   type="range"
                   min="1"
-                  max={rooms[formData.roomPreference].capacity}
+                  max={rooms[formData.roomPreference as keyof typeof rooms].capacity}
                   value={formData.groupSize}
                   onChange={(e) => handleInputChange('groupSize', parseInt(e.target.value))}
                   className="flex-1"
