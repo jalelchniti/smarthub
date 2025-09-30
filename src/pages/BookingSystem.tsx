@@ -121,11 +121,11 @@ export const BookingSystem: React.FC = () => {
         }
         
         // Subscribe to real-time updates
-        const unsubscribe = FirebaseBookingService.subscribeToBookingUpdates((updatedData) => {
+        const unsubscribe = await FirebaseBookingService.subscribeToBookingUpdates((updatedData) => {
           console.log('Real-time update received:', updatedData);
           setBookingData(updatedData);
         });
-        
+
         // Cleanup subscription on unmount
         return () => {
           if (unsubscribe) unsubscribe();

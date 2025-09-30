@@ -155,9 +155,10 @@ export class FirebaseBookingService {
   // Initialize Firebase database with default data if needed
   static async initialize(): Promise<boolean> {
     if (this.initialized) return true;
-    
+
     // Ensure Firebase is initialized
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       console.error('Firebase database not available');
       return false;
     }
@@ -165,14 +166,14 @@ export class FirebaseBookingService {
     try {
       const dbRef = database.ref('/');
       const snapshot = await dbRef.once('value');
-      
+
       if (!snapshot.exists()) {
         // Initialize with default data
         const defaultData = getDefaultBookingData();
         await dbRef.set(defaultData);
         console.log('Firebase initialized with default booking data');
       }
-      
+
       this.initialized = true;
       return true;
     } catch (error) {
@@ -183,18 +184,19 @@ export class FirebaseBookingService {
 
   // Load all booking data
   static async loadBookingData(): Promise<BookingData> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       throw new Error('Firebase not available');
     }
 
     try {
       const dbRef = database.ref('/');
       const snapshot = await dbRef.once('value');
-      
+
       if (snapshot.exists()) {
         return snapshot.val() as BookingData;
       }
-      
+
       // Initialize with default data if empty
       const defaultData = getDefaultBookingData();
       await dbRef.set(defaultData);
@@ -221,7 +223,8 @@ export class FirebaseBookingService {
 
   // Create a new booking
   static async createBooking(booking: Omit<Booking, 'id'>): Promise<string | null> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       throw new Error('Firebase not available');
     }
 
@@ -240,7 +243,7 @@ export class FirebaseBookingService {
 
       const bookingsRef = database.ref('bookings');
       const newBookingRef = bookingsRef.push();
-      
+
       // Calculate fees for this booking
       const feeCalculation = this.calculateBookingFees(booking.roomId, booking.studentCount, booking.duration);
 
@@ -254,12 +257,12 @@ export class FirebaseBookingService {
         createdAt: new Date().toISOString(), // Track creation time
         updatedAt: new Date().toISOString() // Track last modification
       };
-      
+
       await newBookingRef.set(bookingWithId);
-      
+
       // Update last modified timestamp
       await database.ref('lastUpdated').set(new Date().toISOString());
-      
+
       return newBookingRef.key;
     } catch (error) {
       console.error('Failed to create booking:', error);
@@ -269,7 +272,8 @@ export class FirebaseBookingService {
 
   // Cancel a booking
   static async cancelBooking(bookingId: string): Promise<boolean> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       throw new Error('Firebase not available');
     }
 
@@ -290,7 +294,8 @@ export class FirebaseBookingService {
 
   // Check for booking conflicts (updated for date-based system)
   static async checkBookingConflict(roomId: string, date: string, timeSlot: string): Promise<boolean> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       return false;
     }
 
@@ -321,7 +326,8 @@ export class FirebaseBookingService {
 
   // Get bookings for a specific room and date
   static async getBookingsForRoomAndDate(roomId: string, date: string): Promise<Booking[]> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       return [];
     }
 
@@ -347,20 +353,21 @@ export class FirebaseBookingService {
 
 
   // Subscribe to real-time updates
-  static subscribeToBookingUpdates(callback: (data: BookingData) => void): () => void {
-    if (!initializeFirebase() || !database) {
+  static async subscribeToBookingUpdates(callback: (data: BookingData) => void): Promise<() => void> {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       console.error('Firebase not available for subscriptions');
       return () => {};
     }
 
     const dbRef = database.ref('/');
-    
+
     const unsubscribe = dbRef.on('value', (snapshot: { exists: () => boolean; val: () => unknown }) => {
       if (snapshot.exists()) {
         callback(snapshot.val() as BookingData);
       }
     });
-    
+
     return () => {
       dbRef.off('value', unsubscribe);
     };
@@ -379,7 +386,8 @@ export class FirebaseBookingService {
 
   // Clear all booking data (admin function)
   static async clearAllBookings(): Promise<boolean> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       return false;
     }
 
@@ -399,7 +407,8 @@ export class FirebaseBookingService {
 
   // Bulk delete multiple bookings (admin function)
   static async bulkDeleteBookings(bookingIds: string[]): Promise<{ success: boolean; deletedCount: number; errors: string[] }> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       return { success: false, deletedCount: 0, errors: ['Firebase not available'] };
     }
 
@@ -435,7 +444,8 @@ export class FirebaseBookingService {
   static async updatePaymentStatus(bookingId: string, status: 'pending' | 'paid' | 'cancelled'): Promise<boolean> {
     console.log(`🔥 Firebase Service: updatePaymentStatus called for ${bookingId} → ${status}`);
     
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       console.error('❌ Firebase Service: Firebase not initialized or database unavailable');
       return false;
     }
@@ -476,7 +486,8 @@ export class FirebaseBookingService {
     paymentMethod: 'online' | 'offline',
     transactionId?: string
   ): Promise<boolean> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       return false;
     }
 
@@ -504,7 +515,8 @@ export class FirebaseBookingService {
 
   // Get bookings by payment status (admin function)
   static async getBookingsByStatus(status: 'pending' | 'paid' | 'cancelled'): Promise<Booking[]> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       return [];
     }
 
@@ -532,7 +544,8 @@ export class FirebaseBookingService {
 
   // Force update Firebase structure (admin function)
   static async forceUpdateStructure(): Promise<boolean> {
-    if (!initializeFirebase() || !database) {
+    const firebaseReady = await initializeFirebase();
+    if (!firebaseReady || !database) {
       return false;
     }
 

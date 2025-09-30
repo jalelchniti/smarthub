@@ -1,0 +1,31 @@
+{
+  "rules": {
+    "bookings": {
+      ".read": true,
+      ".write": true,
+      "$bookingId": {
+        ".validate": "newData.hasChildren(['roomId', 'date', 'timeSlot', 'teacherName', 'subject', 'studentCount', 'duration', 'contactInfo', 'bookingDate'])"
+      }
+    },
+    "rooms": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "timeSlots": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "weekDays": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "startDate": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "lastUpdated": {
+      ".read": true,
+      ".write": "auth != null"
+    }
+  }
+}
