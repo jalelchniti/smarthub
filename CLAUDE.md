@@ -2,149 +2,201 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Development Commands
+## Project Overview
+
+SmartHub is a French-language static website for an educational facility in Tunis, Tunisia. Built with React 19 + TypeScript 5.8 + Vite 7.1, it serves as a showcase for classroom rentals, teacher services, and facilitates connections between qualified teachers and serious students.
+
+**Business Context**: Operated by ELMAOUIA ET.CO (SARL), the facility is located at 13 Rue de Belgique, Tunis, managed by Mme Souad Dkhili (+216 99 456 059, souad.dkhili@u-smart.net).
+
+## Essential Commands
 
 ```bash
 # Development
-npm run dev          # Start development server (Vite, port 5173)
-npm run build        # TypeScript compilation + Vite production build
-npm run lint         # ESLint code quality check
+npm install          # Install dependencies
+npm run dev          # Start dev server on http://localhost:5173
+npm run build        # TypeScript compilation + production build (outputs to dist/)
+npm run lint         # Run ESLint checks
 npm run preview      # Preview production build locally
 
-# No test command - testing should be done manually through UI
+# Testing the build
+npm run build && npm run preview  # Verify production build works
 ```
-
-## Technology Stack
-
-- **Frontend**: React 19 + TypeScript 5.8 + Vite 7.1
-- **Styling**: Tailwind CSS 3.4 with custom theme
-- **Routing**: React Router DOM 7.8 with nested route structure
-- **Database**: Firebase Realtime Database (CDN-based, no npm dependency)
-- **Authentication**: Firebase Authentication (admin access only)
-- **Icons**: Lucide React
-- **Deployment**: Static build outputs to `dist/` directory
 
 ## Architecture Overview
 
-### Route Structure
-The application uses a unique nested routing structure in `App.tsx:54-72` where most pages are wrapped with Navigation + Footer, while admin, thank-you, and registration pages have isolated layouts:
+### Tech Stack
+- **Frontend**: React 19, TypeScript 5.8, React Router DOM 7.8
+- **Styling**: Tailwind CSS 3.4 with custom theme (blue/purple gradients, glassmorphism effects)
+- **Icons**: Lucide React
+- **Backend**: Firebase Realtime Database + Firebase Authentication (CDN-based, no npm package)
+- **Build Tool**: Vite 7.1
+- **Deployment**: Static hosting on OVH via FTP (credentials in .env)
 
-```typescript
-// Isolated pages (no nav/footer)
-/thank-you/student, /thank-you/teacher
-/booking/thank-you, /payment/online-coming-soon
-/admin/login, /admin/firebase-login
-/admin/bookings, /admin/firebase-bookings
-/register/student, /register/teacher
-/simulation (private revenue simulator)
+### Firebase Integration (Critical)
+- **Configuration**: Uses Firebase CDN scripts loaded in `index.html` (NOT npm packages)
+- **Initialization**: Async initialization pattern in `src/config/firebase.ts` with retry mechanism
+- **Auth**: Firebase Authentication for admin access (authorized emails: jalel.chniti@smarthub.com.tn, jalel.chniti@gmail.com)
+- **Database**: Firebase Realtime Database for booking system
+- **Environment Variables**: All Firebase config in `.env` file (VITE_FIREBASE_* variables)
 
-// Regular pages (with nav/footer)
-/, /rooms, /teachers, /learn-more, /our-mission, /booking-system, /parentsimulator
-```
+### Application Structure
 
-### Firebase Integration
-- Uses **CDN scripts** loaded in `index.html`, not npm packages
-- Configuration through environment variables in `.env`
-- Real-time booking system with conflict prevention
-- Enterprise authentication for admin access (`jalel.chniti@smarthub.com.tn`, `jalel.chniti@gmail.com`)
+**Route Architecture** (`src/App.tsx`):
+- Public routes with Navigation/Footer wrapper
+- Private routes without wrapper (registration forms, thank you pages)
+- Secure admin routes (Firebase authentication required)
+- Hidden routes (revenue simulator at `/simulation`)
 
-### Service Layer Architecture
-- `firebaseAuthService.ts`: Enterprise auth with role-based access
-- `firebaseBookingService.ts`: Real-time booking management with VAT calculations
-- `adminAuthService.ts`: Legacy auth service (kept for reference)
+**Key Pages**:
+- `/` - Home page with hero section
+- `/rooms` - 3 classroom rentals with interactive image galleries
+- `/teachers` - Teacher services and 9 subjects offered
+- `/learn-more` - Detailed educational programs
+- `/booking-system` - Real-time booking via Firebase
+- `/simulation` - Private teacher revenue calculator (12 TND/hour minimum guarantee)
+- `/parentsimulator` - Parent cost calculator
+- `/our-mission` - Mission statement page
+- `/admin/firebase-login` - Secure admin authentication
+- `/admin/firebase-bookings` - Admin dashboard for managing bookings
 
-### Business Logic
-- **Créneau System**: 1.5-3 hour booking slots only (validated in `firebaseBookingService.ts:209-220`)
-- **Dynamic Pricing**: Room-based rates with student count tiers
-- **VAT Handling**: Tunisia standard 19% VAT on all bookings
-- **Payment Tracking**: Multi-status system (pending/paid/cancelled)
+**Services Layer** (`src/services/`):
+- `firebaseAuthService.ts` - Enterprise Firebase Authentication with session management
+- `firebaseBookingService.ts` - Multi-user booking system with real-time sync
+- `adminAuthService.ts` - Legacy admin service (being phased out)
 
-## Key Development Patterns
+### Design System
 
-### Component Structure
-- UI components in `src/components/ui/` (Button, Card, Input, etc.)
-- Page-specific components in `src/pages/` (including RevenueSimulator.tsx and parent-cost-simulator.tsx)
-- Shared components in `src/components/` (Navigation, Footer, GoogleMapEmbed)
+**Colors** (defined in `tailwind.config.js`):
+- Primary: Blue shades (#3b82f6, #2563eb, #1d4ed8, #1e3a8a)
+- Secondary: Purple shades (#8b5cf6, #7c3aed)
+- Background: Gradient from slate-50 to blue-50
+
+**Typography**: Inter font (Google Fonts)
+**Visual Effects**: Gradients, glassmorphism, hover animations, pulse effects with delays
+**Layout**: Centered text alignment by default (text-center global)
+
+### Critical Business Logic
+
+**Teacher Revenue Protection Policy**:
+- SmartHub guarantees teachers minimum 12 TND/hour
+- Automatic discount calculation (up to 35%) when teacher rates exceed minimum
+- Parent pays full teacher rate, SmartHub subsidizes difference
+- Implementation in `src/pages/RevenueSimulator.tsx`
+- TVA (VAT) = 19% applied to all calculations
+
+**9 Subjects Offered**:
+1. Mathématiques
+2. Physique
+3. Français
+4. Anglais
+5. Sciences de la Vie et de la Terre
+6. Arabe
+7. Informatique
+8. Économie & Gestion
+9. ESP (Éducation Scientifique Physique)
+
+## Integration Points
+
+### Brevo Forms (Lead Collection)
+- Student registration: Collects NOM, PRENOM, EMAIL, SMS (with country code)
+- Teacher registration: Same fields
+- Autoresponder emails configured in Brevo
+- Navigation after submission: Use React Router's `useNavigate()` to `/thank-you/student` or `/thank-you/teacher`
+- **Never use** `window.location.href` for internal navigation (breaks SPA)
+
+### WhatsApp Integration
+- Business number: +216 99 456 059
+- Pre-filled messages customized per page context
+- CTA buttons on all public pages
+
+### Firebase Booking System
+- Real-time synchronization across devices
+- Multi-user booking support
+- Fee calculation with VAA tracking
+- Payment status tracking (pending/paid/cancelled)
+- Room availability checks before booking
+- Data structure: `bookings/{bookingId}`, `rooms/{roomId}`, `timeSlots/`
+
+## Deployment Configuration
+
+### Build Output
+- Directory: `dist/`
+- Assets subdirectory: `assets/`
+- Base path: `/` (absolute paths for deployment)
+
+### Server Configurations Included
+- **Apache**: `.htaccess` with SPA routing, MIME types, compression
+- **IIS**: `web.config` with URL rewriting, compression
+- **Static hosts**: Works with Netlify, Vercel, GitHub Pages
+
+### OVH FTP Deployment
+- Credentials in `.env` file
+- Target folder: `./smarthub`
+- Login: fohaixl-webmaster
+- Server: ftp.cluster100.hosting.ovh.net
+
+## Development Guidelines
+
+### Firebase Development
+1. Always await `getFirebaseInitialization()` before using Firebase services
+2. Check `isFirebaseReady()` for synchronous availability checks
+3. Firebase CDN scripts load async - handle loading states in components
+4. Never hardcode Firebase config - use environment variables only
+5. Admin auth emails are whitelisted at Firebase console level
+
+### Component Patterns
+- Use React Router's `useNavigate()` for all internal navigation
+- Handle Firebase initialization states with loading indicators
+- Brevo form submissions should navigate to thank you pages after success
+- All monetary calculations must include 19% TVA
+- Use Tailwind classes for styling (avoid inline styles)
+
+### TypeScript Best Practices
+- Strict mode enabled (`tsconfig.app.json`)
+- Interface definitions for all Firebase data structures
+- Type-safe environment variable access via `import.meta.env`
+- Proper typing for Firebase CDN global objects (`Window` interface extensions)
 
 ### State Management
-- No external state library - uses React hooks and Firebase real-time listeners
-- Authentication state managed in `FirebaseAuthService` with callback pattern
-- Booking data synchronized via Firebase real-time database
+- No external state library (React hooks only)
+- Firebase auth state managed by `FirebaseAuthService` class
+- Local storage used for booking data persistence (see `secureBookingStorage.ts`)
 
-### Form Handling
-- Brevo integration for lead collection with autoresponders
-- WhatsApp integration with pre-filled messages (+216 99 456 059)
-- Payment method selection (online/offline) with coming soon pages
+## Common Issues & Solutions
 
-## Firebase Configuration
+**Firebase CDN not loading**: Check `index.html` script tags are present and network connectivity
+**Build fails**: Run `npm run build` - check TypeScript errors first
+**MIME type errors in production**: Ensure `.htaccess` or `web.config` properly configured
+**Brevo forms not working**: Verify form IDs match Brevo console configuration
+**Routes not working after deploy**: Ensure server-side rewrite rules direct all routes to `index.html`
 
-### Database Structure
-```
-/
-├── rooms: { "1": {name, capacity}, "2": {...}, "3": {...} }
-├── bookings: { [id]: Booking }
-├── timeSlots: { weekdays: [...], sunday: [...] }
-├── weekDays: [...]
-└── lastUpdated: timestamp
-```
+## Important Files to Check
 
-### Authentication
-- Admin users only: `jalel.chniti@smarthub.com.tn`, `jalel.chniti@gmail.com`
-- Custom claims used for role verification
-- Session management with automatic token refresh
+- `.env` - Contains all Firebase config and deployment credentials (never commit)
+- `index.html` - Firebase CDN script tags, Brevo integration scripts
+- `src/config/firebase.ts` - Firebase initialization with retry logic
+- `src/App.tsx` - Route definitions and layout structure
+- `vite.config.ts` - Build configuration for production
+- `tailwind.config.js` - Theme customization
+- `docs/elmaouia_business_model.md` - Business context and financial model
 
-## Build and Deployment
+## Multi-language Support
 
-### Build Configuration
-- **Output**: `dist/` directory with optimized assets
-- **Base Path**: Absolute (`/`) for deployment at domain root
-- **Assets**: Organized in `assets/` subdirectory with hash-based naming
-- **Server Configs**: Includes `.htaccess` and `web.config` for SPA routing
+**Primary Language**: French (all UI text)
+**Target Audience**: Tunisian students, teachers, and parents
+**Currency**: TND (Tunisian Dinar)
+**Contact Hours**: Tunisian business hours (Mon-Sat 9:00-18:00, Sun 10:00-13:00)
 
-### Deployment Requirements
-- Static hosting compatible (Netlify, Vercel, Firebase Hosting)
-- MIME type configuration for `.mjs` and other ES modules
-- SPA routing support (all routes serve `index.html`)
-- Firebase environment variables must be configured
+## Git Repository
 
-## Business Context
+- **Remote**: https://github.com/jalelchniti/smarthub.git
+- **Branch**: master (primary deployment branch)
+- **Deployment flow**: Commit → Push → FTP upload to OVH
 
-**SmartHub** is an educational facility in Tunis offering:
-- 3 meeting rooms for rent (different capacities and pricing)
-- Teacher services with guaranteed minimum revenue (12 TND/hour)
-- Student registration with Brevo CRM integration
-- Real-time booking system for space management
+## Security Considerations
 
-### Contact Information
-- **Address**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
-- **Phone**: +216 99 456 059
-- **Email**: souad.dkhili@u-smart.net
-- **Hours**: Mon-Sat (9:00-13:00, 15:00-18:00), Sun (10:00-13:00)
-
-## Development Notes
-
-### Critical Constraints
-- Créneau duration must be 1.5-3 hours only (business rule)
-- All pricing includes 19% Tunisia VAT
-- Firebase uses CDN scripts, not npm dependencies
-- Admin authentication requires specific email domains
-
-### Special Tools and Simulators
-- **Revenue Simulator** (`/simulation`): Private teacher revenue calculator (hidden route)
-- **Parent Cost Simulator** (`/parentsimulator`): Public parent cost calculator with Navigation/Footer
-  - Teacher hourly rate range: 10-80 TND/hour
-  - Transparent cost breakdown for parents
-  - Includes SmartHub teacher protection policy visualization
-  - Real-time cost calculations based on group size and room selection
-
-### When Working with Bookings
-- Always validate créneau duration before database operations
-- Use `FirebaseBookingService.calculateBookingFees()` for accurate pricing
-- Check conflicts with `checkBookingConflict()` before creating bookings
-- Update `lastUpdated` timestamp after any database modifications
-
-### When Working with Authentication
-- Initialize `FirebaseAuthService` before any auth operations
-- Use enterprise emails only for admin access
-- Handle auth state changes through callback pattern
-- Never hardcode credentials - use Firebase environment variables
+- Firebase API keys are restricted by domain in Firebase Console
+- Admin access controlled via Firebase Authentication with email whitelist
+- No sensitive data in repository (`.env` in `.gitignore`)
+- OVH credentials stored only in `.env` file
+- Legacy admin password system replaced by Firebase Auth (enterprise-grade)

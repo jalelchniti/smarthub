@@ -54,7 +54,7 @@ export const BookingThankYou: React.FC = () => {
 
             {/* Success message */}
             <p className="text-gray-600 mb-6 leading-relaxed">
-              Merci pour votre réservation. Votre créneau a été confirmé et sera payé directement au bureau SmartHub.
+              Merci pour votre réservation. Votre créneau a été confirmé. Veuillez effectuer le paiement dans les 24 heures au bureau SmartHub.
             </p>
 
             {/* Payment info */}
@@ -64,7 +64,8 @@ export const BookingThankYou: React.FC = () => {
                 <span>Informations de Paiement</span>
               </h3>
               <div className="text-sm text-gray-700 space-y-2">
-                <p><strong>Mode:</strong> Paiement sur place</p>
+                <p><strong>Délai:</strong> Paiement dans les 24 heures</p>
+                <p><strong>Mode:</strong> Espèces ou Carte bancaire (TPE)</p>
                 <p><strong>Lieu:</strong> Bureau SmartHub</p>
                 <p><strong>Adresse:</strong> 13, Rue de Belgique, Immeuble MAE</p>
                 <p><strong>Téléphone:</strong> +216 99 456 059</p>
@@ -75,9 +76,10 @@ export const BookingThankYou: React.FC = () => {
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <h4 className="font-medium text-gray-800 mb-2">Prochaines étapes:</h4>
               <ul className="text-sm text-gray-600 text-left space-y-1">
+                <li>• Effectuez le paiement dans les 24 heures</li>
+                <li>• Modes acceptés: Espèces ou Carte bancaire (TPE)</li>
                 <li>• Présentez-vous au bureau à l'heure prévue</li>
                 <li>• Apportez une pièce d'identité</li>
-                <li>• Le paiement se fera sur place</li>
                 <li>• N'hésitez pas à nous contacter si besoin</li>
               </ul>
             </div>

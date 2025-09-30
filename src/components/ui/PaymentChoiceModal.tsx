@@ -19,11 +19,6 @@ export const PaymentChoiceModal: React.FC<PaymentChoiceModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleOnlinePayment = () => {
-    onClose();
-    navigate('/payment/online-coming-soon');
-  };
-
   const handleOfflinePayment = () => {
     onClose();
     navigate('/booking/thank-you');
@@ -65,39 +60,41 @@ export const PaymentChoiceModal: React.FC<PaymentChoiceModalProps> = ({
 
         {/* Payment options */}
         <div className="space-y-4">
-          {/* Online payment option */}
-          <button
-            onClick={handleOnlinePayment}
-            className="w-full p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
-          >
-            <div className="flex items-center justify-center space-x-3">
-              <CreditCard size={24} />
-              <div className="text-center">
-                <div className="font-semibold text-lg">Payer en ligne</div>
-                <div className="text-sm opacity-90">Paiement sécurisé par carte</div>
-              </div>
-            </div>
-          </button>
-
           {/* Offline payment option */}
           <button
             onClick={handleOfflinePayment}
-            className="w-full p-6 bg-gradient-to-r from-gray-500 to-gray-600 text-white rounded-xl hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+            className="w-full p-6 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
           >
             <div className="flex items-center justify-center space-x-3">
               <MapPin size={24} />
               <div className="text-center">
                 <div className="font-semibold text-lg">Payer sur place</div>
-                <div className="text-sm opacity-90">Au bureau SmartHub</div>
+                <div className="text-sm opacity-90">Dans les 24 heures au bureau SmartHub</div>
               </div>
             </div>
           </button>
         </div>
 
+        {/* Payment methods info */}
+        <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <h3 className="font-semibold text-gray-800 mb-2 text-center">Modes de paiement acceptés</h3>
+          <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
+            <div className="flex items-center space-x-1">
+              <CreditCard size={16} className="text-blue-600" />
+              <span>Espèces</span>
+            </div>
+            <span className="text-gray-400">•</span>
+            <div className="flex items-center space-x-1">
+              <CreditCard size={16} className="text-blue-600" />
+              <span>Carte bancaire (TPE)</span>
+            </div>
+          </div>
+        </div>
+
         {/* Footer note */}
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
           <p className="text-sm text-gray-500">
-            Vous pouvez choisir votre méthode de paiement préférée
+            Le paiement doit être effectué dans les 24 heures suivant la réservation
           </p>
         </div>
       </div>
