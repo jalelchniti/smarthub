@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import GoogleMapEmbed from '../components/GoogleMapEmbed';
-import { MapPin, Users, Clock, Wifi, Monitor, Building, CheckCircle, Calendar, X, MessageCircle, Calculator, BookOpen } from 'lucide-react';
+import { MapPin, Users, Clock, Wifi, Monitor, Building, CheckCircle, Calendar, X, MessageCircle, Calculator } from 'lucide-react';
 
 interface Room {
   id: string;
@@ -307,22 +307,14 @@ export const Rooms: React.FC = () => {
               dans notre centre de Tunis. Installations professionnelles pour vos besoins éducatifs.
             </p>
             
-            {/* Navigation Buttons */}
-            <div className="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12">
+            {/* Navigation Button */}
+            <div className="flex justify-center mb-12">
               <button
                 onClick={() => navigate('/revenue-simulator')}
                 className="bg-purple-600/90 backdrop-blur-sm border border-purple-400/30 hover:bg-purple-700/90 text-white px-8 py-4 text-lg rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 w-full sm:w-auto min-w-[250px] justify-center"
               >
                 <Calculator className="w-6 h-6" />
                 Simulateur de Revenus
-              </button>
-              
-              <button
-                onClick={() => navigate('/booking-system')}
-                className="bg-blue-600/90 backdrop-blur-sm border border-blue-400/30 hover:bg-blue-700/90 text-white px-8 py-4 text-lg rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-200 flex items-center gap-3 w-full sm:w-auto min-w-[250px] justify-center"
-              >
-                <BookOpen className="w-6 h-6" />
-                Réservez maintenant
               </button>
             </div>
             

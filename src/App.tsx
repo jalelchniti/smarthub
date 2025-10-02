@@ -11,15 +11,7 @@ import StudentRegistration from './pages/StudentRegistration';
 import TeacherRegistration from './pages/TeacherRegistration';
 import TeacherRevenueCalculator from './pages/RevenueSimulator';
 import ParentCostCalculator from './pages/parent-cost-simulator';
-import { BookingSystem } from './pages/BookingSystem';
-import { BookingThankYou } from './pages/BookingThankYou';
-import { PaymentOnlineComingSoon } from './pages/PaymentOnlineComingSoon';
 import { OurMission } from './pages/Our_Mission';
-import { AdminBookings } from './pages/AdminBookings';
-import { AdminLogin } from './pages/AdminLogin';
-import { SecureAdminBookings } from './pages/SecureAdminBookings';
-import { FirebaseAdminLogin } from './pages/FirebaseAdminLogin';
-import { FirebaseAdminBookings } from './pages/FirebaseAdminBookings';
 
 function App() {
   return (
@@ -28,29 +20,14 @@ function App() {
         {/* Thank You pages without navigation/footer */}
         <Route path="/thank-you/student" element={<StudentThankYou />} />
         <Route path="/thank-you/teacher" element={<TeacherThankYou />} />
-        
-        {/* Payment pages without navigation/footer */}
-        <Route path="/booking/thank-you" element={<BookingThankYou />} />
-        <Route path="/payment/online-coming-soon" element={<PaymentOnlineComingSoon />} />
-        
+
         {/* Private Revenue Simulator page - hidden from public navigation */}
         <Route path="/simulation" element={<TeacherRevenueCalculator />} />
 
-        {/* Admin Login pages - secure authentication */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/firebase-login" element={<FirebaseAdminLogin />} />
-        
-        {/* Secure Admin Bookings Management pages - protected routes */}
-        <Route path="/admin/bookings" element={<SecureAdminBookings />} />
-        <Route path="/admin/firebase-bookings" element={<FirebaseAdminBookings />} />
-        
-        {/* Legacy Admin Bookings page - for reference */}
-        <Route path="/admin/legacy" element={<AdminBookings />} />
-        
         {/* Registration pages with their own navigation/footer */}
         <Route path="/register/student" element={<StudentRegistration />} />
         <Route path="/register/teacher" element={<TeacherRegistration />} />
-        
+
         {/* Regular pages with navigation/footer */}
         <Route path="/*" element={
           <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -65,7 +42,6 @@ function App() {
                 <Route path="/our-mission" element={<OurMission />} />
                 <Route path="/revenue-simulator" element={<TeacherRevenueCalculator />} />
                 <Route path="/parentsimulator" element={<ParentCostCalculator />} />
-                <Route path="/booking-system" element={<BookingSystem />} />
                 <Route path="*" element={<Home />} />
               </Routes>
             </main>
