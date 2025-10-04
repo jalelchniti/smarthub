@@ -48,7 +48,7 @@ Visitez `http://localhost:5173`
 ### Fonctionnalités Principales
 - **Localisation Française**: Contenu entièrement en français
 - **Design Responsive**: Mobile-first avec effets premium glassmorphisme
-- **Intégration WhatsApp**: Contact direct via +216 99 456 059
+- **Intégration WhatsApp**: Contact direct via +216 99 730 144
 - **Formulaires Brevo**: Collecte de leads avec autorépondeurs email
 - **Carte Interactive**: Localisation Google Maps intégrée
 - **9 Matières**: Mathématiques, Physique, Français, Anglais, Sciences de la Vie et de la Terre, Arabe, Informatique, Économie & Gestion, ESP
@@ -64,7 +64,7 @@ Visitez `http://localhost:5173`
 
 **SmartHub - Facilité Éducative**
 - **Adresse**: 13, Rue de Belgique, Immeuble MAE, 1er étage, Bureau 1.1, 1000 Tunis
-- **Contact**: +216 99 456 059 | souad.dkhili@u-smart.net
+- **Contact**: +216 99 730 144 | contact@smarthub.com.tn
 - **Horaires**: Lun-Sam (9:00-13:00, 15:00-18:00), Dim (10:00-13:00)
 - **Services**: Location d'espaces de travail pour enseignants, services éducatifs en présentiel
 
@@ -104,7 +104,7 @@ npm run preview      # Aperçu du build de production
 - **Navigation**: Pages de remerciement locales avec React Router (useNavigate)
 
 ### WhatsApp Business
-- **Numéro**: +216 99 456 059
+- **Numéro**: +216 99 730 144
 - **Integration**: Boutons d'appel à l'action sur toutes les pages
 - **Messages Pré-remplis**: Contexte personnalisé selon la page
 
@@ -214,7 +214,7 @@ Voir `CLAUDE.md` pour les directives complètes de développement, les règles c
 - **Simulateur de revenus intelligent** avec remises automatiques
 - **Email marketing avancé** avec templates de protection revenus
 - **Intégration Brevo complète** pour collecte de leads
-- **Contact WhatsApp intégré** (+216 99 456 059)
+- **Contact WhatsApp intégré** (+216 99 730 144)
 - **Build de production optimisé** avec Vite 7.1
 - **Design responsive premium** avec glassmorphisme
 - **Configuration serveur multi-plateforme** (.htaccess, web.config)

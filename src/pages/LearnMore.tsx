@@ -245,7 +245,7 @@ export const LearnMore: React.FC = () => {
             <div className="flex justify-center items-center">
               <Button size="lg" className="flex items-center space-x-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 text-lg rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-200">
                 <Phone className="w-6 h-6" />
-                <span>Appeler +216 99 456 059</span>
+                <span>Appeler +216 99 730 144</span>
               </Button>
             </div>
           </div>

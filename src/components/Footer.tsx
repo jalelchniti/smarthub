@@ -4,11 +4,11 @@ import { Link } from 'react-router-dom';
 const Footer = () => {
 
   const handlePhoneClick = () => {
-    window.location.href = 'tel:+21699456059';
+    window.location.href = 'tel:+21699730144';
   };
 
   const handleEmailClick = () => {
-    window.location.href = 'mailto:souad.dkhili@u-smart.net';
+    window.location.href = 'mailto:contact@smarthub.com.tn';
   };
 
   return (
@@ -39,14 +39,14 @@ const Footer = () => {
                 className="flex items-center text-gray-300 hover:text-blue-400 transition-colors group w-full text-left"
               >
                 <Phone className="w-5 h-5 mr-3 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span>+216 99 456 059</span>
+                <span>+216 99 730 144</span>
               </button>
               <button
                 onClick={handleEmailClick}
                 className="flex items-center text-gray-300 hover:text-blue-400 transition-colors group w-full text-left"
               >
                 <Mail className="w-5 h-5 mr-3 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span>souad.dkhili@u-smart.net</span>
+                <span>contact@smarthub.com.tn</span>
               </button>
               <div className="flex items-start text-gray-300">
                 <MapPin className="w-5 h-5 mr-3 text-blue-400 mt-1 flex-shrink-0" />

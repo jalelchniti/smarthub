@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 SmartHub is a French-language static website for an educational facility in Tunis, Tunisia. Built with React 19 + TypeScript 5.8 + Vite 7.1, it serves as a showcase for classroom rentals, teacher services, and facilitates connections between qualified teachers and serious students.
 
-**Business Context**: Operated by ELMAOUIA ET.CO (SARL), the facility is located at 13 Rue de Belgique, Tunis, managed by Mme Souad Dkhili (+216 99 456 059, souad.dkhili@u-smart.net).
+**Business Context**: Operated by ELMAOUIA ET.CO (SARL), the facility is located at 13 Rue de Belgique, Tunis (+216 99 730 144, contact@smarthub.com.tn).
 
 ## Essential Commands
 
