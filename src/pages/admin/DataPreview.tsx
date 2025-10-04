@@ -15,8 +15,10 @@ import {
   DollarSign,
   Grid3x3,
   Filter,
-  X
+  X,
+  FileText
 } from 'lucide-react';
+import { generatePDF } from '../../utils/pdfGenerator';
 
 type DataType = 'all' | 'students' | 'teachers' | 'groups' | 'bookings' | 'student_payments' | 'teacher_payments';
 type DateRange = 'all' | 'today' | 'week' | 'month' | 'year' | 'custom';
@@ -30,6 +32,7 @@ export default function DataPreview() {
   const [customStartDate, setCustomStartDate] = useState('');
   const [customEndDate, setCustomEndDate] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 
   // Load admin data
   useEffect(() => {
@@ -100,7 +103,16 @@ export default function DataPreview() {
           s.phone.includes(searchTerm) ||
           s.parent_name.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesDate = filterByDateRange(s.created_at);
-        return matchesSearch && matchesDate;
+
+        // Filter by selected groups
+        let matchesGroup = true;
+        if (selectedGroups.length > 0) {
+          const studentEnrollments = adminData.student_enrollments?.filter(e => e.student_id === s.id) || [];
+          const studentGroupIds = studentEnrollments.map(e => e.group_id);
+          matchesGroup = selectedGroups.some(groupId => studentGroupIds.includes(groupId));
+        }
+
+        return matchesSearch && matchesDate && matchesGroup;
       });
     }
 
@@ -113,7 +125,16 @@ export default function DataPreview() {
           t.phone.includes(searchTerm) ||
           t.subjects.some(s => s.toLowerCase().includes(searchTerm.toLowerCase()));
         const matchesDate = filterByDateRange(t.created_at);
-        return matchesSearch && matchesDate;
+
+        // Filter by selected groups
+        let matchesGroup = true;
+        if (selectedGroups.length > 0) {
+          const teacherGroups = adminData.groups.filter(g => g.teacher_id === t.id);
+          const teacherGroupIds = teacherGroups.map(g => g.id);
+          matchesGroup = selectedGroups.some(groupId => teacherGroupIds.includes(groupId));
+        }
+
+        return matchesSearch && matchesDate && matchesGroup;
       });
     }
 
@@ -125,7 +146,11 @@ export default function DataPreview() {
           g.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
           g.level.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesDate = filterByDateRange(g.created_at);
-        return matchesSearch && matchesDate;
+
+        // Filter by selected groups
+        const matchesGroup = selectedGroups.length === 0 || selectedGroups.includes(g.id);
+
+        return matchesSearch && matchesDate && matchesGroup;
       });
     }
 
@@ -172,7 +197,7 @@ export default function DataPreview() {
     }
 
     return result;
-  }, [adminData, dataType, searchTerm, dateRange, customStartDate, customEndDate]);
+  }, [adminData, dataType, searchTerm, dateRange, customStartDate, customEndDate, selectedGroups]);
 
   // Export data as JSON
   const handleExport = () => {
@@ -186,6 +211,31 @@ export default function DataPreview() {
     a.download = `smarthub-${dataType}-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // Export data as PDF
+  const handlePrintPDF = () => {
+    console.log('PDF Print button clicked');
+    if (!filteredData) {
+      console.error('No filtered data available');
+      alert('Aucune donnée à exporter');
+      return;
+    }
+
+    try {
+      console.log('Generating PDF with data:', { dataType, filteredData, adminData });
+      generatePDF({
+        dataType,
+        filteredData,
+        adminData,
+        searchTerm,
+        dateRange
+      });
+      console.log('PDF generation completed');
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Erreur lors de la génération du PDF: ' + error);
+    }
   };
 
   // Get total counts
@@ -234,11 +284,18 @@ export default function DataPreview() {
             Actualiser
           </button>
           <button
+            onClick={handlePrintPDF}
+            className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+          >
+            <FileText className="w-4 h-4" />
+            Imprimer PDF
+          </button>
+          <button
             onClick={handleExport}
             className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
             <Download className="w-4 h-4" />
-            Exporter
+            Exporter JSON
           </button>
         </div>
       </div>
@@ -296,6 +353,43 @@ export default function DataPreview() {
                 );
               })}
             </div>
+          </div>
+
+          {/* Group Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Filtrer par groupe(s)
+            </label>
+            <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-200 rounded-lg p-3">
+              {adminData?.groups.map((group) => (
+                <label key={group.id} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                  <input
+                    type="checkbox"
+                    checked={selectedGroups.includes(group.id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setSelectedGroups([...selectedGroups, group.id]);
+                      } else {
+                        setSelectedGroups(selectedGroups.filter(id => id !== group.id));
+                      }
+                    }}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <span className="text-sm text-gray-700">{group.group_name}</span>
+                </label>
+              ))}
+              {adminData?.groups.length === 0 && (
+                <p className="text-sm text-gray-500 text-center py-2">Aucun groupe disponible</p>
+              )}
+            </div>
+            {selectedGroups.length > 0 && (
+              <button
+                onClick={() => setSelectedGroups([])}
+                className="mt-2 text-sm text-primary-600 hover:text-primary-700"
+              >
+                Effacer la sélection ({selectedGroups.length} groupe(s) sélectionné(s))
+              </button>
+            )}
           </div>
 
           {/* Date Range Filter */}
@@ -418,32 +512,43 @@ export default function DataPreview() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Parent</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Groupe(s)</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date inscription</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {filteredData.students.map((student) => (
-                      <tr key={student.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{student.name}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{student.email}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{student.phone}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{student.parent_name}</td>
-                        <td className="px-6 py-4">
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            student.status === 'active' ? 'bg-green-100 text-green-800' :
-                            student.status === 'inactive' ? 'bg-gray-100 text-gray-800' :
-                            student.status === 'graduated' ? 'bg-blue-100 text-blue-800' :
-                            'bg-red-100 text-red-800'
-                          }`}>
-                            {student.status === 'active' ? 'Actif' :
-                             student.status === 'inactive' ? 'Inactif' :
-                             student.status === 'graduated' ? 'Diplômé' : 'Retiré'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{student.registration_date}</td>
-                      </tr>
-                    ))}
+                    {filteredData.students.map((student) => {
+                      const enrollments = adminData?.student_enrollments?.filter(e => e.student_id === student.id) || [];
+                      const groupNames = enrollments.map(enrollment => {
+                        const group = adminData?.groups.find(g => g.id === enrollment.group_id);
+                        return group?.group_name || 'N/A';
+                      });
+                      const groupsText = groupNames.length > 0 ? groupNames.join(', ') : 'Aucun';
+
+                      return (
+                        <tr key={student.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{student.name}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{student.email}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{student.phone}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{student.parent_name}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{groupsText}</td>
+                          <td className="px-6 py-4">
+                            <span className={`px-2 py-1 text-xs rounded-full ${
+                              student.status === 'active' ? 'bg-green-100 text-green-800' :
+                              student.status === 'inactive' ? 'bg-gray-100 text-gray-800' :
+                              student.status === 'graduated' ? 'bg-blue-100 text-blue-800' :
+                              'bg-red-100 text-red-800'
+                            }`}>
+                              {student.status === 'active' ? 'Actif' :
+                               student.status === 'inactive' ? 'Inactif' :
+                               student.status === 'graduated' ? 'Diplômé' : 'Retiré'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{student.registration_date}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -467,32 +572,40 @@ export default function DataPreview() {
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Matières</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Groupe(s)</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tarif horaire</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {filteredData.teachers.map((teacher) => (
-                      <tr key={teacher.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{teacher.name}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{teacher.email}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{teacher.phone}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {teacher.subjects.join(', ')}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {teacher.payment_terms.hourly_rate} TND/h
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            teacher.status === 'active' ? 'bg-green-100 text-green-800' :
-                            'bg-gray-100 text-gray-800'
-                          }`}>
-                            {teacher.status === 'active' ? 'Actif' : 'Inactif'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {filteredData.teachers.map((teacher) => {
+                      const assignedGroups = adminData?.groups.filter(g => g.teacher_id === teacher.id) || [];
+                      const groupNames = assignedGroups.map(g => g.group_name);
+                      const groupsText = groupNames.length > 0 ? groupNames.join(', ') : 'Aucun';
+
+                      return (
+                        <tr key={teacher.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">{teacher.name}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{teacher.email}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{teacher.phone}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {teacher.subjects.join(', ')}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-600">{groupsText}</td>
+                          <td className="px-6 py-4 text-sm text-gray-600">
+                            {teacher.payment_terms.hourly_rate} TND/h
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`px-2 py-1 text-xs rounded-full ${
+                              teacher.status === 'active' ? 'bg-green-100 text-green-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {teacher.status === 'active' ? 'Actif' : 'Inactif'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
