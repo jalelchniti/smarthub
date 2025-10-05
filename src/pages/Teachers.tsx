@@ -1,4 +1,4 @@
-import { Languages, Calculator, Laptop, BookOpen, Globe, MessageCircle, Target, Settings, TrendingUp, Star } from 'lucide-react';
+import { Languages, Calculator, Laptop, BookOpen, Globe, MessageCircle, Target, Settings, TrendingUp, Star, GraduationCap } from 'lucide-react';
 
 const Teachers = () => {
   const subjects = [
@@ -32,7 +32,8 @@ const Teachers = () => {
             </span>
           </h1>
           <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
-            Une équipe d'enseignants qualifiés et passionnés, prêts à vous accompagner vers l'excellence académique
+            Une équipe d'enseignants certifiés et expérimentés, spécialisés dans le soutien scolaire,
+            la préparation aux examens et la formation professionnelle
           </p>
         </div>
       </section>
@@ -65,26 +66,77 @@ const Teachers = () => {
         </div>
       </section>
 
+      {/* Nos Domaines d'Expertise */}
+      <section className="py-16 bg-gradient-to-br from-blue-50 to-indigo-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold text-center mb-4 text-gray-900">
+            Nos Domaines d'Expertise
+          </h2>
+          <p className="text-xl text-gray-600 text-center mb-12 max-w-4xl mx-auto">
+            Notre équipe intervient dans tous les aspects de la formation académique et professionnelle
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {/* Soutien Scolaire */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 text-center border-t-4 border-blue-500">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 flex items-center justify-center">
+                <BookOpen className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Soutien Scolaire</h3>
+              <p className="text-gray-600 text-sm">Tous les niveaux académiques avec suivi personnalisé</p>
+            </div>
+
+            {/* Préparation aux Examens */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 text-center border-t-4 border-green-500">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center">
+                <Target className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Préparation aux Examens</h3>
+              <p className="text-gray-600 text-sm">Bac, Concours, TOEFL, DELF et examens internationaux</p>
+            </div>
+
+            {/* Formations Adultes */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 text-center border-t-4 border-purple-500">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
+                <Globe className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Formations Adultes</h3>
+              <p className="text-gray-600 text-sm">Langues étrangères et développement professionnel</p>
+            </div>
+
+            {/* Formation des Formateurs */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 text-center border-t-4 border-orange-400">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center">
+                <GraduationCap className="w-8 h-8 text-white" />
+              </div>
+              <div className="inline-block bg-orange-400 text-white px-2 py-1 rounded-full text-xs font-semibold mb-2">
+                ⭐ NOUVEAU
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Formation des Formateurs</h3>
+              <p className="text-gray-600 text-sm">Programme Digital Teacher avec IA et outils numériques</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Stats Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-blue-600 mb-2">3</div>
-              <div className="text-gray-700">Salles Équipées</div>
+              <div className="text-3xl font-bold text-blue-600 mb-2">18+</div>
+              <div className="text-gray-700">Programmes de Formation</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-green-600 mb-2">4.8/5</div>
-              <div className="text-gray-700">Note Moyenne</div>
+              <div className="text-3xl font-bold text-green-600 mb-2">300+</div>
+              <div className="text-gray-700">Apprenants Formés</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-purple-600 mb-2">95%</div>
+              <div className="text-3xl font-bold text-purple-600 mb-2">15+</div>
+              <div className="text-gray-700">Enseignants Certifiés</div>
+            </div>
+            <div className="bg-white rounded-xl p-6 shadow-lg">
+              <div className="text-3xl font-bold text-orange-600 mb-2">95%</div>
               <div className="text-gray-700">Taux de Réussite</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-orange-600 mb-2">6</div>
-              <div className="text-gray-700">Matières Enseignées</div>
             </div>
           </div>
         </div>

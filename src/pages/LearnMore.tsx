@@ -63,15 +63,15 @@ export const LearnMore: React.FC = () => {
               </div>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 text-center tracking-tight leading-normal">
-              Espaces d'Apprentissage
+              Programmes de Formation
               <span className="block text-orange-300">
-                & Enseignants
+                SmartHub
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-indigo-100 max-w-4xl mx-auto text-center leading-relaxed mb-8">
-              Découvrez à quel point il est facile de trouver, se connecter et apprendre avec des enseignants qualifiés chez{' '}
-              <span className="font-semibold text-yellow-300">SmartHub</span>. 
-              Votre tableau de bord personnalisé met tout ce dont vous avez besoin à portée de main.
+              Centre de formation et de tutorat académique avec des programmes complets : soutien scolaire,
+              préparation aux examens, formations professionnelles et{' '}
+              <span className="font-semibold text-yellow-300">Formation des Formateurs</span>.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -208,7 +208,7 @@ export const LearnMore: React.FC = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link to="/register">
+              <Link to="/register/student">
                 <Button size="lg" className="flex items-center space-x-3 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white px-12 py-6 text-xl rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-200">
                   <UserPlus className="w-8 h-8" />
                   <span>S'inscrire Maintenant - C'est Gratuit</span>

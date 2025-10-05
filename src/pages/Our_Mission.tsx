@@ -152,22 +152,25 @@ export const OurMission = () => {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold mb-6">
-            Qui Sommes-Nous ?
+            Notre Mission
             <span className="block text-2xl md:text-3xl font-normal mt-2 text-blue-100">
-              Un Espace Éducatif • Un Hôte Bienveillant
+              Centre de Formation & Tutorat Académique
             </span>
           </h1>
           <p className="text-xl text-blue-100 mb-8 max-w-4xl mx-auto">
-            SmartHub est plus qu'un simple lieu - nous sommes un espace éducatif qui accueille,
-            honore et sert à la fois les enseignants et les étudiants dans leur parcours d'excellence.
+            SmartHub est un centre de formation et de tutorat académique dédié à l'excellence éducative.
+            Nous accompagnons étudiants, adultes et enseignants dans leur développement avec des programmes
+            de qualité, du soutien scolaire à la Formation des Formateurs.
           </p>
 
           <div className="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-6 inline-block border border-white border-opacity-20">
             <div className="flex items-center justify-center space-x-4">
               <Heart className="w-8 h-8 text-pink-300" />
-              <span className="text-xl font-semibold text-pink-300">Espace Éducatif</span>
+              <span className="text-xl font-semibold text-pink-300">Formation</span>
               <span className="text-lg text-blue-100">+</span>
-              <span className="text-xl font-semibold text-yellow-300">Hôte Bienveillant</span>
+              <span className="text-xl font-semibold text-yellow-300">Tutorat</span>
+              <span className="text-lg text-blue-100">+</span>
+              <span className="text-xl font-semibold text-orange-300">Excellence</span>
             </div>
           </div>
         </div>
@@ -471,15 +474,15 @@ export const OurMission = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6">
-            <Link to="/rooms">
+            <Link to="/formations">
               <button className="inline-flex items-center px-8 py-4 bg-white text-blue-600 hover:bg-gray-100 text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105 shadow-xl">
                 <Building className="w-6 h-6 mr-3" />
-                Découvrir nos Salles
+                Nos Formations
               </button>
             </Link>
 
             <a
-              href="https://wa.me/21699456059?text=Bonjour,%20je%20souhaite%20visiter%20ELMAOUIA%20ET.CO%20et%20découvrir%20vos%20espaces%20éducatifs."
+              href="https://wa.me/21699456059?text=Bonjour,%20je%20souhaite%20en%20savoir%20plus%20sur%20vos%20programmes%20de%20formation."
               target="_blank"
               rel="noopener noreferrer"
             >

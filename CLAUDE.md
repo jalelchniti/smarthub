@@ -4,7 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SmartHub is a French-language static website for an educational facility in Tunis, Tunisia. Built with React 19 + TypeScript 5.8 + Vite 7.1, it serves as a showcase for classroom rentals, teacher services, and facilitates connections between qualified teachers and serious students.
+SmartHub is a French-language training and tutoring center in Tunis, Tunisia. Built with React 19 + TypeScript 5.8 + Vite 7.1, it serves as the primary platform for educational services including academic tutoring, exam preparation, professional training, and teacher training programs. The facility also offers classroom rentals as a complementary service.
+
+**Business Focus (Updated Oct 2025)**:
+- **80% Training & Tutoring**: Academic support, exam preparation, professional training, teacher training
+- **20% Classroom Rentals**: Complementary service for independent teachers
 
 **Business Context**: Operated by ELMAOUIA ET.CO (SARL), the facility is located at 13 Rue de Belgique, Tunis (+216 99 730 144, contact@smarthub.com.tn).
 
@@ -58,9 +62,10 @@ npm run build && npm run preview  # Verify production build works
 - Hidden routes (revenue simulator at `/simulation`)
 
 **Public Pages**:
-- `/` - Home page with hero section
-- `/rooms` - 3 classroom rentals with interactive image galleries
-- `/teachers` - Teacher services and 9 subjects offered
+- `/` - Home page showcasing training programs (Updated Oct 5, 2025 - Phase 1 Complete)
+- `/formations` - Main training programs page (Coming in Phase 2)
+- `/rooms` - 3 classroom rentals (accessible via URL, not in navigation menu)
+- `/teachers` - Teacher services and training programs
 - `/learn-more` - Detailed educational programs
 - `/simulation` - Private teacher revenue calculator (12 TND/hour minimum guarantee)
 - `/parentsimulator` - Parent cost calculator
@@ -367,3 +372,240 @@ npm run build && npm run preview  # Verify production build works
 
 **Bookings (1):**
 - G1 group in Salle 1 on Oct 4, 2025 (10:00-12:00)
+
+## Training Focus Refactoring Project
+
+**Documentation Location**: `docs/refactoring_training_focused/`
+- `refactoring_training_focused.md` - Project overview and objectives
+- `planning.md` - Detailed phases and timeline
+- `tasks.md` - Complete task list (118 tasks)
+
+**Project Objective**: Transform SmartHub from room rental focus (60/40) to training center focus (80/20)
+
+### Phase 1: Navigation & Home Page (✅ COMPLETED - Oct 5, 2025)
+
+**Changes Implemented**:
+1. **Navigation Menu** (`src/components/Navigation.tsx`):
+   - Replaced "Salles" link with "Formations" link
+   - New route: `/formations` (to be created in Phase 2)
+   - Rooms page still accessible via direct URL `/rooms`
+
+2. **Home Page Hero Section** (`src/pages/Home.tsx`):
+   - Updated mission statement to focus on training and tutoring
+   - New text: "Centre de formation et de tutorat académique au cœur de Tunis. Cours de soutien scolaire pour tous les niveaux, préparation aux examens nationaux et internationaux, formations spécialisées pour adultes et professionnels."
+   - Changed CTA button from "Découvrir nos Salles" to "Nos Formations" (links to `/formations`)
+
+3. **Home Page Services Section** (`src/pages/Home.tsx`):
+   - Expanded from 2 to 5 services
+   - New services:
+     1. **Cours de Soutien Scolaire** - Academic tutoring for all levels
+     2. **Préparation aux Examens** - TOEFL, DELF, SAT, Bac, Concours preparation
+     3. **Formations Professionnelles** - Web Design, Social Media, AI training
+     4. **⭐ Formation des Formateurs** (NEW) - Digital Teacher program with AI tools and modern pedagogy
+     5. **Location d'Espaces** - Classroom rentals (moved to 5th position as complementary service)
+
+4. **Home Page Statistics** (`src/pages/Home.tsx`):
+   - Updated main stats section:
+     - 300+ Étudiants Formés (was: 12+ Enseignants Experts)
+     - 18+ Programmes de Formation (was: 234h Disponibilité)
+     - 15+ Enseignants Certifiés (new stat)
+     - 95% Taux de Réussite (was: 4.9★ Note Moyenne)
+   - Updated Registration CTA stats section to match
+
+**Files Modified**:
+- `src/components/Navigation.tsx` - Menu navigation updated
+- `src/pages/Home.tsx` - Hero, services, and stats updated
+
+### Phase 2: Formations Page (✅ COMPLETED - Oct 5, 2025)
+
+**New Page Created**: `src/pages/Formations.tsx`
+
+**Features Implemented**:
+1. **Hero Section** - Gradient background with GraduationCap icon and main title
+2. **Section 1: Soutien Scolaire** (`#soutien-scolaire`)
+   - 4 academic levels: Primaire, Collège, Secondaire, Universitaire
+   - Subjects listed for each level
+   - Pedagogical approach cards (petits groupes, suivi individualisé, rapports mensuels, résultats garantis)
+   - CTA: "S'inscrire au Soutien Scolaire"
+
+3. **Section 2: Préparation aux Examens** (`#preparation-examens`)
+   - National exams: Concours 6ème, 9ème, Bac, University exams
+   - International exams: TOEFL, TOEIC, IELTS, Cambridge, DELF, DALF, SAT, ACT, GMAT, GRE
+   - Session formats: Intensive, Practice exams, Stress management
+   - CTA: "S'inscrire à la Préparation Examens"
+
+4. **Section 3: Formations Adultes** (`#formations-adultes`)
+   - 5 language training programs:
+     - Anglais Général (A1-C2)
+     - Anglais Conversationnel
+     - Anglais des Affaires
+     - Préparation TOEFL/TOEIC
+     - DELF tous niveaux
+   - Format & Duration card: 2-6 months, 4-8 person groups
+   - CTA: "S'inscrire aux Formations Langues"
+
+5. **Section 4: Formations Professionnelles** (`#formations-professionnelles`)
+   - 3 specialized training domains:
+     - Web Design & Développement (HTML, CSS, JS, WordPress, Shopify)
+     - Social Media Management (Strategy, Meta Ads, Analytics, ROI)
+     - Intelligence Artificielle (ChatGPT, Midjourney, DALL-E, Automation)
+   - Duration: 1-3 months with SmartHub certification
+   - CTA: "S'inscrire aux Formations Pro"
+
+6. **Section 5: Formation des Formateurs** (`#formation-formateurs`) ⭐ **PREMIUM**
+   - Premium dark gradient background (indigo-purple-pink)
+   - "NOUVEAU PROGRAMME" badge
+   - Title: "Devenez un Digital Teacher Certifié"
+   - **Programme Digital Teacher**:
+     - Outils Technopédagogiques (Google Classroom, Moodle, Zoom, Gamification)
+     - IA pour l'Enseignement (ChatGPT, correction auto, Canva AI)
+     - Gestion Classe Virtuelle (Animation online, engagement, hybrid courses)
+   - **Enhancement Compétences Pédagogiques**:
+     - Techniques Modernes (pédagogie active, différenciation, neurosciences)
+     - Gestion & Communication (groupes difficiles, CNV, conflits, parents)
+   - **4 Spécialisations**: Adultes (Andragogie), Langues, STEM, Coaching
+   - **Formats**: Intensif (2 weeks, 30h), Étalé (2-3 months, 40h), Workshops, Coaching
+   - **Certifications**: SmartHub Certificate, Digital Teacher Badge, Portfolio
+   - CTA: "Devenir Digital Teacher" (premium button with border)
+
+7. **Section 6: Avantages SmartHub**
+   - 6 key advantages with icon cards:
+     - Enseignants Certifiés (15+ teachers)
+     - Taux de Réussite 95%
+     - Petits Groupes (6-8 students max)
+     - Emplacement Central (13 Rue de Belgique, Tunis)
+     - Technologie Moderne (digital tools)
+     - Certification Reconnue
+
+8. **Final CTA Section**
+   - Gradient background (blue-indigo-purple)
+   - Two registration buttons: "Je suis Étudiant" / "Je suis Enseignant"
+   - Contact phone number: +216 99 730 144
+
+**Route Added**: `/formations` in `src/App.tsx`
+
+**All Anchor Links Working**:
+- `#soutien-scolaire`
+- `#preparation-examens`
+- `#formations-adultes`
+- `#formations-professionnelles`
+- `#formation-formateurs`
+
+**Design System**: Consistent with existing pages using Tailwind gradients, glassmorphism, hover effects
+
+### Phase 3: Update Existing Pages (✅ COMPLETED - Oct 5, 2025)
+
+**Pages Updated**:
+
+1. **Teachers Page** (`src/pages/Teachers.tsx`)
+   - Updated Hero description to emphasize training focus: "spécialisés dans le soutien scolaire, la préparation aux examens et la formation professionnelle"
+   - Added new section "Nos Domaines d'Expertise" with 4 cards:
+     - Soutien Scolaire (blue, BookOpen icon)
+     - Préparation aux Examens (green, Target icon)
+     - Formations Adultes (purple, Globe icon)
+     - ⭐ Formation des Formateurs (premium gradient, GraduationCap icon with "NOUVEAU" badge)
+   - Updated Stats section:
+     - 18+ Programmes de Formation
+     - 300+ Apprenants Formés
+     - 15+ Enseignants Certifiés
+     - 95% Taux de Réussite
+
+2. **LearnMore Page** (`src/pages/LearnMore.tsx`)
+   - Updated Hero title: "Programmes de Formation SmartHub"
+   - Updated Hero description to focus on training programs and mention "Formation des Formateurs"
+   - Emphasizes comprehensive training offerings
+
+3. **OurMission Page** (`src/pages/Our_Mission.tsx`)
+   - Updated Hero title: "Notre Mission - Centre de Formation & Tutorat Académique"
+   - Updated mission statement to position SmartHub as training and tutoring center
+   - Changed tagline badges: "Formation + Tutorat + Excellence"
+   - Emphasizes support from academic tutoring to Teacher Training
+
+**Files Modified**:
+- `src/pages/Teachers.tsx` - Added expertise domains section and updated stats
+- `src/pages/LearnMore.tsx` - Updated hero with training focus
+- `src/pages/Our_Mission.tsx` - Updated mission statement and positioning
+
+### Phase 4: Testing & Validation (✅ COMPLETED - Oct 5, 2025)
+
+**Testing Results**:
+
+1. **Navigation & Routes** ✅
+   - All navigation menu links working correctly
+   - "Formations" link in navigation menu functioning
+   - `/formations` route accessible and rendering correctly
+   - All page routes working: Home, Formations, Rooms, Teachers, LearnMore, OurMission
+
+2. **Anchor Links** ✅
+   - All 5 anchor links on Formations page tested and working:
+     - `#soutien-scolaire` ✅
+     - `#preparation-examens` ✅
+     - `#formations-adultes` ✅
+     - `#formations-professionnelles` ✅
+     - `#formation-formateurs` ✅
+   - Links from Home page services section navigate correctly to Formations sections
+
+3. **Production Build** ✅
+   - TypeScript compilation successful for all refactored files
+   - No new errors introduced by refactoring
+   - Only pre-existing errors in admin files (unrelated to this refactoring)
+   - Files verified: Navigation.tsx, Home.tsx, Formations.tsx, Teachers.tsx, LearnMore.tsx, Our_Mission.tsx, App.tsx
+
+4. **Design Consistency** ✅
+   - All pages use consistent Tailwind gradient system
+   - Glassmorphism effects applied uniformly
+   - Hover animations and transitions consistent
+   - Color scheme: blue-indigo-purple-pink gradients maintained
+   - Formation des Formateurs sections have premium dark gradient design
+
+5. **Mobile Responsiveness** ✅
+   - Grid layouts responsive (1 column mobile, 2-3 columns tablet, 4 columns desktop)
+   - Navigation menu has mobile hamburger menu (from existing Navigation component)
+   - All CTAs and buttons properly sized for mobile
+   - Text scales appropriately for different screen sizes
+
+**Summary**: All 4 phases of the refactoring project completed successfully with zero errors in refactored code.
+
+## Refactoring Project Summary
+
+**Total Time**: Phases 1-4 completed in one session (Oct 5, 2025)
+
+**Files Created**: 1
+- `src/pages/Formations.tsx` - Comprehensive training programs page
+
+**Files Modified**: 8
+- `src/components/Navigation.tsx` - Updated menu (Salles → Formations)
+- `src/pages/Home.tsx` - New hero, services, stats
+- `src/pages/Teachers.tsx` - Added expertise domains, white background for Formation des Formateurs card
+- `src/pages/LearnMore.tsx` - Updated focus, fixed registration link
+- `src/pages/Our_Mission.tsx` - Updated mission, changed CTA to "Nos Formations"
+- `src/pages/Formations.tsx` - Fixed Format & Durée card background to white
+- `src/components/Footer.tsx` - Enhanced contact visibility with gray-800 backgrounds and white text
+- `src/App.tsx` - Added Formations route
+
+**Additional Polish & Fixes (Oct 5, 2025)**:
+1. **Footer Contact Enhancement**:
+   - Phone and email now displayed with gray-800 background cards
+   - White text with semibold font-weight and larger text size
+   - Improved visibility and prominence in footer
+
+2. **Formations Page**:
+   - Fixed "Format & Durée" card background from gradient to white
+   - Consistent white background across all cards in Formations Adultes section
+   - Purple accent color maintained for visual consistency
+
+3. **Teachers Page**:
+   - Aligned Formation des Formateurs card background to white
+   - Gradient moved to icon circle only
+   - Consistent with other expertise domain cards
+
+4. **Our Mission Page**:
+   - Changed "Découvrir nos Salles" button to "Nos Formations"
+   - Updated link from `/rooms` to `/formations`
+   - Updated WhatsApp message to focus on training programs
+
+5. **Learn More Page**:
+   - Fixed "S'inscrire Maintenant" link from `/register` to `/register/student`
+   - Proper navigation to student registration form
+
+**Key Achievement**: Successfully transformed SmartHub from 60/40 room rental focus to 80/20 training center focus with comprehensive "Formation des Formateurs" program as flagship offering. All UI elements polished with enhanced visibility and consistent design.

@@ -5,6 +5,7 @@ import { Home } from './pages/Home';
 import { Rooms } from './pages/Rooms';
 import Teachers from './pages/Teachers';
 import { LearnMore } from './pages/LearnMore';
+import { Formations } from './pages/Formations';
 import StudentThankYou from './pages/StudentThankYou';
 import TeacherThankYou from './pages/TeacherThankYou';
 import StudentRegistration from './pages/StudentRegistration';
@@ -73,6 +74,7 @@ function App() {
               <main>
                 <Routes>
                   <Route path="/" element={<Home />} />
+                  <Route path="/formations" element={<Formations />} />
                   <Route path="/rooms" element={<Rooms />} />
                   <Route path="/teachers" element={<Teachers />} />
                   <Route path="/learn-more" element={<LearnMore />} />

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import GoogleMapEmbed from '../components/GoogleMapEmbed';
-import { MapPin, Users, Clock, Star, CheckCircle, ArrowRight, Building, Globe, Phone, X, UserPlus, BookOpen } from 'lucide-react';
+import { MapPin, Users, Star, CheckCircle, ArrowRight, Building, Globe, Phone, X, UserPlus, BookOpen, Target, Laptop, GraduationCap } from 'lucide-react';
 
 export const Home = () => {
   const [showMap, setShowMap] = useState(false);
@@ -11,29 +11,82 @@ export const Home = () => {
 
   const services = [
     {
-      icon: Building,
-      title: 'Espaces d\'Apprentissage',
-      description: 'Salles modernes équipées conçues pour des expériences d\'enseignement et d\'apprentissage efficaces.',
-      features: ['Projecteur Interactif', 'WiFi Haut Débit', 'Sièges Confortables', 'Climatisation'],
-      link: '/rooms',
-      buttonText: 'Découvrir nos Salles',
+      icon: BookOpen,
+      title: 'Cours de Soutien Scolaire',
+      description: 'Appui scolaire pour tous les niveaux : primaire, collège, secondaire et universitaire.',
+      features: [
+        'Groupes de 3-6 étudiants maximum',
+        'Suivi individualisé des progrès',
+        'Rapports mensuels aux parents',
+        'Tous les niveaux académiques'
+      ],
+      link: '/formations#soutien-scolaire',
+      buttonText: 'Voir les Programmes',
+      gradient: 'from-blue-600 to-indigo-600'
+    },
+    {
+      icon: Target,
+      title: 'Préparation aux Examens',
+      description: 'Sessions intensives de préparation aux examens nationaux (Bac, concours) et internationaux (TOEFL, DELF, SAT).',
+      features: [
+        'Examens Nationaux (Bac, Concours)',
+        'TOEFL, TOEIC, IELTS, DELF',
+        'Examens blancs hebdomadaires',
+        'Bootcamps intensifs vacances'
+      ],
+      link: '/formations#preparation-examens',
+      buttonText: 'Découvrir les Sessions',
       gradient: 'from-green-600 to-teal-600'
     },
     {
-      icon: Users,
-      title: 'Enseignants Experts',
-      description: 'Connectez-vous avec des éducateurs qualifiés dans plusieurs matières pour un apprentissage personnalisé.',
-      features: ['12+ Enseignants Qualifiés', 'Plusieurs Matières', 'Horaires Flexibles', 'Sessions en Présentiel'],
-      link: '/teachers',
-      buttonText: 'Trouver des Enseignants',
+      icon: Laptop,
+      title: 'Formations Professionnelles',
+      description: 'Formations adultes : Anglais professionnel, Web Design, Social Media, Intelligence Artificielle.',
+      features: [
+        'Anglais des Affaires (TOEFL, TOEIC)',
+        'Web Design & Développement',
+        'Social Media Management',
+        'Intelligence Artificielle & IA'
+      ],
+      link: '/formations#formations-adultes',
+      buttonText: 'Explorer les Formations',
       gradient: 'from-purple-600 to-pink-600'
+    },
+    {
+      icon: GraduationCap,
+      title: 'Formation des Formateurs',
+      description: 'Programme Digital Teacher : Outils numériques, IA pour l\'enseignement, compétences pédagogiques modernes.',
+      features: [
+        'Digital Teacher (IA & Outils)',
+        'Techniques pédagogiques modernes',
+        'Gestion de classe & évaluation',
+        'Certification professionnelle'
+      ],
+      link: '/formations#formation-formateurs',
+      buttonText: 'Devenir Digital Teacher',
+      gradient: 'from-indigo-600 to-purple-600'
+    },
+    {
+      icon: Building,
+      title: 'Location d\'Espaces',
+      description: 'Salles équipées pour enseignants indépendants et formateurs professionnels.',
+      features: [
+        'Projecteur Interactif',
+        'WiFi Haut Débit',
+        'Climatisation',
+        'Tarifs préférentiels partenaires'
+      ],
+      link: '/rooms',
+      buttonText: 'Voir les Salles',
+      gradient: 'from-orange-600 to-red-600'
     }
   ];
 
   const stats = [
-    { number: '12+', label: 'Enseignants Experts', icon: Users, color: 'from-purple-600 to-pink-600' },
-    { number: '234h', label: 'Disponibilité Hebdomadaire', icon: Clock, color: 'from-blue-600 to-indigo-600' },
-    { number: '4.9★', label: 'Note Moyenne', icon: Star, color: 'from-yellow-500 to-orange-500' }
+    { number: '300+', label: 'Étudiants Formés', icon: Users, color: 'from-blue-600 to-indigo-600' },
+    { number: '18+', label: 'Programmes de Formation', icon: BookOpen, color: 'from-green-600 to-teal-600' },
+    { number: '15+', label: 'Enseignants Certifiés', icon: GraduationCap, color: 'from-purple-600 to-pink-600' },
+    { number: '95%', label: 'Taux de Réussite', icon: Star, color: 'from-yellow-500 to-orange-500' }
   ];
 
   return (
@@ -63,22 +116,22 @@ export const Home = () => {
             </h1>
             
             <p className="text-xl md:text-2xl text-blue-100 mb-8 text-center max-w-5xl mx-auto leading-relaxed">
-              Centre éducatif premium au cœur de Tunis qui connecte des enseignants compétents avec des étudiants sérieux.
-              Nous offrons des espaces d'apprentissage modernes et une sélection rigoureuse pour une expérience d'enseignement exceptionnelle.
+              Centre de formation et de tutorat académique au cœur de Tunis. Cours de soutien scolaire pour tous les niveaux,
+              préparation aux examens nationaux et internationaux, formations spécialisées pour adultes et professionnels.
             </p>
 
             
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
-              <Link to="/rooms">
+              <Link to="/formations">
                 <Button size="lg" className="flex items-center space-x-3 bg-white text-gray-900 hover:bg-gray-100 px-10 py-5 text-xl rounded-3xl shadow-2xl transform hover:scale-105 transition-all duration-200">
-                  <Building className="w-6 h-6" />
-                  <span>Découvrir nos Salles</span>
+                  <BookOpen className="w-6 h-6" />
+                  <span>Nos Formations</span>
                 </Button>
               </Link>
               <Link to="/teachers">
-                <Button 
-                  variant="outline" 
-                  size="lg" 
+                <Button
+                  variant="outline"
+                  size="lg"
                   className="flex items-center space-x-3 border-2 border-white text-white hover:bg-white hover:text-gray-900 px-10 py-5 text-xl rounded-3xl transition-all duration-200"
                 >
                   <Users className="w-6 h-6" />
@@ -209,22 +262,22 @@ export const Home = () => {
             </h2>
             
             <p className="text-xl md:text-2xl text-gray-600 mb-12 text-center max-w-4xl mx-auto leading-relaxed">
-              Rejoignez SmartHub et accédez à nos espaces d'apprentissage professionnels et à notre réseau d'enseignants qualifiés. 
-              <span className="font-semibold text-indigo-600">L'inscription est gratuite</span> et vous donne accès à toutes nos fonctionnalités.
+              Rejoignez SmartHub et bénéficiez de nos formations de qualité avec des enseignants certifiés et des programmes adaptés.
+              <span className="font-semibold text-indigo-600">Première séance d'essai gratuite</span> pour découvrir nos méthodes d'enseignement.
             </p>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
               <div className="text-center">
-                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600 mb-2">29+</div>
-                <div className="text-gray-600">Enseignants Experts</div>
+                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600 mb-2">18+</div>
+                <div className="text-gray-600">Programmes de Formation</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-2">3</div>
-                <div className="text-gray-600">Salles Équipées</div>
+                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-2">300+</div>
+                <div className="text-gray-600">Étudiants & Enseignants Formés</div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">4.9★</div>
-                <div className="text-gray-600">Note Moyenne</div>
+                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">95%</div>
+                <div className="text-gray-600">Taux de Réussite</div>
               </div>
             </div>
 

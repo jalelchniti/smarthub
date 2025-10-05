@@ -36,17 +36,17 @@ const Footer = () => {
             <div className="space-y-4">
               <button
                 onClick={handlePhoneClick}
-                className="flex items-center text-gray-300 hover:text-blue-400 transition-colors group w-full text-left"
+                className="flex items-center text-white hover:text-blue-400 transition-colors group w-full text-left bg-gray-800 hover:bg-gray-700 p-3 rounded-lg"
               >
                 <Phone className="w-5 h-5 mr-3 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span>+216 99 730 144</span>
+                <span className="font-semibold text-lg">+216 99 730 144</span>
               </button>
               <button
                 onClick={handleEmailClick}
-                className="flex items-center text-gray-300 hover:text-blue-400 transition-colors group w-full text-left"
+                className="flex items-center text-white hover:text-blue-400 transition-colors group w-full text-left bg-gray-800 hover:bg-gray-700 p-3 rounded-lg"
               >
                 <Mail className="w-5 h-5 mr-3 text-blue-400 group-hover:scale-110 transition-transform" />
-                <span>contact@smarthub.com.tn</span>
+                <span className="font-semibold text-lg">contact@smarthub.com.tn</span>
               </button>
               <div className="flex items-start text-gray-300">
                 <MapPin className="w-5 h-5 mr-3 text-blue-400 mt-1 flex-shrink-0" />
