@@ -35,6 +35,7 @@ npm run build && npm run preview  # Verify production build works
 - **Build Tool**: Vite 7.1
 - **Deployment**: Static hosting on OVH via FTP (credentials in .env)
 - **Dev Tools**: Nodemon (backend auto-reload), Concurrently (run both servers)
+- **Note**: Firebase integration was removed in favor of the Express backend system
 
 ### Admin System Data Storage (UPDATED - Backend API)
 - **Storage Method**: Backend Express API writes to JSON file (`src/data/admin-data.json`)
