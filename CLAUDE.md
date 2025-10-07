@@ -44,18 +44,33 @@ npm run build && npm run preview  # Verify production build works
 - **Build Tool**: Vite 7.1
 - **Deployment**: Static hosting on OVH via FTP (credentials in .env)
 - **Dev Tools**: Nodemon (backend auto-reload), Concurrently (run both servers)
-- **Note**: Firebase integration was removed in favor of the Express backend system
+- **Firebase**: Realtime Database (public booking system) + Authentication (admin access)
 
-### Admin System Data Storage (UPDATED - Backend API)
+### Dual Storage Architecture
+
+**1. Firebase System** (Public Bookings):
+- **Database**: Firebase Realtime Database (cloud-hosted)
+- **Authentication**: Firebase Auth with Google sign-in
+- **Service**: `src/services/firebaseBookingService.ts`
+- **Auth Service**: `src/services/firebaseAuthService.ts`
+- **Admin Route**: `/admin/firebase-login` → `/admin/firebase-bookings`
+- **Configuration**: CDN scripts in `index.html` + `.env` credentials
+- **Purpose**: Public-facing booking system accessible to customers
+- **Security**: Production-grade with authorized email whitelist
+- **Real-time**: Live synchronization across multiple users
+
+**2. JSON System** (Internal Admin):
 - **Storage Method**: Backend Express API writes to JSON file (`src/data/admin-data.json`)
 - **API Base URL**: http://localhost:3001/api
 - **Backend Server**: `server/index.js` - Express API with CRUD endpoints
 - **Storage Utility**: `src/utils/adminDataStorage.ts` - Frontend API client (async fetch)
+- **Admin Routes**: `/admin/login` → `/admin/*` (students, payments, data-preview, etc.)
 - **Data Structure**: Single AdminData object containing all entities (rooms, teachers, students, groups, bookings, payments)
 - **Automatic Backups**: Created in `src/data/backups/` on every save
 - **Version Control**: Built-in versioning system for data migration
 - **Backup/Export**: Download/upload JSON files via API endpoints
 - **TypeScript Types**: Full type definitions in `src/types/admin.types.ts`
+- **Purpose**: Internal administrative data management (students, payments, reports)
 - **Benefits**: Permanent storage, Git version control, multi-computer access
 
 ### Application Structure
@@ -67,9 +82,10 @@ npm run build && npm run preview  # Verify production build works
 - Hidden routes (revenue simulator at `/simulation`)
 
 **Public Pages**:
-- `/` - Home page showcasing training programs (Updated Oct 5, 2025 - Phase 1 Complete)
-- `/formations` - Main training programs page (Coming in Phase 2)
+- `/` - Home page showcasing training programs (Updated Oct 5, 2025)
+- `/formations` - Main training programs page (Updated Oct 5, 2025)
 - `/rooms` - 3 classroom rentals with updated pricing structure (HT/TTC display, 20% discount for independent teachers)
+- `/booking` - Public booking system using Firebase Realtime Database
 - `/teachers` - Teacher services and training programs
 - `/learn-more` - Detailed educational programs
 - `/simulation` - Private teacher revenue calculator (12 TND/hour minimum guarantee)
@@ -77,9 +93,11 @@ npm run build && npm run preview  # Verify production build works
 - `/our-mission` - Mission statement page
 
 **Admin System Pages** (UPDATED):
-- `/admin/login` - Admin authentication page (authentication disabled - free access)
-- `/admin` - Dashboard with overview metrics
-- `/admin/bookings` - **✅ IMPLEMENTED** - Full booking management with CRUD operations
+- `/admin/login` - Admin authentication page (localStorage-based - currently bypassed for free access)
+- `/admin/firebase-login` - Firebase Authentication login (enterprise-grade, jalel.chniti@smarthub.com.tn)
+- `/admin/firebase-bookings` - Firebase admin dashboard with real-time booking management
+- `/admin` - Dashboard with overview metrics (JSON-based admin system)
+- `/admin/bookings` - **✅ IMPLEMENTED** - Full booking management with CRUD operations (JSON storage)
 - `/admin/students` - **✅ IMPLEMENTED** - Student enrollment management with complete registration forms
 - `/admin/student-payments` - **✅ IMPLEMENTED** - Student payment tracking with invoice generation
 - `/admin/data-preview` - **✅ IMPLEMENTED** - Comprehensive data preview with advanced filtering and export
@@ -90,10 +108,11 @@ npm run build && npm run preview  # Verify production build works
 - `/admin/reports` - Financial reports and analytics (placeholder - Phase 7)
 
 **Core Utilities**:
-- `server/index.js` - Express backend API server (port 3001)
-- `src/utils/adminDataStorage.ts` - Frontend API client for backend communication
-- `src/utils/secureBookingStorage.ts` - Legacy booking storage (public booking system)
-- `src/contexts/AuthContext.tsx` - Admin authentication context (currently bypassed)
+- `server/index.js` - Express backend API server (port 3001) - JSON-based admin system
+- `src/utils/adminDataStorage.ts` - Frontend API client for backend communication (JSON storage)
+- `src/services/firebaseBookingService.ts` - Firebase Realtime Database service (public booking system)
+- `src/services/firebaseAuthService.ts` - Firebase Authentication service (admin access)
+- `src/contexts/AuthContext.tsx` - Admin authentication context for localStorage (currently bypassed)
 - `src/types/admin.types.ts` - TypeScript interfaces for all admin data models
 - `src/pages/admin/Bookings.tsx` - Full booking management module
 - `src/pages/admin/Students.tsx` - Student enrollment management module
@@ -154,14 +173,26 @@ npm run build && npm run preview  # Verify production build works
 - CTA buttons on all public pages
 
 ### Admin Authentication System
-- **Status**: CURRENTLY DISABLED - Free access to all admin pages
-- **Method**: Simple localStorage-based authentication (available but bypassed)
-- **Default User**: jalel.chniti@smarthub.com.tn (configured in `admin-data.json`)
-- **Password**: Stored as simple hash (demo - NOT production-grade)
-- **Protection**: `ProtectedRoute` component removed from routes - direct access enabled
-- **Role-Based Access**: Manager, Staff, Accountant roles defined but not enforced
-- **Context**: `AuthContext` provides authentication state (currently unused)
-- **Note**: Authentication can be re-enabled by wrapping admin routes with `ProtectedRoute` component
+
+**Dual System Architecture**:
+
+1. **Firebase Authentication** (Public Booking Admin - Enterprise-grade):
+   - **Route**: `/admin/firebase-login` → `/admin/firebase-bookings`
+   - **Method**: Firebase Auth with Google sign-in
+   - **Authorized Users**: jalel.chniti@smarthub.com.tn, jalel.chniti@gmail.com
+   - **Service**: `src/services/firebaseAuthService.ts`
+   - **Security**: Production-ready with session management
+   - **Purpose**: Secure access to Firebase Realtime Database bookings
+
+2. **localStorage Authentication** (Internal Admin - JSON System):
+   - **Status**: CURRENTLY DISABLED - Free access to all admin pages
+   - **Routes**: `/admin/login` → `/admin/*` (students, payments, data-preview, etc.)
+   - **Method**: Simple localStorage-based authentication (available but bypassed)
+   - **Default User**: jalel.chniti@smarthub.com.tn (configured in `admin-data.json`)
+   - **Password**: Stored as simple hash (demo - NOT production-grade)
+   - **Protection**: `ProtectedRoute` component removed from routes - direct access enabled
+   - **Context**: `AuthContext` provides authentication state (currently unused)
+   - **Note**: Authentication can be re-enabled by wrapping admin routes with `ProtectedRoute` component
 
 ## Deployment Configuration
 
@@ -224,13 +255,29 @@ npm run build && npm run preview  # Verify production build works
 - `src/App.backup.tsx` - Development version with admin (restore anytime)
 - `DEPLOYMENT_GUIDE.md` - Complete deployment instructions with file list
 
-**Local development**: Admin system always available at `http://localhost:5176/admin` after restoring App.backup.tsx
+**Local development**: Admin system always available at `http://localhost:5174/admin` after restoring App.backup.tsx (backend on port 3001)
 
 ## Development Guidelines
 
-### Admin System Development
+### Understanding the Dual System Architecture
+
+**IMPORTANT**: SmartHub uses TWO separate storage systems. Choose the correct one for your feature:
+
+**Use Firebase** when working on:
+- Public booking system (`/booking` page)
+- Firebase admin bookings (`/admin/firebase-bookings`)
+- Real-time customer-facing features
+- Services: `firebaseBookingService.ts`, `firebaseAuthService.ts`
+
+**Use JSON System** when working on:
+- Internal admin pages (students, payments, data-preview)
+- Backend data that doesn't need real-time sync
+- Features requiring local backup and Git version control
+- Services: `adminDataStorage.ts` + Express backend
+
+### JSON Admin System Development
 1. **Data Operations**: Always use `await AdminDataStorage.load()` and `await AdminDataStorage.save()` - Both are async
-2. **Backend Requirement**: Ensure backend server is running (`npm run server` or `npm run dev`)
+2. **Backend Requirement**: Ensure Express backend server is running (`npm run server` or `npm run dev`)
 3. **API Endpoints**: All data operations go through Express API at http://localhost:3001/api
 4. **React Hook**: Use `useAdminData()` hook in components for reactive data updates with async loading
 5. **Authentication**: Currently disabled - all admin routes have free access
@@ -238,6 +285,15 @@ npm run build && npm run preview  # Verify production build works
 7. **Versioning**: Data structure version is in `admin-data.json` - update when schema changes
 8. **Loading States**: Always handle loading states with spinners when using async data operations
 9. **Error Handling**: Backend errors are displayed to user via alert() - check browser console for details
+
+### Firebase System Development
+1. **Authentication Required**: Use `firebaseAuthService.ts` for login/logout operations
+2. **Real-time Database**: Use `firebaseBookingService.ts` for all booking CRUD operations
+3. **Configuration**: Ensure `.env` has correct Firebase credentials (API key, project ID, etc.)
+4. **Authorized Users**: Only jalel.chniti@smarthub.com.tn and jalel.chniti@gmail.com can access admin
+5. **CDN Scripts**: Firebase loaded via CDN in `index.html` - no npm package needed
+6. **Error Handling**: Firebase errors should be caught and displayed to users with friendly messages
+7. **Session Management**: Auth state persists across page refreshes automatically
 
 ### Component Patterns
 - Use React Router's `useNavigate()` for all internal navigation
@@ -255,19 +311,24 @@ npm run build && npm run preview  # Verify production build works
 
 ### State Management
 - No external state library (React hooks only)
-- Admin auth state managed by `AuthContext` provider (currently bypassed)
-- Admin data managed by async API calls to Express backend
+- **Dual Storage Systems**:
+  - **Firebase**: Public booking system uses Firebase Realtime Database (`firebaseBookingService.ts`)
+  - **Express + JSON**: Internal admin system uses Express API with JSON storage (`adminDataStorage.ts`)
+- Admin auth state managed by:
+  - `AuthContext` provider for localStorage (currently bypassed)
+  - `firebaseAuthService.ts` for Firebase Authentication (active for booking admin)
 - All admin components use local state with `useState` and `useEffect` for data loading
-- Public booking data uses `secureBookingStorage.ts` (legacy system)
 
 ## Common Issues & Solutions
 
 **Backend not connecting**: Ensure Express server is running on port 3001 (`npm run server` or `npm run dev`)
-**Data not persisting**: Check if backend server is running and `admin-data.json` file has write permissions
+**Data not persisting (JSON admin)**: Check if backend server is running and `admin-data.json` file has write permissions
+**Data not persisting (Firebase booking)**: Check Firebase credentials in `.env` and network connectivity
 **"Cannot read properties of null"**: Component tried to access data before it loaded - add loading state check
-**Admin pages show loading forever**: Backend server not running - start with `npm run server`
+**Admin pages show loading forever**: Backend server not running (for JSON admin) - start with `npm run server`
+**Firebase auth not working**: Verify `.env` has correct Firebase config and authorized email is whitelisted
 **CORS errors**: Backend has CORS enabled for all origins - check if API_BASE_URL in adminDataStorage.ts is correct
-**Port conflicts**: Frontend uses 5174, backend uses 3001 - change in vite.config.ts or server/index.js if needed
+**Port conflicts**: Frontend uses 5174 (Vite default), backend uses 3001 - change in vite.config.ts or server/index.js if needed
 **Build fails**: Run `npm run build` - check TypeScript errors first
 **MIME type errors in production**: Ensure `.htaccess` or `web.config` properly configured
 **Brevo forms not working**: Verify form IDs match Brevo console configuration
@@ -275,15 +336,17 @@ npm run build && npm run preview  # Verify production build works
 
 ## Important Files to Check
 
-- `.env` - Contains deployment credentials (never commit)
-- `index.html` - Brevo integration scripts
+- `.env` - Contains Firebase config + OVH deployment credentials (never commit)
+- `index.html` - Brevo integration scripts + Firebase CDN scripts
 - `src/App.tsx` - Route definitions and layout structure (includes admin routes)
 - `src/App.backup.tsx` - Development version backup with admin routes (restore anytime)
-- `server/index.js` - Express backend API server with all endpoints
-- `src/data/admin-data.json` - Main data file (written by backend API)
+- `server/index.js` - Express backend API server with all endpoints (JSON admin system)
+- `src/data/admin-data.json` - Main data file for internal admin (written by backend API)
 - `src/data/backups/` - Automatic backups created on every save
-- `src/utils/adminDataStorage.ts` - Frontend API client for backend communication
-- `src/contexts/AuthContext.tsx` - Authentication logic (currently bypassed)
+- `src/utils/adminDataStorage.ts` - Frontend API client for JSON-based admin system
+- `src/services/firebaseBookingService.ts` - Firebase Realtime Database service (public bookings)
+- `src/services/firebaseAuthService.ts` - Firebase Authentication service (booking admin)
+- `src/contexts/AuthContext.tsx` - Authentication logic for localStorage (currently bypassed)
 - `src/types/admin.types.ts` - TypeScript interfaces for all data models
 - `src/pages/admin/Bookings.tsx` - Booking management module implementation
 - `src/pages/admin/Students.tsx` - Student management module implementation
