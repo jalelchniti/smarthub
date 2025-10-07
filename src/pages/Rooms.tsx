@@ -59,9 +59,7 @@ export const Rooms: React.FC = () => {
         { icon: Clock, text: '78 heures/semaine' }
       ],
       pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 20 },
-        { capacity: '2-6 personnes', rate: 25 },
-        { capacity: '7-9 personnes', rate: 30 },
+        { capacity: '1-9 personnes', rate: 30 },
         { capacity: '10-15 personnes', rate: 35 }
       ],
       availability: '78 hours/week',
@@ -83,9 +81,7 @@ export const Rooms: React.FC = () => {
         { icon: Clock, text: '78 heures/semaine' }
       ],
       pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 15 },
-        { capacity: '2-7 personnes', rate: 20 },
-        { capacity: '8-9 personnes', rate: 25 }
+        { capacity: '1-9 personnes', rate: 25 }
       ],
       availability: '78 hours/week',
       image: '/images/salle2-1.jpg',
@@ -106,9 +102,7 @@ export const Rooms: React.FC = () => {
         { icon: Clock, text: '78 heures/semaine' }
       ],
       pricing: [
-        { capacity: 'Individuel (1 apprenant)', rate: 15 },
-        { capacity: '2-7 personnes', rate: 20 },
-        { capacity: '8-9 personnes', rate: 25 }
+        { capacity: '1-9 personnes', rate: 25 }
       ],
       availability: '78 hours/week',
       image: '/images/salle3-1.jpg',
@@ -262,15 +256,39 @@ export const Rooms: React.FC = () => {
 
                     {/* Pricing & Availability */}
                     <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-2xl p-6 mb-6 text-center border border-green-100">
-                      <h4 className="font-bold text-gray-900 mb-4 text-center text-lg">Tarification</h4>
+                      <h4 className="font-bold text-gray-900 mb-2 text-center text-lg">Tarification</h4>
+                      <p className="text-xs text-amber-900 mb-4 text-center font-bold">
+                        (Frais SmartHub = Espace + gestion d'élèves : assiduité, discipline et paiement)
+                      </p>
                       <div className="space-y-3 mb-6">
                         {room.pricing.map((tier, index) => (
-                          <div key={index} className="flex justify-between items-center p-2 rounded-lg bg-white/50">
-                            <span className="text-sm font-medium text-gray-700 text-center">{tier.capacity}</span>
-                            <span className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600">{tier.rate} TND/heure</span>
+                          <div key={index} className="p-3 rounded-lg bg-white/50 space-y-1">
+                            <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium text-gray-700">{tier.capacity}</span>
+                              <div className="text-right">
+                                <div className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-blue-600">
+                                  {tier.rate} TND HT
+                                </div>
+                                <div className="text-xs text-gray-600 font-bold">
+                                  {(tier.rate * 1.07).toFixed(2)} TND TTC (TVA 7%)
+                                </div>
+                              </div>
+                            </div>
                           </div>
                         ))}
                       </div>
+
+                      {/* Teacher Discount Notice */}
+                      <div className="mb-6 p-3 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg border-2 border-purple-300">
+                        <div className="flex items-center justify-center gap-2 mb-1">
+                          <span className="text-2xl">🎓</span>
+                          <span className="text-sm font-bold text-purple-900">OFFRE ENSEIGNANTS INDÉPENDANTS</span>
+                        </div>
+                        <p className="text-xs text-purple-800 font-bold">
+                          -20% de réduction pour les enseignants avec leurs propres étudiants
+                        </p>
+                      </div>
+
                       <div className="text-center border-t border-green-200 pt-4">
                         <div className="flex items-center justify-center space-x-2 mb-1">
                           <Clock className="w-5 h-5 text-green-600" />

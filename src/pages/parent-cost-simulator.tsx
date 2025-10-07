@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calculator, Users, Clock, DollarSign, BookOpen, CheckCircle, AlertTriangle, Building, Heart } from 'lucide-react';
+import { Calculator, Users, Clock, DollarSign, BookOpen, AlertTriangle, Building } from 'lucide-react';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 
@@ -22,9 +22,7 @@ const ParentCostCalculator = () => {
       capacity: 15,
       equipment: 'Projecteur Interactif, Climatisation, WiFi Premium',
       pricing: [
-        { min: 1, max: 1, rate: 20 },
-        { min: 2, max: 6, rate: 25 },
-        { min: 7, max: 9, rate: 30 },
+        { min: 1, max: 9, rate: 30 },
         { min: 10, max: 15, rate: 35 }
       ]
     },
@@ -33,9 +31,7 @@ const ParentCostCalculator = () => {
       capacity: 9,
       equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 1, rate: 15 },
-        { min: 2, max: 7, rate: 20 },
-        { min: 8, max: 9, rate: 25 }
+        { min: 1, max: 9, rate: 25 }
       ]
     },
     '3': {
@@ -43,9 +39,7 @@ const ParentCostCalculator = () => {
       capacity: 9,
       equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 1, rate: 15 },
-        { min: 2, max: 7, rate: 20 },
-        { min: 8, max: 9, rate: 25 }
+        { min: 1, max: 9, rate: 25 }
       ]
     }
   };
@@ -78,7 +72,7 @@ const ParentCostCalculator = () => {
     
     // Room costs (with VAT)
     const monthlyRoomCostHTVA = roomRateHTVA * monthlyHours;
-    const monthlyRoomCostTTC = monthlyRoomCostHTVA * 1.19;
+    const monthlyRoomCostTTC = monthlyRoomCostHTVA * 1.07;
     
     // Total monthly cost to be shared among students
     const totalMonthlyCost = monthlyTeacherIncome + monthlyRoomCostTTC;
@@ -92,29 +86,6 @@ const ParentCostCalculator = () => {
     
     // Cost per student per hour
     const costPerStudentHour = costPerStudentMonthly / monthlyHours;
-
-    // Protection analysis (if teacher rate is below 12 TND/hour)
-    let protectionApplied = false;
-    let discountPercentage = 0;
-    let discountAmount = 0;
-    let finalRoomCost = monthlyRoomCostTTC;
-    let finalCostPerStudent = costPerStudentMonthly;
-
-    if (teacherHourlyRate < 12) {
-      const targetTeacherIncome = 12 * monthlyHours;
-      const requiredRoomCost = (totalMonthlyCost - targetTeacherIncome);
-      const maxDiscount = monthlyRoomCostTTC * 0.35;
-      
-      if ((monthlyRoomCostTTC - requiredRoomCost) <= maxDiscount) {
-        protectionApplied = true;
-        discountAmount = monthlyRoomCostTTC - requiredRoomCost;
-        discountPercentage = (discountAmount / monthlyRoomCostTTC) * 100;
-        finalRoomCost = requiredRoomCost;
-        
-        const adjustedTotalCost = targetTeacherIncome + finalRoomCost;
-        finalCostPerStudent = adjustedTotalCost / groupSize;
-      }
-    }
 
     return {
       teacherHourlyRate,
@@ -130,11 +101,7 @@ const ParentCostCalculator = () => {
       weeklyHours,
       sessionsPerMonth,
       selectedRoom,
-      protectionApplied,
-      discountPercentage,
-      discountAmount,
-      finalRoomCost,
-      finalCostPerStudent: protectionApplied ? finalCostPerStudent : costPerStudentMonthly
+      groupSize
     };
   };
 
@@ -205,12 +172,6 @@ const ParentCostCalculator = () => {
                   {formData.teacherHourlyRate} TND/h
                 </span>
               </div>
-              {formData.teacherHourlyRate < 12 && (
-                <p className="text-sm text-orange-600 mt-1 flex items-center gap-1">
-                  <Heart className="w-4 h-4" />
-                  Protection ELMAOUIA activée (minimum 12 TND/h garanti)
-                </p>
-              )}
             </div>
 
             {/* Session Duration */}
@@ -314,7 +275,7 @@ const ParentCostCalculator = () => {
               <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6 text-center">
                 <h3 className="text-lg font-medium text-gray-700 mb-2">Coût Mensuel par Étudiant</h3>
                 <div className="text-4xl font-bold text-green-600 mb-2">
-                  {formatCurrency(results.finalCostPerStudent)}
+                  {formatCurrency(results.costPerStudentMonthly)}
                 </div>
                 <p className="text-sm text-gray-600">
                   Pour {results.monthlyHours}h de cours par mois ({results.sessionsPerMonth} séances)
@@ -331,30 +292,18 @@ const ParentCostCalculator = () => {
                       {formatCurrency(results.monthlyTeacherIncome / results.groupSize)}
                     </span>
                   </div>
-                  
+
                   <div className="flex justify-between items-center py-2 border-b border-gray-200">
                     <span className="text-gray-600">Frais de salle (part/étudiant)</span>
                     <span className="font-semibold text-orange-600">
-                      {formatCurrency(results.finalRoomCost / results.groupSize)}
+                      {formatCurrency(results.monthlyRoomCostTTC / results.groupSize)}
                     </span>
                   </div>
 
-                  {results.protectionApplied && (
-                    <div className="flex justify-between items-center py-2 border-b border-gray-200">
-                      <span className="text-green-600 flex items-center gap-1">
-                        <Heart className="w-4 h-4" />
-                        Réduction ELMAOUIA
-                      </span>
-                      <span className="font-semibold text-green-600">
-                        -{formatCurrency(results.discountAmount / results.groupSize)}
-                      </span>
-                    </div>
-                  )}
-                  
                   <div className="flex justify-between items-center py-3 bg-white rounded-lg px-3">
                     <span className="font-semibold text-gray-800">Total par étudiant</span>
                     <span className="font-bold text-green-600 text-lg">
-                      {formatCurrency(results.finalCostPerStudent)}
+                      {formatCurrency(results.costPerStudentMonthly)}
                     </span>
                   </div>
                 </div>
@@ -365,13 +314,13 @@ const ParentCostCalculator = () => {
                 <div className="bg-blue-50 rounded-lg p-4 text-center">
                   <h4 className="font-semibold text-blue-800 mb-1">Par Séance</h4>
                   <p className="text-xl font-bold text-blue-600">
-                    {formatCurrency(results.finalCostPerStudent / results.sessionsPerMonth)}
+                    {formatCurrency(results.costPerStudentMonthly / results.sessionsPerMonth)}
                   </p>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-4 text-center">
                   <h4 className="font-semibold text-purple-800 mb-1">Par Heure</h4>
                   <p className="text-xl font-bold text-purple-600">
-                    {formatCurrency(results.finalCostPerStudent / results.monthlyHours)}
+                    {formatCurrency(results.costPerStudentMonthly / results.monthlyHours)}
                   </p>
                 </div>
               </div>
@@ -384,31 +333,6 @@ const ParentCostCalculator = () => {
                 <p className="text-sm text-gray-600 mt-2">
                   Tarif salle: {formatCurrency(results.roomRateHTVA)}/heure (HT)
                 </p>
-              </div>
-
-              {/* Teacher Protection Info */}
-              {results.protectionApplied && (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                    <h4 className="font-semibold text-green-800">Protection Enseignant Activée</h4>
-                  </div>
-                  <p className="text-sm text-green-700">
-                    ELMAOUIA garantit un minimum de 12 TND/heure à votre enseignant en appliquant 
-                    une réduction de {results.discountPercentage.toFixed(1)}% sur les frais de salle.
-                  </p>
-                </div>
-              )}
-
-              {/* Call to Action */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-                <h4 className="font-semibold text-blue-800 mb-2">Prêt à Commencer?</h4>
-                <p className="text-sm text-blue-700 mb-3">
-                  Contactez ELMAOUIA pour réserver votre place dans ce groupe d'apprentissage.
-                </p>
-                <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                  Réserver Maintenant
-                </button>
               </div>
             </div>
           ) : null}

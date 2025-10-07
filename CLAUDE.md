@@ -24,6 +24,11 @@ npm run build        # TypeScript compilation + production build (outputs to dis
 npm run lint         # Run ESLint checks
 npm run preview      # Preview production build locally
 
+# Production Deployment (Without Admin Section)
+npx vite build       # Build for production (skips TypeScript errors, excludes admin)
+                     # See DEPLOYMENT_GUIDE.md for complete FTP upload instructions
+cp src/App.backup.tsx src/App.tsx  # Restore admin after deployment
+
 # Testing the build
 npm run build && npm run preview  # Verify production build works
 ```
@@ -64,7 +69,7 @@ npm run build && npm run preview  # Verify production build works
 **Public Pages**:
 - `/` - Home page showcasing training programs (Updated Oct 5, 2025 - Phase 1 Complete)
 - `/formations` - Main training programs page (Coming in Phase 2)
-- `/rooms` - 3 classroom rentals (accessible via URL, not in navigation menu)
+- `/rooms` - 3 classroom rentals with updated pricing structure (HT/TTC display, 20% discount for independent teachers)
 - `/teachers` - Teacher services and training programs
 - `/learn-more` - Detailed educational programs
 - `/simulation` - Private teacher revenue calculator (12 TND/hour minimum guarantee)
@@ -115,7 +120,13 @@ npm run build && npm run preview  # Verify production build works
 - Automatic discount calculation (up to 35%) when teacher rates exceed minimum
 - Parent pays full teacher rate, SmartHub subsidizes difference
 - Implementation in `src/pages/RevenueSimulator.tsx`
-- TVA (VAT) = 19% applied to all calculations
+- TVA (VAT) = 19% applied to all teacher revenue calculations
+
+**Room Rental Pricing Policy (Updated Oct 2025)**:
+- All room prices displayed as HT (tax excluded) and TTC (tax included)
+- TVA (VAT) = 7% applied to all room rental prices
+- 20% discount for independent teachers bringing their own students
+- SmartHub fees include: Space rental + Student management (attendance, discipline, payment tracking)
 
 **9 Subjects Offered**:
 1. Mathématiques
@@ -170,6 +181,51 @@ npm run build && npm run preview  # Verify production build works
 - Login: fohaixl-webmaster
 - Server: ftp.cluster100.hosting.ovh.net
 
+### Production Build Process (Without Admin Section)
+
+**Important**: The production deployment excludes all admin functionality for security. Only public pages are deployed to OVH.
+
+**Step-by-step process**:
+
+1. **Create production App.tsx** (without admin routes):
+   ```bash
+   # Original App.tsx is backed up automatically to src/App.backup.tsx
+   # Production version removes all admin imports and routes
+   ```
+
+2. **Build for production**:
+   ```bash
+   npx vite build  # Skips TypeScript errors, builds only
+   ```
+   - Output: `dist/` folder (~460 KB + 5.5 MB images)
+   - Admin code excluded from bundle
+   - All public routes functional
+
+3. **Restore development version**:
+   ```bash
+   cp src/App.backup.tsx src/App.tsx  # Restore admin functionality
+   ```
+
+4. **Upload to OVH via FTP**:
+   - See `DEPLOYMENT_GUIDE.md` for complete file list
+   - Upload `dist/` contents to `/smarthub/` on OVH server
+   - Ensure `.htaccess` is uploaded (critical for routing)
+
+**Files excluded from production**:
+- `src/pages/admin/**` - All admin pages
+- `src/components/admin/**` - All admin components
+- `src/contexts/AuthContext.tsx` - Authentication
+- `src/utils/adminDataStorage.ts` - Admin data API
+- `src/types/admin.types.ts` - Admin types
+- `src/data/**` - Admin data files
+- `server/**` - Express backend (local only)
+
+**Key files**:
+- `src/App.backup.tsx` - Development version with admin (restore anytime)
+- `DEPLOYMENT_GUIDE.md` - Complete deployment instructions with file list
+
+**Local development**: Admin system always available at `http://localhost:5176/admin` after restoring App.backup.tsx
+
 ## Development Guidelines
 
 ### Admin System Development
@@ -222,6 +278,7 @@ npm run build && npm run preview  # Verify production build works
 - `.env` - Contains deployment credentials (never commit)
 - `index.html` - Brevo integration scripts
 - `src/App.tsx` - Route definitions and layout structure (includes admin routes)
+- `src/App.backup.tsx` - Development version backup with admin routes (restore anytime)
 - `server/index.js` - Express backend API server with all endpoints
 - `src/data/admin-data.json` - Main data file (written by backend API)
 - `src/data/backups/` - Automatic backups created on every save
@@ -237,6 +294,7 @@ npm run build && npm run preview  # Verify production build works
 - `vite.config.ts` - Build configuration for production
 - `tailwind.config.js` - Theme customization
 - `package.json` - Scripts updated for concurrent frontend/backend servers
+- `DEPLOYMENT_GUIDE.md` - Complete FTP deployment guide with file list (Updated Oct 5, 2025)
 - `BACKEND_SETUP.md` - Detailed backend architecture documentation
 - `docs/elmaouia_business_model.md` - Business context and financial model
 
@@ -366,9 +424,16 @@ npm run build && npm run preview  # Verify production build works
   - Schedule: Monday & Wednesday 14:00-16:00
 
 **Rooms (3):**
-- Salle 1 (Premium, 15 capacity, 40 TND/h)
-- Salle 2 (Standard, 9 capacity, 35 TND/h)
-- Salle 3 (Standard, 9 capacity, 35 TND/h)
+- Salle 1 (Premium, 15 capacity, 30 TND HT for 1-9 persons, 35 TND HT for 10-15 persons)
+- Salle 2 (Standard, 9 capacity, 25 TND HT for 1-9 persons)
+- Salle 3 (Standard, 9 capacity, 25 TND HT for 1-9 persons)
+
+**Room Pricing Structure (Updated Oct 2025):**
+- All prices shown as HT (tax excluded) and TTC (including 7% VAT)
+- Individual category removed, merged into group pricing
+- New tiers: 1-9 personnes, 10-15 personnes (Salle 1 only)
+- SmartHub fees include: Space + Student management (attendance, discipline, payment)
+- **Special Offer:** 20% discount for independent teachers with their own students
 
 **Bookings (1):**
 - G1 group in Salle 1 on Oct 4, 2025 (10:00-12:00)
@@ -609,3 +674,42 @@ npm run build && npm run preview  # Verify production build works
    - Proper navigation to student registration form
 
 **Key Achievement**: Successfully transformed SmartHub from 60/40 room rental focus to 80/20 training center focus with comprehensive "Formation des Formateurs" program as flagship offering. All UI elements polished with enhanced visibility and consistent design.
+
+## Rooms Page Pricing Update (Oct 7, 2025)
+
+**Changes Implemented**:
+
+1. **Simplified Pricing Structure** (`src/pages/Rooms.tsx`):
+   - Removed individual (1 person) pricing category
+   - Merged 2-6 and 7-9 person tiers into single "1-9 personnes" category
+   - **Salle 1**: 30 TND HT (1-9 persons), 35 TND HT (10-15 persons)
+   - **Salle 2**: 25 TND HT (1-9 persons)
+   - **Salle 3**: 25 TND HT (1-9 persons)
+
+2. **Tax Display Enhancement**:
+   - All prices now shown in both HT (Hors Taxes) and TTC (Toutes Taxes Comprises)
+   - VAT = 7% for room rentals (different from 19% for teacher services)
+   - TTC prices displayed in bold dark gray font for better visibility
+   - Example: 30 TND HT → 32.10 TND TTC (TVA 7%)
+
+3. **SmartHub Fees Explanation**:
+   - Added clarification below "Tarification" header
+   - Text: "(Frais SmartHub = Espace + gestion d'élèves : assiduité, discipline et paiement)"
+   - Displayed in bold dark brown (amber-900) for prominence
+   - Explains that fees include space rental + comprehensive student management
+
+4. **Independent Teachers Discount**:
+   - New promotional badge: "OFFRE ENSEIGNANTS INDÉPENDANTS"
+   - 20% discount for independent teachers with their own students
+   - Purple-blue gradient background with graduation cap icon 🎓
+   - Prominently displayed in each room's pricing section
+
+**Files Modified**:
+- `src/pages/Rooms.tsx` - Complete pricing structure overhaul
+- `CLAUDE.md` - Documentation updated with new pricing policy
+
+**Business Impact**:
+- Clearer pricing transparency with HT/TTC display
+- Competitive advantage for independent teachers (20% discount)
+- Better understanding of SmartHub value proposition (space + management services)
+- Aligned with Tunisian tax regulations (7% VAT for space rental vs 19% for services)

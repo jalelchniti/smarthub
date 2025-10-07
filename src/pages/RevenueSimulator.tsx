@@ -20,9 +20,7 @@ const TeacherRevenueCalculator = () => {
       capacity: 15,
       equipment: 'Projecteur Interactif, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 1, rate: 20 },
-        { min: 2, max: 6, rate: 25 },
-        { min: 7, max: 9, rate: 30 },
+        { min: 1, max: 9, rate: 30 },
         { min: 10, max: 15, rate: 35 }
       ]
     },
@@ -31,9 +29,7 @@ const TeacherRevenueCalculator = () => {
       capacity: 9,
       equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 1, rate: 15 },
-        { min: 2, max: 7, rate: 20 },
-        { min: 8, max: 9, rate: 25 }
+        { min: 1, max: 9, rate: 25 }
       ]
     },
     '3': {
@@ -41,9 +37,7 @@ const TeacherRevenueCalculator = () => {
       capacity: 9,
       equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 1, rate: 15 },
-        { min: 2, max: 7, rate: 20 },
-        { min: 8, max: 9, rate: 25 }
+        { min: 1, max: 9, rate: 25 }
       ]
     }
   };
@@ -64,7 +58,7 @@ const TeacherRevenueCalculator = () => {
     const monthlyHours = weeklyHours * 4;
     const monthlyStudentRevenue = studentFee * studentCount;
     const monthlyRoomCostHTVA = roomRateHTVA * monthlyHours;
-    const monthlyRoomCostTTC = monthlyRoomCostHTVA * 1.19;
+    const monthlyRoomCostTTC = monthlyRoomCostHTVA * 1.07;
     
     const baseTeacherIncome = monthlyStudentRevenue - monthlyRoomCostTTC;
     const baseTeacherRate = baseTeacherIncome / monthlyHours;
@@ -191,7 +185,7 @@ const TeacherRevenueCalculator = () => {
                           <div className="text-lg font-bold text-green-600">
                             {getRoomRate(id, formData.studentCount)} TND/h
                           </div>
-                          <div className="text-xs text-gray-500">HTVA</div>
+                          <div className="text-xs text-gray-500">HT</div>
                         </div>
                       </div>
                     </div>
@@ -376,7 +370,7 @@ const TeacherRevenueCalculator = () => {
                   <p className="text-sm text-gray-600 mb-1">{selectedRoom.name}</p>
                   <p className="text-sm text-gray-600 mb-1">{selectedRoom.equipment}</p>
                   <p className="text-sm font-semibold text-blue-600">
-                    {results.roomRateHTVA} TND/h HTVA pour {formData.studentCount} étudiant{formData.studentCount > 1 ? 's' : ''}
+                    {results.roomRateHTVA} TND/h HT pour {formData.studentCount} étudiant{formData.studentCount > 1 ? 's' : ''}
                   </p>
                 </div>
               </div>
