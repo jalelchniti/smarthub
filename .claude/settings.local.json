@@ -15,7 +15,9 @@
       "Bash(find:*)",
       "Bash(npx vite:*)",
       "Bash(npm run dev:client:*)",
-      "Bash(timeout 5 bash -c 'until curl -s http://localhost:5174 > /dev/null; do sleep 0.5; done && echo \"\"Server ready\"\"')"
+      "Bash(timeout 5 bash -c 'until curl -s http://localhost:5174 > /dev/null; do sleep 0.5; done && echo \"\"Server ready\"\"')",
+      "Bash(npm run server:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []

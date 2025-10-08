@@ -118,30 +118,6 @@ const Teachers = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-blue-600 mb-2">18+</div>
-              <div className="text-gray-700">Programmes de Formation</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-green-600 mb-2">300+</div>
-              <div className="text-gray-700">Apprenants Formés</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-purple-600 mb-2">15+</div>
-              <div className="text-gray-700">Enseignants Certifiés</div>
-            </div>
-            <div className="bg-white rounded-xl p-6 shadow-lg">
-              <div className="text-3xl font-bold text-orange-600 mb-2">95%</div>
-              <div className="text-gray-700">Taux de Réussite</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">

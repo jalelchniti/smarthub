@@ -188,24 +188,9 @@ export const LearnMore: React.FC = () => {
             </h2>
             
             <p className="text-xl md:text-2xl text-blue-100 mb-12 text-center max-w-4xl mx-auto leading-relaxed">
-              Rejoignez des centaines d'étudiants qui apprennent déjà avec des enseignants qualifiés chez SmartHub. 
+              Rejoignez des centaines d'étudiants qui apprennent déjà avec des enseignants qualifiés chez SmartHub.
               Inscrivez-vous maintenant pour déverrouiller votre tableau de bord personnalisé et commencer à vous connecter avec des éducateurs experts.
             </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-yellow-400 mb-2">29+</div>
-                <div className="text-blue-100">Enseignants Experts</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-yellow-400 mb-2">4.9★</div>
-                <div className="text-blue-100">Note Moyenne</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-yellow-400 mb-2">234h</div>
-                <div className="text-blue-100">Disponibilité Hebdomadaire</div>
-              </div>
-            </div>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/register/student">

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import GoogleMapEmbed from '../components/GoogleMapEmbed';
-import { MapPin, Users, Star, CheckCircle, ArrowRight, Building, Globe, Phone, X, UserPlus, BookOpen, Target, Laptop, GraduationCap } from 'lucide-react';
+import { MapPin, Users, CheckCircle, ArrowRight, Building, Globe, Phone, X, UserPlus, BookOpen, Target, Laptop, GraduationCap } from 'lucide-react';
 
 export const Home = () => {
   const [showMap, setShowMap] = useState(false);
@@ -82,13 +82,6 @@ export const Home = () => {
     }
   ];
 
-  const stats = [
-    { number: '300+', label: 'Étudiants Formés', icon: Users, color: 'from-blue-600 to-indigo-600' },
-    { number: '18+', label: 'Programmes de Formation', icon: BookOpen, color: 'from-green-600 to-teal-600' },
-    { number: '15+', label: 'Enseignants Certifiés', icon: GraduationCap, color: 'from-purple-600 to-pink-600' },
-    { number: '95%', label: 'Taux de Réussite', icon: Star, color: 'from-yellow-500 to-orange-500' }
-  ];
-
   return (
     <div className="text-center">
       {/* Hero Section */}
@@ -143,30 +136,6 @@ export const Home = () => {
             <div className="flex items-center justify-center space-x-2 text-blue-200">
               <CheckCircle className="w-6 h-6 text-green-400" />
               <span className="text-center text-lg">Centre éducatif premium • Enseignants qualifiés • Équipements modernes</span>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      {/* Enhanced Stats Section */}
-      <section className="relative section-padding text-center bg-white">
-        <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
-              {stats.map((stat, index) => {
-                const IconComponent = stat.icon;
-                return (
-                  <div key={index} className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 transform hover:scale-105 transition-all duration-300">
-                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${stat.color} mb-4 shadow-lg`}>
-                      <IconComponent className="w-8 h-8 text-white" />
-                    </div>
-                    <div className={`text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r ${stat.color} mb-2`}>
-                      {stat.number}
-                    </div>
-                    <div className="text-gray-600 font-medium">{stat.label}</div>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>
@@ -263,23 +232,8 @@ export const Home = () => {
             
             <p className="text-xl md:text-2xl text-gray-600 mb-12 text-center max-w-4xl mx-auto leading-relaxed">
               Rejoignez SmartHub et bénéficiez de nos formations de qualité avec des enseignants certifiés et des programmes adaptés.
-              <span className="font-semibold text-indigo-600">Première séance d'essai gratuite</span> pour découvrir nos méthodes d'enseignement.
+              <span className="font-semibold text-indigo-600"> Première séance d'essai gratuite</span> pour découvrir nos méthodes d'enseignement.
             </p>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-teal-600 mb-2">18+</div>
-                <div className="text-gray-600">Programmes de Formation</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-2">300+</div>
-                <div className="text-gray-600">Étudiants & Enseignants Formés</div>
-              </div>
-              <div className="text-center">
-                <div className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-2">95%</div>
-                <div className="text-gray-600">Taux de Réussite</div>
-              </div>
-            </div>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
               <Link to="/register/student">
