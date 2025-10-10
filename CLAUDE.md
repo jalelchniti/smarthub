@@ -487,15 +487,18 @@ npm run build && npm run preview  # Verify production build works
   - Schedule: Monday & Wednesday 14:00-16:00
 
 **Rooms (3):**
-- Salle 1 (Premium, 15 capacity, 30 TND HT for 1-9 persons, 35 TND HT for 10-15 persons)
-- Salle 2 (Standard, 9 capacity, 25 TND HT for 1-9 persons)
-- Salle 3 (Standard, 9 capacity, 25 TND HT for 1-9 persons)
+- Salle 1 (Premium, 15 capacity, 25 TND HT unified pricing)
+- Salle 2 (Standard, 9 capacity, 20 TND HT unified pricing)
+- Salle 3 (Standard, 9 capacity, 20 TND HT unified pricing)
 
-**Room Pricing Structure (Updated Oct 2025):**
-- All prices shown as HT (tax excluded) and TTC (including 7% VAT)
-- Individual category removed, merged into group pricing
-- New tiers: 1-9 personnes, 10-15 personnes (Salle 1 only)
-- SmartHub fees include: Space + Student management (attendance, discipline, payment)
+**Room Pricing Structure (Updated Oct 10, 2025):**
+- **Unified Pricing Model**: Single flat rate per room (no capacity-based tiers)
+- **Salle 1**: 25 TND HT (26.75 TND TTC with 7% VAT) - Capacity 1-15 persons
+- **Salle 2**: 20 TND HT (21.40 TND TTC with 7% VAT) - Capacity 1-9 persons
+- **Salle 3**: 20 TND HT (21.40 TND TTC with 7% VAT) - Capacity 1-9 persons
+- All prices shown as HT (tax excluded) and TTC (tax included)
+- TVA (VAT) = 7% applied to all room rental prices
+- SmartHub fees include: Space rental + Student management (attendance, discipline, payment tracking)
 - **Special Offer:** 20% discount for independent teachers with their own students
 
 **Bookings (1):**
@@ -738,22 +741,22 @@ npm run build && npm run preview  # Verify production build works
 
 **Key Achievement**: Successfully transformed SmartHub from 60/40 room rental focus to 80/20 training center focus with comprehensive "Formation des Formateurs" program as flagship offering. All UI elements polished with enhanced visibility and consistent design.
 
-## Rooms Page Pricing Update (Oct 7, 2025)
+## Rooms Page Pricing Update (Oct 10, 2025)
 
 **Changes Implemented**:
 
-1. **Simplified Pricing Structure** (`src/pages/Rooms.tsx`):
-   - Removed individual (1 person) pricing category
-   - Merged 2-6 and 7-9 person tiers into single "1-9 personnes" category
-   - **Salle 1**: 30 TND HT (1-9 persons), 35 TND HT (10-15 persons)
-   - **Salle 2**: 25 TND HT (1-9 persons)
-   - **Salle 3**: 25 TND HT (1-9 persons)
+1. **Unified Pricing Structure** (`src/pages/Rooms.tsx`):
+   - Removed all capacity-based tiered pricing
+   - Implemented single flat rate per room regardless of capacity
+   - **Salle 1**: 25 TND HT (unified for 1-15 persons)
+   - **Salle 2**: 20 TND HT (unified for 1-9 persons)
+   - **Salle 3**: 20 TND HT (unified for 1-9 persons)
 
 2. **Tax Display Enhancement**:
    - All prices now shown in both HT (Hors Taxes) and TTC (Toutes Taxes Comprises)
    - VAT = 7% for room rentals (different from 19% for teacher services)
    - TTC prices displayed in bold dark gray font for better visibility
-   - Example: 30 TND HT → 32.10 TND TTC (TVA 7%)
+   - Example: 25 TND HT → 26.75 TND TTC (TVA 7%)
 
 3. **SmartHub Fees Explanation**:
    - Added clarification below "Tarification" header
@@ -768,10 +771,15 @@ npm run build && npm run preview  # Verify production build works
    - Prominently displayed in each room's pricing section
 
 **Files Modified**:
-- `src/pages/Rooms.tsx` - Complete pricing structure overhaul
-- `CLAUDE.md` - Documentation updated with new pricing policy
+- `src/pages/Rooms.tsx` - Unified pricing structure implemented
+- `src/pages/RevenueSimulator.tsx` - Updated to match unified pricing
+- `src/pages/parent-cost-simulator.tsx` - Already had correct unified pricing
+- `CLAUDE.md` - Documentation updated with unified pricing policy
 
 **Business Impact**:
+- **Simplified pricing model**: Easier to understand and communicate
+- **No capacity tiers**: Same price regardless of group size (fairer for small groups)
+- **Salle 1 now more affordable**: Reduced from 30-35 TND to flat 25 TND HT
 - Clearer pricing transparency with HT/TTC display
 - Competitive advantage for independent teachers (20% discount)
 - Better understanding of SmartHub value proposition (space + management services)

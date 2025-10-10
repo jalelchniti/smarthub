@@ -7,7 +7,8 @@ const TeacherRevenueCalculator = () => {
     studentCount: 6,
     sessionHours: 2,
     sessionsPerWeek: 2,
-    studentFee: 120
+    studentFee: 120,
+    bringOwnStudents: false
   });
 
   const [results, setResults] = useState<any>(null);
@@ -20,8 +21,7 @@ const TeacherRevenueCalculator = () => {
       capacity: 15,
       equipment: 'Projecteur Interactif, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 9, rate: 30 },
-        { min: 10, max: 15, rate: 35 }
+        { min: 1, max: 15, rate: 25 }
       ]
     },
     '2': {
@@ -29,7 +29,7 @@ const TeacherRevenueCalculator = () => {
       capacity: 9,
       equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 9, rate: 25 }
+        { min: 1, max: 9, rate: 20 }
       ]
     },
     '3': {
@@ -37,7 +37,7 @@ const TeacherRevenueCalculator = () => {
       capacity: 9,
       equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 9, rate: 25 }
+        { min: 1, max: 9, rate: 20 }
       ]
     }
   };
@@ -52,12 +52,17 @@ const TeacherRevenueCalculator = () => {
   };
 
   // Calculate teacher protection
-  const calculateProtectedRevenue = (roomId: string, studentCount: number, hours: number, studentFee: number, sessionsPerWeek: number) => {
-    const roomRateHTVA = getRoomRate(roomId, studentCount);
+  const calculateProtectedRevenue = (roomId: string, studentCount: number, hours: number, studentFee: number, sessionsPerWeek: number, bringOwnStudents: boolean) => {
+    let roomRateHTVA = getRoomRate(roomId, studentCount);
+
+    // Apply 20% discount if bringing own students
+    const roomDiscount = bringOwnStudents ? 0.20 : 0;
+    const discountedRoomRate = roomRateHTVA * (1 - roomDiscount);
+
     const weeklyHours = hours * sessionsPerWeek;
     const monthlyHours = weeklyHours * 4;
     const monthlyStudentRevenue = studentFee * studentCount;
-    const monthlyRoomCostHTVA = roomRateHTVA * monthlyHours;
+    const monthlyRoomCostHTVA = discountedRoomRate * monthlyHours;
     const monthlyRoomCostTTC = monthlyRoomCostHTVA * 1.07;
     
     const baseTeacherIncome = monthlyStudentRevenue - monthlyRoomCostTTC;
@@ -97,7 +102,11 @@ const TeacherRevenueCalculator = () => {
       teacherFinalRate,
       teacherMonthlyIncome: monthlyStudentRevenue - finalRoomCostTTC,
       monthlyHours,
-      roomRateHTVA
+      roomRateHTVA,
+      originalRoomRate: roomRateHTVA,
+      discountedRoomRate,
+      roomDiscountApplied: bringOwnStudents,
+      roomDiscountAmount: (roomRateHTVA - discountedRoomRate) * monthlyHours
     };
   };
 
@@ -122,7 +131,8 @@ const TeacherRevenueCalculator = () => {
           formData.studentCount,
           formData.sessionHours,
           formData.studentFee,
-          formData.sessionsPerWeek
+          formData.sessionsPerWeek,
+          formData.bringOwnStudents
         );
         setResults(calculation as any);
       }
@@ -259,6 +269,26 @@ const TeacherRevenueCalculator = () => {
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                 />
               </div>
+
+              {/* Bring Own Students Checkbox */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-xl p-4">
+                <label className="flex items-start cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.bringOwnStudents}
+                    onChange={(e) => handleInputChange('bringOwnStudents', e.target.checked)}
+                    className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-2 focus:ring-purple-500 mt-0.5 mr-3"
+                  />
+                  <div className="flex-1">
+                    <span className="font-semibold text-gray-800 block mb-1">
+                      J'amène mes propres étudiants
+                    </span>
+                    <span className="text-sm text-gray-600">
+                      Bénéficiez de <span className="font-bold text-purple-700">20% de réduction</span> sur les frais de location de salle (HT)
+                    </span>
+                  </div>
+                </label>
+              </div>
             </div>
           </div>
 
@@ -340,7 +370,14 @@ const TeacherRevenueCalculator = () => {
                     <span className="text-gray-600">Coût salle (base):</span>
                     <span className="font-semibold">{results.baseRoomCostTTC.toFixed(0)} TND TTC</span>
                   </div>
-                  
+
+                  {results.roomDiscountApplied && (
+                    <div className="flex justify-between py-2 border-b border-gray-100 bg-purple-50">
+                      <span className="text-purple-700 font-medium">Réduction étudiants propres (-20%):</span>
+                      <span className="font-semibold text-purple-700">-{results.roomDiscountAmount.toFixed(0)} TND</span>
+                    </div>
+                  )}
+
                   {results.discountApplied && (
                     <div className="flex justify-between py-2 border-b border-gray-100">
                       <span className="text-orange-600">Remise protection:</span>
@@ -369,9 +406,20 @@ const TeacherRevenueCalculator = () => {
                   <h4 className="font-semibold text-gray-800 mb-2">Information Salle</h4>
                   <p className="text-sm text-gray-600 mb-1">{selectedRoom.name}</p>
                   <p className="text-sm text-gray-600 mb-1">{selectedRoom.equipment}</p>
-                  <p className="text-sm font-semibold text-blue-600">
-                    {results.roomRateHTVA} TND/h HT pour {formData.studentCount} étudiant{formData.studentCount > 1 ? 's' : ''}
-                  </p>
+                  {results.roomDiscountApplied ? (
+                    <>
+                      <p className="text-sm text-gray-500 line-through">
+                        {results.originalRoomRate} TND/h HT (tarif normal)
+                      </p>
+                      <p className="text-sm font-semibold text-purple-600">
+                        {results.discountedRoomRate.toFixed(2)} TND/h HT (avec -20%) pour {formData.studentCount} étudiant{formData.studentCount > 1 ? 's' : ''}
+                      </p>
+                    </>
+                  ) : (
+                    <p className="text-sm font-semibold text-blue-600">
+                      {results.roomRateHTVA} TND/h HT pour {formData.studentCount} étudiant{formData.studentCount > 1 ? 's' : ''}
+                    </p>
+                  )}
                 </div>
               </div>
             )}

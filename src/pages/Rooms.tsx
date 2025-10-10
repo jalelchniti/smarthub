@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import GoogleMapEmbed from '../components/GoogleMapEmbed';
-import { MapPin, Users, Clock, Wifi, Monitor, Building, CheckCircle, Calendar, X, MessageCircle, Calculator } from 'lucide-react';
+import { MapPin, Users, Clock, Wifi, Monitor, Building, CheckCircle, Calendar, X, MessageCircle, Calculator, GraduationCap } from 'lucide-react';
 
 interface Room {
   id: string;
@@ -59,8 +59,7 @@ export const Rooms: React.FC = () => {
         { icon: Clock, text: '78 heures/semaine' }
       ],
       pricing: [
-        { capacity: '1-9 personnes', rate: 30 },
-        { capacity: '10-15 personnes', rate: 35 }
+        { capacity: 'Tarif unique', rate: 25 }
       ],
       availability: '78 hours/week',
       image: '/images/salle-1-1.jpg',
@@ -81,7 +80,7 @@ export const Rooms: React.FC = () => {
         { icon: Clock, text: '78 heures/semaine' }
       ],
       pricing: [
-        { capacity: '1-9 personnes', rate: 25 }
+        { capacity: 'Tarif unique', rate: 20 }
       ],
       availability: '78 hours/week',
       image: '/images/salle2-1.jpg',
@@ -102,7 +101,7 @@ export const Rooms: React.FC = () => {
         { icon: Clock, text: '78 heures/semaine' }
       ],
       pricing: [
-        { capacity: '1-9 personnes', rate: 25 }
+        { capacity: 'Tarif unique', rate: 20 }
       ],
       availability: '78 hours/week',
       image: '/images/salle3-1.jpg',
@@ -165,10 +164,10 @@ export const Rooms: React.FC = () => {
                 
                 <div className="text-center">
                   <div className="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-red-600 mb-2">
-                    15-35
+                    20-25
                   </div>
                   <div className="text-xl font-semibold text-gray-700 mb-2">TND/Heure</div>
-                  <div className="text-gray-600">Tarification flexible</div>
+                  <div className="text-gray-600">Tarifs HT</div>
                 </div>
               </div>
             </div>
@@ -179,7 +178,7 @@ export const Rooms: React.FC = () => {
       {/* Enhanced Rooms Grid */}
       <section className="section-padding text-center bg-gray-50">
         <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
-          <div className="text-center max-w-4xl mx-auto mb-16">
+          <div className="text-center max-w-4xl mx-auto mb-8">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 text-center">
               Nos Espaces d'Apprentissage
             </h2>
@@ -187,7 +186,29 @@ export const Rooms: React.FC = () => {
               Découvrez nos salles modernes et équipées pour vos besoins éducatifs
             </p>
           </div>
-          
+
+          {/* Special Offer Banner for Independent Teachers */}
+          <div className="max-w-4xl mx-auto mb-12">
+            <div className="bg-gradient-to-r from-purple-600 via-blue-600 to-purple-600 rounded-2xl p-6 shadow-2xl border-2 border-purple-300">
+              <div className="flex items-center justify-center gap-4 flex-wrap">
+                <div className="bg-white rounded-full p-3">
+                  <GraduationCap className="w-8 h-8 text-purple-600" />
+                </div>
+                <div className="text-center">
+                  <div className="text-sm font-bold text-purple-200 uppercase tracking-wide mb-1">
+                    OFFRE ENSEIGNANTS INDÉPENDANTS
+                  </div>
+                  <div className="text-2xl md:text-3xl font-bold text-white">
+                    <span className="text-yellow-300">-20%</span> de Réduction
+                  </div>
+                  <div className="text-sm text-purple-100 mt-1">
+                    Pour les enseignants qui amènent leurs propres étudiants
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Rooms Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-center items-stretch">
             {rooms.map((room) => (
@@ -276,17 +297,6 @@ export const Rooms: React.FC = () => {
                             </div>
                           </div>
                         ))}
-                      </div>
-
-                      {/* Teacher Discount Notice */}
-                      <div className="mb-6 p-3 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg border-2 border-purple-300">
-                        <div className="flex items-center justify-center gap-2 mb-1">
-                          <span className="text-2xl">🎓</span>
-                          <span className="text-sm font-bold text-purple-900">OFFRE ENSEIGNANTS INDÉPENDANTS</span>
-                        </div>
-                        <p className="text-xs text-purple-800 font-bold">
-                          -20% de réduction pour les enseignants avec leurs propres étudiants
-                        </p>
                       </div>
 
                       <div className="text-center border-t border-green-200 pt-4">

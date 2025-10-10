@@ -22,8 +22,7 @@ const ParentCostCalculator = () => {
       capacity: 15,
       equipment: 'Projecteur Interactif, Climatisation, WiFi Premium',
       pricing: [
-        { min: 1, max: 9, rate: 30 },
-        { min: 10, max: 15, rate: 35 }
+        { min: 1, max: 15, rate: 25 }
       ]
     },
     '2': {
@@ -31,7 +30,7 @@ const ParentCostCalculator = () => {
       capacity: 9,
       equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 9, rate: 25 }
+        { min: 1, max: 9, rate: 20 }
       ]
     },
     '3': {
@@ -39,7 +38,7 @@ const ParentCostCalculator = () => {
       capacity: 9,
       equipment: 'Tableau Blanc, Climatisation, WiFi',
       pricing: [
-        { min: 1, max: 9, rate: 25 }
+        { min: 1, max: 9, rate: 20 }
       ]
     }
   };
