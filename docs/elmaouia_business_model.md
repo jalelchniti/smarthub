@@ -79,22 +79,25 @@
 
 ## 📚 **Service Categories & Pricing Structure**
 
-### **Current Room-Based Pricing Implementation**
+### **Current Room-Based Pricing Implementation (Updated Oct 10, 2025)**
 
-**Room 1 (Premium Large Capacity - 15 people):**
-- **Tier 1**: Individual (1 learner) → **20 TND/hour** (+5 TND premium)
-- **Tier 2**: Small Groups (2-6 people) → **25 TND/hour** (+5 TND premium)
-- **Tier 3**: Medium Groups (7-9 people) → **30 TND/hour** (+5 TND premium)
-- **Tier 4**: Large Groups (10-15 people) → **35 TND/hour**
+**Unified Pricing Model** - Single flat rate per room, no capacity-based tiers:
+
+**Room 1 (Premium - 15 people capacity):**
+- **Unified Rate**: **25 TND/hour HT** (26.75 TND TTC with 7% VAT)
+- **Capacity**: 1-15 people (single flat rate regardless of group size)
 - **Equipment**: Interactive Projector, Air Conditioning, High-Speed WiFi, Premium Features
-- **Applications**: Professional presentations, large group training, corporate workshops, advanced educational sessions
+- **Applications**: All group sizes from individual tutoring to large group training, professional presentations, corporate workshops
 
-**Rooms 2-3 (Medium Capacity - 9 people each):**
-- **Tier 1**: Individual (1 learner) → **15 TND/hour**
-- **Tier 2**: Small Groups (2-6 people) → **20 TND/hour**
-- **Tier 3**: Medium Groups (7-9 people) → **25 TND/hour**
+**Rooms 2-3 (Standard - 9 people capacity each):**
+- **Unified Rate**: **20 TND/hour HT** (21.40 TND TTC with 7% VAT)
+- **Capacity**: 1-9 people (single flat rate regardless of group size)
 - **Equipment**: Whiteboard, Air Conditioning, High-Speed WiFi
-- **Applications**: Private tutoring, small group sessions, medium group workshops
+- **Applications**: All group sizes from individual tutoring to medium group workshops
+
+**Special Offer:**
+- **20% discount** for independent teachers bringing their own students
+- Discounted rates: Room 1 = 20 TND HT (21.40 TND TTC), Rooms 2-3 = 16 TND HT (17.12 TND TTC)
 
 ### **Conceptual 6-Level Educational Framework**
 *Strategic framework for future implementation based on CEFR-aligned complexity:*
@@ -119,24 +122,27 @@
 
 ## 📈 **Revenue Optimization Strategy**
 
-### **Occupancy Targets & Financial Projections**
-- **Conservative Scenario (60% occupancy)**: 
+### **Occupancy Targets & Financial Projections (Updated Oct 10, 2025)**
+
+*Based on unified pricing model: Room 1 (25 TND), Rooms 2-3 (20 TND)*
+
+- **Conservative Scenario (60% occupancy)**:
   - Weekly Hours: 115 hours utilized (out of 192 total)
-  - Average Rate: 25 TND/hour
-  - **Monthly Revenue**: ~12,400 TND
-  - **Annual Revenue**: ~148,800 TND
+  - Average Rate: 21.7 TND/hour (33% Room 1 bookings, 67% Rooms 2-3)
+  - **Monthly Revenue**: ~10,800 TND
+  - **Annual Revenue**: ~129,600 TND
 
 - **Target Scenario (70% occupancy)**:
   - Weekly Hours: 134 hours utilized (out of 192 total)
-  - Average Rate: 27 TND/hour
-  - **Monthly Revenue**: ~15,700 TND
-  - **Annual Revenue**: ~188,400 TND
+  - Average Rate: 22 TND/hour (40% Room 1 bookings, 60% Rooms 2-3)
+  - **Monthly Revenue**: ~12,800 TND
+  - **Annual Revenue**: ~153,600 TND
 
 - **Optimal Scenario (75% occupancy)**:
   - Weekly Hours: 144 hours utilized (out of 192 total)
-  - Average Rate: 30 TND/hour
-  - **Monthly Revenue**: ~18,700 TND
-  - **Annual Revenue**: ~224,400 TND
+  - Average Rate: 22.5 TND/hour (50% Room 1 bookings, 50% Rooms 2-3)
+  - **Monthly Revenue**: ~14,000 TND
+  - **Annual Revenue**: ~168,000 TND
 
 ### **Pricing Optimization Mechanisms**
 
@@ -159,11 +165,11 @@
 - **Teacher Payment**: 70% of booking value
 - **Value-Added Services**: Equipment, marketing, payment processing
 
-### **Break-Even Analysis**
+### **Break-Even Analysis (Updated Oct 10, 2025)**
 - **Monthly Fixed Costs**: 2,449.100 TND
-- **Break-Even Hours**: ~98 hours/month (at 25 TND average)
-- **Break-Even Occupancy**: ~51% of total capacity (192 hours/week)
-- **Safety Margin**: Target 70% provides 37% buffer above break-even
+- **Break-Even Hours**: ~111 hours/month (at 22 TND average rate with unified pricing)
+- **Break-Even Occupancy**: ~58% of total capacity (192 hours/week)
+- **Safety Margin**: Target 70% provides 21% buffer above break-even
 
 ---
 
@@ -201,9 +207,9 @@
 - **Facility Maintenance**: Equipment and space management
 - **Quality Assurance**: Service standards maintenance
 
-### **Key Performance Indicators (KPIs)**
+### **Key Performance Indicators (KPIs) (Updated Oct 10, 2025)**
 - **Occupancy Rate**: Target 70% (134 hours/week utilized out of 192 available)
-- **Average Hourly Rate**: Target 27 TND (20% above break-even rate)
+- **Average Hourly Rate**: Target 22 TND (with balanced Room 1/Rooms 2-3 mix)
 - **Customer Retention**: 80% teacher return rate quarterly
 - **Revenue Growth**: 15% year-over-year increase target
 - **Profit Margin**: Target 25% net margin after all expenses
@@ -237,11 +243,11 @@
 - **Technology platform licensing** to other educational facilities
 - **Corporate training division** with premium pricing (50+ TND/hour)
 
-### **Success Metrics Timeline**
-- **Month 3**: 45% occupancy, break-even achieved
-- **Month 6**: 60% occupancy, 12,400 TND monthly revenue
-- **Month 12**: 70% occupancy, 15,700 TND monthly revenue
-- **Year 2**: 75% occupancy, 18,700 TND monthly revenue, expansion planning
+### **Success Metrics Timeline (Updated Oct 10, 2025)**
+- **Month 3**: 45% occupancy, approaching break-even
+- **Month 6**: 60% occupancy, 10,800 TND monthly revenue
+- **Month 12**: 70% occupancy, 12,800 TND monthly revenue
+- **Year 2**: 75% occupancy, 14,000 TND monthly revenue, expansion planning
 
 ---
 
