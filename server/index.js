@@ -6,6 +6,7 @@ import cors from 'cors';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import multer from 'multer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +20,41 @@ const DATA_FILE_PATH = path.join(__dirname, '../src/data/admin-data.json');
 // Middleware
 app.use(cors()); // Allow requests from React frontend
 app.use(express.json({ limit: '10mb' })); // Parse JSON bodies
+
+// Serve static files from public/uploads directory
+app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadType = req.path.includes('teacher') ? 'teachers' : 'students';
+    const uploadPath = path.join(__dirname, '../public/uploads', uploadType);
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const uploadType = req.path.includes('teacher') ? 'teacher' : 'student';
+    const entityId = req.body.entityId || Date.now();
+    const extension = path.extname(file.originalname);
+    cb(null, `${uploadType}-${entityId}${extension}`);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  fileFilter: (req, file, cb) => {
+    // Accept images only
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed (jpeg, jpg, png, gif, webp)'));
+    }
+  }
+});
 
 // Request logging middleware
 app.use((req, res, next) => {
@@ -150,6 +186,96 @@ app.post('/api/admin/restore', async (req, res) => {
     console.error('Error restoring backup:', error);
     res.status(500).json({
       error: 'Failed to restore backup',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/upload/teacher
+ * Upload teacher photo
+ */
+app.post('/api/upload/teacher', upload.single('photo'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const photoPath = `/uploads/teachers/${req.file.filename}`;
+
+    res.json({
+      success: true,
+      photoPath,
+      filename: req.file.filename,
+      message: 'Teacher photo uploaded successfully'
+    });
+  } catch (error) {
+    console.error('Error uploading teacher photo:', error);
+    res.status(500).json({
+      error: 'Failed to upload photo',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/upload/student
+ * Upload student photo
+ */
+app.post('/api/upload/student', upload.single('photo'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    const photoPath = `/uploads/students/${req.file.filename}`;
+
+    res.json({
+      success: true,
+      photoPath,
+      filename: req.file.filename,
+      message: 'Student photo uploaded successfully'
+    });
+  } catch (error) {
+    console.error('Error uploading student photo:', error);
+    res.status(500).json({
+      error: 'Failed to upload photo',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * DELETE /api/upload/:type/:filename
+ * Delete uploaded photo
+ */
+app.delete('/api/upload/:type/:filename', async (req, res) => {
+  try {
+    const { type, filename } = req.params;
+
+    if (type !== 'teachers' && type !== 'students') {
+      return res.status(400).json({ error: 'Invalid upload type' });
+    }
+
+    const filePath = path.join(__dirname, '../public/uploads', type, filename);
+
+    try {
+      await fs.unlink(filePath);
+      res.json({
+        success: true,
+        message: 'Photo deleted successfully'
+      });
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        res.status(404).json({ error: 'File not found' });
+      } else {
+        throw error;
+      }
+    }
+  } catch (error) {
+    console.error('Error deleting photo:', error);
+    res.status(500).json({
+      error: 'Failed to delete photo',
       message: error.message
     });
   }

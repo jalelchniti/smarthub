@@ -25,6 +25,8 @@ export interface Teacher {
   name: string;
   email: string;
   phone: string;
+  bio?: string; // Teacher biography/description
+  photo?: string; // Profile photo path (e.g., "/uploads/teachers/teacher-001.jpg")
   subjects: string[]; // From 9 subjects offered
   payment_terms: {
     hourly_rate: number; // 35 or 40 TND
@@ -44,6 +46,8 @@ export interface Student {
   name: string;
   date_of_birth?: string; // YYYY-MM-DD
   id_number?: string; // National ID
+  grade?: string; // Student's current grade/level (e.g., "Bac", "4ème année secondaire", etc.)
+  photo?: string; // Profile photo path (e.g., "/uploads/students/student-001.jpg")
   email: string;
   phone: string;
   address?: string;
@@ -267,6 +271,8 @@ export interface StudentFormData {
   phone: string;
   date_of_birth?: string;
   id_number?: string;
+  grade?: string;
+  photo?: string;
   address?: string;
   parent_name: string;
   parent_relationship: 'father' | 'mother' | 'guardian';
@@ -281,6 +287,8 @@ export interface TeacherFormData {
   name: string;
   email: string;
   phone: string;
+  bio?: string;
+  photo?: string;
   subjects: string[];
   hourly_rate: number;
   category: 'A1-A2' | 'B1-B4';
