@@ -3,16 +3,126 @@ import { useState, useEffect } from 'react';
 import { AdminDataStorage } from '../utils/adminDataStorage';
 import type { Teacher } from '../types/admin.types';
 
+// Static fallback data for production (when backend is unavailable)
+const FALLBACK_TEACHERS: Teacher[] = [
+  {
+    id: "teacher-1760347610830",
+    name: "Jalel Chniti",
+    email: "jalel.chniti@gmail.com",
+    phone: "22484874",
+    bio: "Titulaire d'une maîtrise en anglais depuis 1985 avec 29 ans d'expérience complète dans l'enseignement. A travaillé 15 ans dans les établissements publics et 14 ans dans le secteur privé. Spécialisé dans l'enseignement de l'anglais pour tous les niveaux avec une approche pédagogique adaptée.",
+    photo: "/uploads/teachers/teacher-1760357584848.jpg",
+    subjects: ["Anglais"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-13T09:26:50.830Z",
+    updated_at: "2025-10-13T12:13:05.080Z"
+  },
+  {
+    id: "teacher-1760346451966",
+    name: "Sassia Rahali",
+    email: "no_mail@gmail.com",
+    phone: "27073733",
+    bio: "Docteure en Mathématiques depuis 2017 avec 8 ans d'expérience dans l'enseignement. Actuellement enseignante à l'établissement Bouedbdelli. Spécialisée dans l'enseignement des mathématiques pour tous les niveaux académiques avec une approche moderne basée sur la recherche et les méthodes pédagogiques innovantes.",
+    photo: "/uploads/teachers/teacher-1760346451833.jpg",
+    subjects: ["Mathématiques"],
+    payment_terms: { hourly_rate: 25, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-13T09:07:31.966Z",
+    updated_at: "2025-10-13T09:08:23.878Z"
+  },
+  {
+    id: "teacher-1760179920783",
+    name: "Meriem Kharrazi",
+    email: "kharrazimeriem@gmail.com",
+    phone: "29038392",
+    bio: "Enseignante d'anglais avec une expérience significative dans le domaine du Content Web et de la rédaction. Spécialisée dans l'enseignement de l'anglais pour les enfants avec des méthodes ludiques et interactives. Expertise dans l'adaptation des cours selon l'âge et le niveau de chaque enfant.",
+    subjects: ["Anglais"],
+    payment_terms: { hourly_rate: 30, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:52:00.783Z",
+    updated_at: "2025-10-13T09:09:11.437Z",
+    photo: "/uploads/teachers/teacher-1760344727117.jpg"
+  },
+  {
+    id: "teacher-1760179508272",
+    name: "Alaya Hassan",
+    email: "hassen.allaya@yahoo.fr",
+    phone: "93572857",
+    bio: "Docteur en Biologie avec 21 ans d'expérience dans l'enseignement public des Sciences de la Vie et de la Terre. Actuellement enseignant au prestigieux Lycée Pilote de Tunis. Spécialisé dans l'enseignement de la SVT pour tous les niveaux secondaires avec une approche scientifique rigoureuse et des méthodes pédagogiques adaptées aux programmes tunisiens et internationaux.",
+    subjects: ["Sciences de la Vie et de la Terre"],
+    payment_terms: { hourly_rate: 40, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:45:08.272Z",
+    updated_at: "2025-10-13T12:13:28.638Z",
+    photo: "/uploads/teachers/teacher-1760357608465.jpg"
+  },
+  {
+    id: "teacher-1760179158355",
+    name: "Hasna Ben Jeddou",
+    email: "nomail@gmail.com",
+    phone: "52833204",
+    bio: "Enseignante chevronnée avec 30 ans d'expérience professionnelle. Spécialisée en français, arabe et mathématiques pour le primaire. Enseigne également l'arabe pour tous les niveaux et le français pour le collège et secondaire. Expertise particulière dans l'accompagnement des élèves présentant des difficultés comportementales.",
+    subjects: ["Français", "Arabe", "Mathématiques"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:39:18.355Z",
+    updated_at: "2025-10-13T09:29:33.090Z",
+    photo: "/uploads/teachers/teacher-1760344750026.jpg"
+  },
+  {
+    id: "teacher-1760179001866",
+    name: "Belhassan Dridi",
+    email: "belhassendridi73@gmail.com",
+    phone: "23860280",
+    bio: "Enseignant en Économie et Gestion avec 14 ans d'expérience dans le soutien scolaire. Spécialisé dans l'enseignement de la gestion pour tous les niveaux académiques et de l'économie pour la 2ème année secondaire. Approche pédagogique adaptée aux besoins spécifiques de chaque élève.",
+    subjects: ["Économie & Gestion"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:36:41.866Z",
+    updated_at: "2025-10-13T08:58:07.759Z",
+    photo: "/uploads/teachers/teacher-1760345887547.jpg"
+  },
+  {
+    id: "teacher-1760178560067",
+    name: "Khaoula Missaoui",
+    email: "misskawla13@gmail.com",
+    phone: "58755809",
+    bio: "Docteure en Chimie avec 15 ans d'expérience dans l'enseignement des mathématiques et de la physique, dont 4 ans dans l'enseignement supérieur. Spécialisée dans l'enseignement de la physique-chimie pour tous les niveaux académiques du collège au baccalauréat. Approche pédagogique basée sur l'expérimentation et la compréhension approfondie des concepts scientifiques.",
+    subjects: ["Mathématiques", "Physique"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:29:20.067Z",
+    updated_at: "2025-10-13T12:13:47.045Z",
+    photo: "/uploads/teachers/teacher-1760357626872.jpg"
+  },
+  {
+    id: "teacher-1760177231544",
+    name: "Mohamed Amara",
+    email: "amaramoh59@gmail.com",
+    phone: "53214449",
+    bio: "Titulaire d'une maîtrise en mathématiques depuis 1989 avec 34 ans d'enseignement aux lycées et collèges. Expérience également sur les plateformes éducatives en ligne. A enseigné tous les niveaux de la 7ème de base jusqu'au baccalauréat toutes sections. Dispose d'une chaîne YouTube dédiée aux mathématiques.",
+    subjects: ["Mathématiques"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:07:11.544Z",
+    updated_at: "2025-10-13T09:10:34.590Z",
+    photo: "/uploads/teachers/teacher-1760181301130.jpg"
+  }
+];
+
 const Teachers = () => {
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch teachers from backend API
+  // Fetch teachers from backend API with fallback to static data
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
         setLoading(true);
+
+        // Try to load from backend
         const data = await AdminDataStorage.load();
 
         // Get only active teachers with photos, sorted by creation date (newest first)
@@ -27,8 +137,10 @@ const Teachers = () => {
         setTeachers(activeTeachersWithPhotos);
         setError(null);
       } catch (err) {
-        console.error('Failed to load teachers:', err);
-        setError('Impossible de charger les enseignants. Vérifiez que le serveur est démarré.');
+        console.log('Backend unavailable, using static fallback data');
+        // Use static fallback data for production
+        setTeachers(FALLBACK_TEACHERS);
+        setError(null);
       } finally {
         setLoading(false);
       }
@@ -39,6 +151,7 @@ const Teachers = () => {
 
   // Calculate years of experience from bio or use default
   const getExperience = (teacher: Teacher): string => {
+    if (!teacher.bio) return 'Expérimenté';
     const bioMatch = teacher.bio.match(/(\d+)\s*ans/i);
     if (bioMatch) {
       return `${bioMatch[1]} ans`;
@@ -47,7 +160,8 @@ const Teachers = () => {
   };
 
   // Truncate bio to exact word count for uniform card heights
-  const truncateBio = (bio: string, wordLimit: number = 35): string => {
+  const truncateBio = (bio: string | undefined, wordLimit: number = 35): string => {
+    if (!bio) return '';
     const words = bio.trim().split(/\s+/);
     if (words.length <= wordLimit) {
       return bio;
@@ -69,7 +183,7 @@ const Teachers = () => {
 
   const handleWhatsAppContact = () => {
     const message = `Bonjour! Je suis intéressé(e) par les services SmartHub.`;
-    window.open(`https://wa.me/21699456059?text=${encodeURIComponent(message)}`, '_blank');
+    window.open(`https://wa.me/21699730144?text=${encodeURIComponent(message)}`, '_blank');
   };
 
 
@@ -188,7 +302,7 @@ const Teachers = () => {
                     </div>
 
                     {/* Bio */}
-                    <div className="mb-16 h-[160px]">
+                    <div className="mb-24 h-[160px]">
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                         Profil
                       </div>
@@ -201,7 +315,7 @@ const Teachers = () => {
                     <button
                       onClick={() => {
                         const message = `Bonjour! Je suis intéressé(e) par les cours de ${teacher.name} (${teacher.subjects.join(', ')}). Pouvez-vous me donner plus d'informations?`;
-                        window.open(`https://wa.me/21699456059?text=${encodeURIComponent(message)}`, '_blank');
+                        window.open(`https://wa.me/21699730144?text=${encodeURIComponent(message)}`, '_blank');
                       }}
                       className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                     >

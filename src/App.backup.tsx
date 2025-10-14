@@ -22,6 +22,7 @@ import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminBookings from './pages/admin/Bookings';
 import AdminStudents from './pages/admin/Students';
+import AdminTeachers from './pages/admin/Teachers';
 import AdminStudentPayments from './pages/admin/StudentPayments';
 import AdminDataPreview from './pages/admin/DataPreview';
 
@@ -46,10 +47,11 @@ function App() {
                 <Route path="/student-payments" element={<AdminStudentPayments />} />
                 {/* Data Preview - All Data with Filtering */}
                 <Route path="/data-preview" element={<AdminDataPreview />} />
+                {/* Teachers Management - Phase 4 */}
+                <Route path="/teachers" element={<AdminTeachers />} />
                 {/* Placeholder routes - will be implemented in future phases */}
                 <Route path="/room-status" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Statut des Salles</h2><p className="text-gray-600 mt-2">En cours de développement</p></div>} />
                 <Route path="/working-hours" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Horaires de Travail</h2><p className="text-gray-600 mt-2">En cours de développement</p></div>} />
-                <Route path="/teachers" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Gestion des Enseignants</h2><p className="text-gray-600 mt-2">En cours de développement</p></div>} />
                 <Route path="/teacher-payments" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Paiements Enseignants</h2><p className="text-gray-600 mt-2">En cours de développement</p></div>} />
                 <Route path="/reports" element={<div className="text-center py-12"><h2 className="text-2xl font-bold text-gray-900">Rapports Financiers</h2><p className="text-gray-600 mt-2">En cours de développement</p></div>} />
               </Routes>

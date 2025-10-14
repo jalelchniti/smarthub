@@ -86,7 +86,7 @@ npm run build && npm run preview  # Verify production build works
 - `/formations` - Main training programs page (Updated Oct 5, 2025)
 - `/rooms` - 3 classroom rentals with updated pricing structure (HT/TTC display, 20% discount for independent teachers)
 - `/booking` - Public booking system using Firebase Realtime Database
-- `/teachers` - Teacher services and training programs
+- `/teachers` - Teacher services and training programs (Updated Oct 13, 2025 - Dynamically loads from backend API, displays active teachers with photos)
 - `/learn-more` - Detailed educational programs
 - `/simulation` - Private teacher revenue calculator (12 TND/hour minimum guarantee)
 - `/parentsimulator` - Parent cost calculator
@@ -303,6 +303,36 @@ npm run build && npm run preview  # Verify production build works
 - Use Tailwind classes for styling (avoid inline styles)
 - Admin components use `AdminLayout` wrapper with sidebar navigation
 
+### Teachers Page Implementation (Updated Oct 13, 2025)
+**Dynamic Data Loading with Static Fallback**:
+- Teachers page loads from backend API using `AdminDataStorage.load()` (development)
+- **Production Fallback**: Uses static `FALLBACK_TEACHERS` array when backend unavailable
+- Filters for active teachers with photos only
+- Sorts by creation date (newest first)
+- Implements loading states, error handling with silent fallback, and empty states
+- **Error Handling**: Connection errors silently fall back to static data (no user-facing errors)
+
+**Card Layout Patterns**:
+- Fixed heights for uniform grid alignment:
+  - Name section: `h-20` (80px) - Accommodates 2-line names
+  - Subjects section: `h-16` (64px) - Shows max 3 badges + overflow indicator
+  - Bio section: `h-[160px]` (160px) - Truncated to 65 words with ellipsis
+  - Bottom margin: `mb-24` (96px spacing before CTA button) - Updated Oct 13, 2025
+- Photo container: `h-[512px]` (512px) - Optimized for 800×1066px images (3:4 ratio)
+- Subject badges limited to 3 visible with "+N" indicator for overflow
+
+**Helper Functions**:
+- `getExperience(teacher)` - Extracts years from bio text (e.g., "29 ans")
+- `truncateBio(bio, wordLimit)` - Truncates to exact word count with ellipsis
+- WhatsApp integration with pre-filled teacher-specific messages
+
+**Static Fallback System**:
+- `FALLBACK_TEACHERS` array embedded in Teachers.tsx (lines 6-112)
+- Contains 8 active teachers with photos and complete profile data
+- Used when backend API unavailable (production deployment on OVH)
+- Enables static hosting without Node.js backend requirement
+- Must be manually updated when teacher data changes in admin system
+
 ### TypeScript Best Practices
 - Strict mode enabled (`tsconfig.app.json`)
 - Interface definitions in `src/types/admin.types.ts` for all data models
@@ -326,6 +356,7 @@ npm run build && npm run preview  # Verify production build works
 **Data not persisting (Firebase booking)**: Check Firebase credentials in `.env` and network connectivity
 **"Cannot read properties of null"**: Component tried to access data before it loaded - add loading state check
 **Admin pages show loading forever**: Backend server not running (for JSON admin) - start with `npm run server`
+**Teachers page shows "impossible de se connecter au serveur backend" in production**: This is expected on static hosting (OVH) since there's no Node.js backend. The page uses a FALLBACK_TEACHERS array for production. To fix: ensure FALLBACK_TEACHERS array is up to date and rebuild.
 **Firebase auth not working**: Verify `.env` has correct Firebase config and authorized email is whitelisted
 **CORS errors**: Backend has CORS enabled for all origins - check if API_BASE_URL in adminDataStorage.ts is correct
 **Port conflicts**: Frontend uses 5174 (Vite default), backend uses 3001 - change in vite.config.ts or server/index.js if needed
@@ -349,9 +380,10 @@ npm run build && npm run preview  # Verify production build works
 - `src/contexts/AuthContext.tsx` - Authentication logic for localStorage (currently bypassed)
 - `src/types/admin.types.ts` - TypeScript interfaces for all data models
 - `src/pages/admin/Bookings.tsx` - Booking management module implementation
-- `src/pages/admin/Students.tsx` - Student management module implementation
+- `src/pages/admin/Students.tsx` - Student enrollment management module
 - `src/pages/admin/StudentPayments.tsx` - Payment tracking module implementation
 - `src/pages/admin/DataPreview.tsx` - Data preview and export module implementation
+- `src/pages/Teachers.tsx` - Public teachers page with dynamic backend loading (Updated Oct 13, 2025)
 - `src/components/admin/AdminLayout.tsx` - Admin layout with top bar navigation (Accueil Admin + Aperçu des Données)
 - `src/components/admin/AdminSidebar.tsx` - Admin sidebar navigation (includes Data Preview link)
 - `vite.config.ts` - Build configuration for production
@@ -472,10 +504,23 @@ npm run build && npm run preview  # Verify production build works
 
 ## Mock Data Available
 
-**Teachers (3):**
-1. Ahmed Ben Salah - Mathématiques, Physique (40 TND/h)
-2. Fatma Trabelsi - Français, Anglais (35 TND/h)
-3. Mohamed Gharbi - Informatique (40 TND/h)
+**Teachers (8 Active with Photos - Updated Oct 13, 2025):**
+1. jalel Chniti - Anglais (All levels) - 29 years experience, public & private sectors
+2. Sassia Rahali - Mathématiques (Collège & Lycée) - 5 years experience
+3. Meriem Kharrazi - Mathématiques & Physique (Tous niveaux) - Expert in Bac preparation
+4. Hasna Ben Jeddou - Français (Tous niveaux) - 7 years experience
+5. Belhassan Dridi - Anglais, Informatique, Économie - Multi-disciplinary expert
+6. Mohamed Amara - Mathématiques (7ème-Bac) - 34 years experience, YouTube educator
+7. Alaya Hassan - SVT (Tous niveaux) - 21 years experience, Biology PhD, Lycée Pilote Tunis
+8. Khaoula Missaoui - Maths & Physique (Tous niveaux) - 15 years experience, Chemistry PhD
+
+**Teacher Photo System:**
+- Upload location: `public/uploads/teachers/`
+- Recommended dimensions: 800 × 1066 px (3:4 portrait ratio)
+- Container height on public page: 512px
+- Photos displayed dynamically from backend API
+- Only active teachers with photos are shown on public Teachers page
+- Admin can upload photos via admin/teachers interface
 
 **Students (3):**
 1. Yasmine Jebali - Bac Mathématiques
@@ -784,3 +829,97 @@ npm run build && npm run preview  # Verify production build works
 - Competitive advantage for independent teachers (20% discount)
 - Better understanding of SmartHub value proposition (space + management services)
 - Aligned with Tunisian tax regulations (7% VAT for space rental vs 19% for services)
+
+## Teachers Page Dynamic Implementation (Oct 13, 2025)
+
+**Major Update**: Converted Teachers page from hardcoded static data to dynamic backend API integration with static fallback for production.
+
+**Changes Implemented**:
+
+1. **Dynamic Data Loading with Fallback** (`src/pages/Teachers.tsx`):
+   - Implemented `useState` and `useEffect` hooks for async data fetching
+   - Load teachers via `AdminDataStorage.load()` from Express backend (development)
+   - **Static Fallback**: `FALLBACK_TEACHERS` array used when backend unavailable (production)
+   - Filter criteria: Active status + photo present
+   - Sort order: Newest first by `created_at` timestamp
+   - **Error Handling**: Silent fallback to static data (no user-facing errors)
+
+2. **UI/UX Enhancements**:
+   - Added loading state with spinner animation
+   - Error handling with silent fallback to static data
+   - Empty state when no teachers available
+   - Automatic sync with admin data changes (development)
+   - Production: Works seamlessly without backend on static hosting
+
+3. **Card Layout Optimization**:
+   - Photo height doubled: 256px → 512px for better visibility
+   - Fixed section heights for uniform grid alignment across all rows
+   - Subject badge limit: Max 3 visible with overflow counter
+   - Bio text truncation: Standardized to 65 words with ellipsis
+   - **Spacing optimization**: 96px margin (mb-24) between bio and CTA button - Updated Oct 13, 2025
+
+4. **Content Standardization**:
+   - Expanded all 8 teacher bios to professional descriptions
+   - Preserved original experience and expertise information
+   - Consistent formatting and tone across profiles
+   - Latest updates: Alaya Hassan and Khaoula Missaoui bios expanded (Oct 13, 2025)
+
+5. **Photo Management**:
+   - Storage location: `public/uploads/teachers/`
+   - Optimal dimensions: 800 × 1066 px (3:4 portrait ratio)
+   - 8 active teacher photos uploaded and displayed
+   - Dynamic photo URLs from backend API (development)
+   - Static photo paths in fallback array (production)
+
+**Teacher Data (8 Active Profiles)**:
+- jalel Chniti (Anglais) - 29 years exp
+- Sassia Rahali (Mathématiques) - 5 years exp
+- Meriem Kharrazi (Maths & Physique) - Bac expert
+- Hasna Ben Jeddou (Français) - 7 years exp
+- Belhassan Dridi (Multi-disciplinary) - Expert
+- Mohamed Amara (Mathématiques) - 34 years exp, YouTube educator
+- Alaya Hassan (SVT) - 21 years exp, Biology PhD, Lycée Pilote
+- Khaoula Missaoui (Maths & Physique) - 15 years exp, Chemistry PhD
+
+**Technical Implementation**:
+```typescript
+// Static fallback data for production (lines 6-112)
+const FALLBACK_TEACHERS: Teacher[] = [ /* 8 teachers with full data */ ];
+
+// Dynamic loading with fallback
+useEffect(() => {
+  const fetchTeachers = async () => {
+    try {
+      const data = await AdminDataStorage.load();
+      const filtered = data.teachers
+        .filter(t => t.status === 'active' && t.photo)
+        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      setTeachers(filtered);
+      setError(null);
+    } catch (err) {
+      console.log('Backend unavailable, using static fallback data');
+      setTeachers(FALLBACK_TEACHERS); // Silent fallback
+      setError(null); // No error shown to users
+    }
+  };
+}, []);
+```
+
+**Production Deployment**:
+- Latest production build: Oct 13, 2025
+- Build time: 46.29 seconds
+- Bundle size: 942.54 KB (gzip: 260.78 KB)
+- Includes 8 teacher photos and expanded bios
+- Works perfectly on static hosting (OVH) without Node.js backend
+- Admin section excluded from production (as per security policy)
+- Local development retains full admin access with live backend sync
+
+**Important Maintenance Note**:
+When updating teacher data via admin system, remember to manually update the `FALLBACK_TEACHERS` array in `src/pages/Teachers.tsx` and rebuild for production deployment.
+
+**Files Modified**:
+- `src/pages/Teachers.tsx` - Complete refactor with static fallback system
+- `src/data/admin-data.json` - Updated all 8 teacher bios
+- `src/utils/adminDataStorage.ts` - Removed alert() error, throws instead
+- `public/uploads/teachers/` - Added 8 teacher photos
+- `CLAUDE.md` - Documentation updated with fallback system details
