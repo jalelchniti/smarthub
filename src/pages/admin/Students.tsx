@@ -1,7 +1,31 @@
 import { useState, useMemo, useEffect } from 'react';
-import { Users, Search, Plus, Edit2, Trash2, UserCheck, UserX, Filter, Phone, Mail, Calendar } from 'lucide-react';
+import { Users, Search, Plus, Edit2, Trash2, UserCheck, UserX, Filter, Phone, Mail, Calendar, Upload, X } from 'lucide-react';
 import { AdminDataStorage } from '../../utils/adminDataStorage';
+import { uploadStudentPhoto, getPhotoUrl, deletePhoto } from '../../utils/uploadService';
 import type { Student, AdminData } from '../../types/admin.types';
+
+// Tunisian education system grade levels
+const GRADE_OPTIONS = [
+  // Primary
+  '1ère année primaire',
+  '2ème année primaire',
+  '3ème année primaire',
+  '4ème année primaire',
+  '5ème année primaire',
+  '6ème année primaire',
+  // College (Middle School)
+  '7ème année (1ère collège)',
+  '8ème année (2ème collège)',
+  '9ème année (3ème collège)',
+  // Secondary (High School)
+  '1ère année secondaire',
+  '2ème année secondaire',
+  '3ème année secondaire',
+  '4ème année secondaire (Bac)',
+  // Higher Education
+  'Universitaire',
+  'Autre'
+];
 
 export default function AdminStudents() {
   const [adminData, setAdminData] = useState<AdminData | null>(null);
@@ -11,11 +35,18 @@ export default function AdminStudents() {
   const [showModal, setShowModal] = useState(false);
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
 
+  // Photo upload states
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string>('');
+  const [uploading, setUploading] = useState(false);
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
     date_of_birth: '',
     id_number: '',
+    grade: '',
+    photo: '',
     email: '',
     phone: '',
     address: '',
@@ -71,47 +102,86 @@ export default function AdminStudents() {
     });
   }, [adminData, filterStatus, searchTerm]);
 
+  // Handle photo file selection
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPhotoFile(file);
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Clear photo selection
+  const clearPhoto = () => {
+    setPhotoFile(null);
+    setPhotoPreview('');
+    setFormData({ ...formData, photo: '' });
+  };
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!adminData) return;
 
-    if (editingStudent) {
-      // Update existing student
-      const updated = adminData.students.map(s =>
-        s.id === editingStudent.id
-          ? {
-              ...s,
-              ...formData,
-              updated_at: new Date().toISOString()
-            }
-          : s
-      );
+    try {
+      setUploading(true);
+      let photoPath = formData.photo;
 
-      const newData = { ...adminData, students: updated, last_updated: new Date().toISOString() };
-      await AdminDataStorage.save(newData);
-      setAdminData(newData);
-    } else {
-      // Create new student
-      const newStudent: Student = {
-        id: `student-${Date.now()}`,
-        ...formData,
-        registration_date: new Date().toISOString().split('T')[0],
-        status: 'active',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      };
+      // Upload photo if a new file is selected
+      if (photoFile) {
+        const tempId = editingStudent?.id || `student-${Date.now()}`;
+        photoPath = await uploadStudentPhoto(photoFile, tempId);
+      }
 
-      const newData = {
-        ...adminData,
-        students: [...adminData.students, newStudent],
-        last_updated: new Date().toISOString()
-      };
-      await AdminDataStorage.save(newData);
-      setAdminData(newData);
+      if (editingStudent) {
+        // Update existing student
+        const updated = adminData.students.map(s =>
+          s.id === editingStudent.id
+            ? {
+                ...s,
+                ...formData,
+                photo: photoPath,
+                updated_at: new Date().toISOString()
+              }
+            : s
+        );
+
+        const newData = { ...adminData, students: updated, last_updated: new Date().toISOString() };
+        await AdminDataStorage.save(newData);
+        setAdminData(newData);
+      } else {
+        // Create new student
+        const newStudent: Student = {
+          id: `student-${Date.now()}`,
+          ...formData,
+          photo: photoPath,
+          registration_date: new Date().toISOString().split('T')[0],
+          status: 'active',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
+        const newData = {
+          ...adminData,
+          students: [...adminData.students, newStudent],
+          last_updated: new Date().toISOString()
+        };
+        await AdminDataStorage.save(newData);
+        setAdminData(newData);
+      }
+
+      resetForm();
+    } catch (error) {
+      console.error('Error saving student:', error);
+      alert('Erreur lors de la sauvegarde: ' + (error as Error).message);
+    } finally {
+      setUploading(false);
     }
-
-    resetForm();
   };
 
   // Reset form
@@ -120,6 +190,8 @@ export default function AdminStudents() {
       name: '',
       date_of_birth: '',
       id_number: '',
+      grade: '',
+      photo: '',
       email: '',
       phone: '',
       address: '',
@@ -131,6 +203,8 @@ export default function AdminStudents() {
       emergency_contact_phone: '',
       notes: ''
     });
+    setPhotoFile(null);
+    setPhotoPreview('');
     setEditingStudent(null);
     setShowModal(false);
   };
@@ -142,6 +216,8 @@ export default function AdminStudents() {
       name: student.name,
       date_of_birth: student.date_of_birth || '',
       id_number: student.id_number || '',
+      grade: student.grade || '',
+      photo: student.photo || '',
       email: student.email,
       phone: student.phone,
       address: student.address || '',
@@ -153,6 +229,10 @@ export default function AdminStudents() {
       emergency_contact_phone: student.emergency_contact_phone,
       notes: student.notes || ''
     });
+    // Set photo preview if student has a photo
+    if (student.photo) {
+      setPhotoPreview(getPhotoUrl(student.photo));
+    }
     setShowModal(true);
   };
 
@@ -318,11 +398,29 @@ export default function AdminStudents() {
                 {filteredStudents.map((student) => (
                   <tr key={student.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">{student.name}</div>
-                        {student.id_number && (
-                          <div className="text-sm text-gray-500">CIN: {student.id_number}</div>
+                      <div className="flex items-center gap-3">
+                        {/* Photo Avatar */}
+                        {student.photo ? (
+                          <img
+                            src={getPhotoUrl(student.photo)}
+                            alt={student.name}
+                            className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-green-500 flex items-center justify-center text-white font-semibold text-lg">
+                            {student.name.charAt(0).toUpperCase()}
+                          </div>
                         )}
+                        {/* Name, Grade and CIN */}
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{student.name}</div>
+                          {student.grade && (
+                            <div className="text-sm text-blue-600 font-medium">{student.grade}</div>
+                          )}
+                          {student.id_number && (
+                            <div className="text-sm text-gray-500">CIN: {student.id_number}</div>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -444,6 +542,75 @@ export default function AdminStudents() {
                       onChange={(e) => setFormData({ ...formData, id_number: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     />
+                  </div>
+
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Niveau Scolaire
+                    </label>
+                    <select
+                      value={formData.grade}
+                      onChange={(e) => setFormData({ ...formData, grade: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    >
+                      <option value="">Sélectionner un niveau...</option>
+                      {GRADE_OPTIONS.map((grade) => (
+                        <option key={grade} value={grade}>{grade}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Photo Upload */}
+                  <div className="col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Photo de profil
+                    </label>
+                    <div className="flex items-start gap-4">
+                      {/* Photo Preview */}
+                      <div className="flex-shrink-0">
+                        {photoPreview ? (
+                          <div className="relative">
+                            <img
+                              src={photoPreview}
+                              alt="Preview"
+                              className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                            />
+                            <button
+                              type="button"
+                              onClick={clearPhoto}
+                              className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center text-gray-400">
+                            <Upload className="w-8 h-8" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Upload Button */}
+                      <div className="flex-1">
+                        <input
+                          type="file"
+                          id="student-photo-upload"
+                          accept="image/*"
+                          onChange={handlePhotoChange}
+                          className="hidden"
+                        />
+                        <label
+                          htmlFor="student-photo-upload"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
+                        >
+                          <Upload className="w-4 h-4" />
+                          {photoPreview ? 'Changer la photo' : 'Choisir une photo'}
+                        </label>
+                        <p className="text-xs text-gray-500 mt-2">
+                          JPG, PNG, GIF ou WEBP (max 5 MB)
+                        </p>
+                      </div>
+                    </div>
                   </div>
 
                   <div>
@@ -596,15 +763,24 @@ export default function AdminStudents() {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  disabled={uploading}
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  disabled={uploading}
+                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
-                  {editingStudent ? 'Mettre à jour' : 'Ajouter'}
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Enregistrement...
+                    </>
+                  ) : (
+                    editingStudent ? 'Mettre à jour' : 'Ajouter'
+                  )}
                 </button>
               </div>
             </form>

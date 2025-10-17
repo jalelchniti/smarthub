@@ -142,6 +142,9 @@ export const OurMission = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <link rel="canonical" href="https://smarthub.com.tn/our-mission" />
+      <title>Notre Mission - SmartHub</title>
+      <meta name="description" content="Découvrez la mission de SmartHub : offrir un environnement d'apprentissage d'excellence pour les étudiants et un cadre professionnel valorisant pour les enseignants." />
       {/* 1. Hero Section - Who We Are */}
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

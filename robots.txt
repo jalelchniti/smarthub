@@ -1,0 +1,13 @@
+# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+
+User-agent: *
+Disallow: /admin
+Disallow: /src/
+Disallow: /node_modules/
+Disallow: /server/
+
+# Allow all other content
+Allow: /
+
+# Sitemap location
+Sitemap: https://smarthub.com.tn/sitemap.xml

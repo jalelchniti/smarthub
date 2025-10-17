@@ -22,6 +22,7 @@ import AdminLogin from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
 import AdminBookings from './pages/admin/Bookings';
 import AdminStudents from './pages/admin/Students';
+import AdminGroups from './pages/admin/Groups';
 import AdminTeachers from './pages/admin/Teachers';
 import AdminStudentPayments from './pages/admin/StudentPayments';
 import AdminDataPreview from './pages/admin/DataPreview';
@@ -43,6 +44,8 @@ function App() {
                 <Route path="/bookings" element={<AdminBookings />} />
                 {/* Students Management - Phase 4 */}
                 <Route path="/students" element={<AdminStudents />} />
+                {/* Groups Management - NEW */}
+                <Route path="/groups" element={<AdminGroups />} />
                 {/* Student Payments - Phase 5 */}
                 <Route path="/student-payments" element={<AdminStudentPayments />} />
                 {/* Data Preview - All Data with Filtering */}

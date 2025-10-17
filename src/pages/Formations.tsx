@@ -26,6 +26,9 @@ import {
 export const Formations = () => {
   return (
     <div className="min-h-screen">
+      <link rel="canonical" href="https://smarthub.com.tn/formations" />
+      <title>Programmes de Formation - SmartHub</title>
+      <meta name="description" content="Découvrez nos formations complètes à SmartHub : soutien scolaire, préparation aux examens, formations pour adultes, et notre programme Digital Teacher." />
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-indigo-900 via-blue-800 to-purple-900 text-white py-32 overflow-hidden">
         {/* Background effects */}
@@ -557,7 +560,7 @@ export const Formations = () => {
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />
-                  <span className="text-gray-700">Facebook, Instagram, LinkedIn, TikTok</span>
+                  <span className="text-gray-700"><a href="https://www.facebook.com/smarthub.com.tn" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Facebook</a>, Instagram, <a href="https://www.linkedin.com/company/smarthubtunis" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">LinkedIn</a>, TikTok</span>
                 </li>
                 <li className="flex items-start">
                   <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-1 flex-shrink-0" />

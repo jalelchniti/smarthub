@@ -111,6 +111,9 @@ export const Rooms: React.FC = () => {
 
   return (
     <div className="text-center">
+      <link rel="canonical" href="https://smarthub.com.tn/rooms" />
+      <title>Espaces d'Apprentissage - SmartHub</title>
+      <meta name="description" content="Découvrez nos salles de cours et espaces d'apprentissage modernes et équipés à louer au centre de Tunis. Parfait pour les enseignants, tuteurs et formateurs." />
       {/* Hero Section with Animated Background */}
       <section className="relative bg-gradient-to-br from-green-900 via-teal-800 to-blue-900 text-white section-padding overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-20"></div>

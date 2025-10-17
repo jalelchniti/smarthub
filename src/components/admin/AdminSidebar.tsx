@@ -14,7 +14,8 @@ import {
   BarChart3,
   LogOut,
   Home,
-  Database
+  Database,
+  UsersRound
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import type { UserRole } from '../../types/admin.types';
@@ -55,6 +56,12 @@ const navItems: NavItem[] = [
     icon: Users,
     label: 'Étudiants',
     path: '/admin/students',
+    allowedRoles: ['manager', 'staff']
+  },
+  {
+    icon: UsersRound,
+    label: 'Groupes',
+    path: '/admin/groups',
     allowedRoles: ['manager', 'staff']
   },
   {

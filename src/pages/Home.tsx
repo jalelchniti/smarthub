@@ -84,6 +84,9 @@ export const Home = () => {
 
   return (
     <div className="text-center">
+      <link rel="canonical" href="https://smarthub.com.tn/" />
+      <title>SmartHub - Espaces d'Apprentissage & Enseignants Experts à Tunis</title>
+      <meta name="description" content="SmartHub - Espaces d'apprentissage professionnels et enseignants qualifiés au centre de Tunis. Location de salles équipées et services éducatifs personnalisés." />
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white section-padding overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-20"></div>

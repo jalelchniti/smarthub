@@ -97,6 +97,19 @@ const FALLBACK_TEACHERS: Teacher[] = [
     photo: "/uploads/teachers/teacher-1760357626872.jpg"
   },
   {
+    id: "teacher-1760178372739",
+    name: "Sahla Soltani",
+    email: "Soltanisahla1@gmail.com",
+    phone: "24768062",
+    bio: "Enseignante d'arabe avec 26 ans d'expérience dans l'enseignement public. Spécialisée dans l'enseignement de la langue arabe pour tous les niveaux du collège et du secondaire. Expertise dans la grammaire, la littérature arabe classique et moderne, et la préparation aux examens nationaux.",
+    subjects: ["Arabe"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:26:12.739Z",
+    updated_at: "2025-10-17T09:49:05.901Z",
+    photo: "/uploads/teachers/teacher-1760694545672.jpg"
+  },
+  {
     id: "teacher-1760177231544",
     name: "Mohamed Amara",
     email: "amaramoh59@gmail.com",
@@ -108,6 +121,19 @@ const FALLBACK_TEACHERS: Teacher[] = [
     created_at: "2025-10-11T10:07:11.544Z",
     updated_at: "2025-10-13T09:10:34.590Z",
     photo: "/uploads/teachers/teacher-1760181301130.jpg"
+  },
+  {
+    id: "teacher-1760178861202",
+    name: "Arbia kéfi",
+    email: "arbiakefi81@gmail.com",
+    phone: "22167823",
+    bio: "Enseignante d'informatique avec 15 ans d'expérience dans l'enseignement public. Spécialisée dans l'enseignement de l'informatique pour tous les niveaux du collège au baccalauréat. Expertise en programmation, algorithmique et préparation au Bac Informatique. Approche pédagogique moderne basée sur la pratique et les projets concrets.",
+    subjects: ["Informatique"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:34:21.202Z",
+    updated_at: "2025-10-14T10:00:24.552Z",
+    photo: "/uploads/teachers/teacher-1760436024328.jpg"
   }
 ];
 
@@ -190,6 +216,9 @@ const Teachers = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <link rel="canonical" href="https://smarthub.com.tn/teachers" />
+      <title>Nos Enseignants - SmartHub</title>
+      <meta name="description" content="Découvrez nos enseignants experts et qualifiés à SmartHub. Une équipe de professionnels passionnés par l'éducation et la réussite de leurs étudiants." />
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -302,7 +331,7 @@ const Teachers = () => {
                     </div>
 
                     {/* Bio */}
-                    <div className="mb-24 h-[160px]">
+                    <div className={`${teacher.id === 'teacher-1760177231544' ? 'mb-12' : 'mb-24'} h-[160px]`}>
                       <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
                         Profil
                       </div>

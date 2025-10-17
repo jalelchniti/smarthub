@@ -146,6 +146,9 @@ const TeacherRevenueCalculator = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 p-4">
+      <link rel="canonical" href="https://smarthub.com.tn/revenue-simulator" />
+      <title>Simulateur de Revenus pour Enseignants - SmartHub</title>
+      <meta name="description" content="Enseignants, simulez vos revenus mensuels nets avec le calculateur de revenus de SmartHub. Découvrez notre système de protection garantissant un minimum de 12 TND/heure." />
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">

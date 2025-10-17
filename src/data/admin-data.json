@@ -47,11 +47,11 @@
   "teachers": [
     {
       "id": "teacher-1760347610830",
-      "name": "jalel Chniti",
+      "name": "Jalel Chniti",
       "email": "jalel.chniti@gmail.com",
       "phone": "22484874",
       "bio": "Titulaire d'une maîtrise en anglais depuis 1985 avec 29 ans d'expérience complète dans l'enseignement. A travaillé 15 ans dans les établissements publics et 14 ans dans le secteur privé. Spécialisé dans l'enseignement de l'anglais pour tous les niveaux avec une approche pédagogique adaptée.",
-      "photo": "/uploads/teachers/teacher-1760347610677.jpg",
+      "photo": "/uploads/teachers/teacher-1760357584848.jpg",
       "subjects": [
         "Anglais"
       ],
@@ -61,7 +61,7 @@
       },
       "status": "active",
       "created_at": "2025-10-13T09:26:50.830Z",
-      "updated_at": "2025-10-13T09:28:19.490Z"
+      "updated_at": "2025-10-13T12:13:05.080Z"
     },
     {
       "id": "teacher-1760346451966",
@@ -138,7 +138,7 @@
       "name": "Alaya Hassan",
       "email": "hassen.allaya@yahoo.fr",
       "phone": "93572857",
-      "bio": "SVT + 21 ans dans l'enseignement publique + Doctorat en Biologie + Actuellement au Lycée Pilote de Tunis",
+      "bio": "Docteur en Biologie avec 21 ans d'expérience dans l'enseignement public des Sciences de la Vie et de la Terre. Actuellement enseignant au prestigieux Lycée Pilote de Tunis. Spécialisé dans l'enseignement de la SVT pour tous les niveaux secondaires avec une approche scientifique rigoureuse et des méthodes pédagogiques adaptées aux programmes tunisiens et internationaux.",
       "subjects": [
         "Sciences de la Vie et de la Terre"
       ],
@@ -148,7 +148,8 @@
       },
       "status": "active",
       "created_at": "2025-10-11T10:45:08.272Z",
-      "updated_at": "2025-10-11T10:45:08.272Z"
+      "updated_at": "2025-10-13T12:13:28.638Z",
+      "photo": "/uploads/teachers/teacher-1760357608465.jpg"
     },
     {
       "id": "teacher-1760179350337",
@@ -210,7 +211,7 @@
       "name": "Arbia kéfi",
       "email": "arbiakefi81@gmail.com",
       "phone": "22167823",
-      "bio": "Informatique. Tous les niveaux. 15 ans. Enseigne dans le public.",
+      "bio": "Enseignante d'informatique avec 15 ans d'expérience dans l'enseignement public. Spécialisée dans l'enseignement de l'informatique pour tous les niveaux du collège au baccalauréat. Expertise en programmation, algorithmique et préparation au Bac Informatique. Approche pédagogique moderne basée sur la pratique et les projets concrets.",
       "subjects": [
         "Informatique"
       ],
@@ -220,7 +221,8 @@
       },
       "status": "active",
       "created_at": "2025-10-11T10:34:21.202Z",
-      "updated_at": "2025-10-11T10:34:21.202Z"
+      "updated_at": "2025-10-14T10:00:24.552Z",
+      "photo": "/uploads/teachers/teacher-1760436024328.jpg"
     },
     {
       "id": "teacher-1760178758818",
@@ -244,7 +246,7 @@
       "name": "Khaoula Missaoui",
       "email": "misskawla13@gmail.com",
       "phone": "58755809",
-      "bio": "Physique. Doctorat en Chimie. 15 ans d'éxpérience dans l'enseignement dont 4 and à l'esenignement supérieur. Tous les niveaux : Mathsn physique, chimie.",
+      "bio": "Docteure en Chimie avec 15 ans d'expérience dans l'enseignement des mathématiques et de la physique, dont 4 ans dans l'enseignement supérieur. Spécialisée dans l'enseignement de la physique-chimie pour tous les niveaux académiques du collège au baccalauréat. Approche pédagogique basée sur l'expérimentation et la compréhension approfondie des concepts scientifiques.",
       "subjects": [
         "Mathématiques",
         "Physique"
@@ -255,14 +257,15 @@
       },
       "status": "active",
       "created_at": "2025-10-11T10:29:20.067Z",
-      "updated_at": "2025-10-11T10:29:46.627Z"
+      "updated_at": "2025-10-13T12:13:47.045Z",
+      "photo": "/uploads/teachers/teacher-1760357626872.jpg"
     },
     {
       "id": "teacher-1760178372739",
       "name": "Sahla Soltani",
       "email": "Soltanisahla1@gmail.com",
       "phone": "24768062",
-      "bio": "Matière: Arabe. Enseignante d'arabe dans établissement publique. Expérience 26 ans. Tous les niveaux du collège et du secondaire",
+      "bio": "Enseignante d'arabe avec 26 ans d'expérience dans l'enseignement public. Spécialisée dans l'enseignement de la langue arabe pour tous les niveaux du collège et du secondaire. Expertise dans la grammaire, la littérature arabe classique et moderne, et la préparation aux examens nationaux.",
       "subjects": [
         "Arabe"
       ],
@@ -272,7 +275,8 @@
       },
       "status": "active",
       "created_at": "2025-10-11T10:26:12.739Z",
-      "updated_at": "2025-10-11T10:26:12.739Z"
+      "updated_at": "2025-10-17T09:49:05.901Z",
+      "photo": "/uploads/teachers/teacher-1760694545672.jpg"
     },
     {
       "id": "teacher-1760177231544",
@@ -533,22 +537,7 @@
       "updated_at": "2025-10-01T00:00:00.000Z"
     }
   ],
-  "bookings": [
-    {
-      "id": "booking-1759487839392",
-      "room_id": "1",
-      "group_id": "group-001",
-      "date": "2025-10-04",
-      "start_time": "10:00",
-      "end_time": "12:00",
-      "notes": "",
-      "teacher_id": "teacher-001",
-      "duration_hours": 2,
-      "status": "confirmed",
-      "created_at": "2025-10-03T10:37:19.393Z",
-      "updated_at": "2025-10-03T10:37:19.393Z"
-    }
-  ],
+  "bookings": [],
   "student_enrollments": [
     {
       "id": "enrollment-001",
@@ -719,6 +708,6 @@
       "created_at": "2025-01-01T00:00:00.000Z"
     }
   ],
-  "last_updated": "2025-10-13T09:29:33.164Z",
+  "last_updated": "2025-10-17T09:49:05.983Z",
   "version": "1.0.0"
 }

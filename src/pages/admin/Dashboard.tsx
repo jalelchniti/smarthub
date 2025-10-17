@@ -142,7 +142,7 @@ export default function AdminDashboard() {
       {/* Quick Actions */}
       <div className="bg-white rounded-xl shadow p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Actions Rapides</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <QuickActionButton
             href="/admin/bookings"
             label="Créer une Réservation"
@@ -152,6 +152,11 @@ export default function AdminDashboard() {
             href="/admin/students"
             label="Ajouter un Étudiant"
             icon={Users}
+          />
+          <QuickActionButton
+            href="/admin/teachers"
+            label="Gérer Enseignants"
+            icon={UserCheck}
           />
           <QuickActionButton
             href="/admin/student-payments"

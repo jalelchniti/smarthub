@@ -131,6 +131,9 @@ const ParentCostCalculator = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <link rel="canonical" href="https://smarthub.com.tn/parent-cost-simulator" />
+      <title>Simulateur de Coûts pour Parents - SmartHub</title>
+      <meta name="description" content="Simulez les coûts mensuels des cours pour votre enfant avec le calculateur de coûts pour parents de SmartHub. Transparence totale sur les tarifs." />
       <Navigation />
       <main className="max-w-6xl mx-auto p-6">
         {/* Page Title */}

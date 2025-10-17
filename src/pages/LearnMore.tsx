@@ -46,6 +46,9 @@ export const LearnMore: React.FC = () => {
 
   return (
     <div className="text-center">
+      <link rel="canonical" href="https://smarthub.com.tn/learn-more" />
+      <title>En Savoir Plus - SmartHub</title>
+      <meta name="description" content="Apprenez-en plus sur SmartHub, nos programmes de formation, nos enseignants qualifiés et notre centre d'apprentissage moderne au coeur de Tunis." />
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 text-white section-padding overflow-hidden">
         <div className="absolute inset-0 bg-black bg-opacity-30"></div>

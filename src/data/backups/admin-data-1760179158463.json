@@ -1,0 +1,580 @@
+{
+  "rooms": [
+    {
+      "id": "1",
+      "name": "Salle 1",
+      "type": "premium",
+      "capacity": 15,
+      "equipment_list": [
+        "Tableau blanc",
+        "Projecteur",
+        "Climatisation",
+        "WiFi"
+      ],
+      "hourly_rate": 40,
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "2",
+      "name": "Salle 2",
+      "type": "standard",
+      "capacity": 9,
+      "equipment_list": [
+        "Tableau blanc",
+        "Climatisation",
+        "WiFi"
+      ],
+      "hourly_rate": 35,
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "name": "Salle 3",
+      "type": "standard",
+      "capacity": 9,
+      "equipment_list": [
+        "Tableau blanc",
+        "Climatisation",
+        "WiFi"
+      ],
+      "hourly_rate": 35,
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "teachers": [
+    {
+      "id": "teacher-1760178861202",
+      "name": "Arbia kéfi",
+      "email": "arbiakefi81@gmail.com",
+      "phone": "22167823",
+      "bio": "Informatique. Tous les niveaux. 15 ans. Enseigne dans le public.",
+      "subjects": [
+        "Informatique"
+      ],
+      "payment_terms": {
+        "hourly_rate": 15,
+        "category": "B1-B4"
+      },
+      "status": "active",
+      "created_at": "2025-10-11T10:34:21.202Z",
+      "updated_at": "2025-10-11T10:34:21.202Z"
+    },
+    {
+      "id": "teacher-1760178758818",
+      "name": "Amira Boughanmi",
+      "email": "boughanmiamira1993@gmail.com",
+      "phone": "29198084",
+      "bio": "Arabe. 7 ans dans l'enseignement public. Collège et secondaire jusqu'aux 3éA secondaire",
+      "subjects": [
+        "Arabe"
+      ],
+      "payment_terms": {
+        "hourly_rate": 20,
+        "category": "B1-B4"
+      },
+      "status": "active",
+      "created_at": "2025-10-11T10:32:38.818Z",
+      "updated_at": "2025-10-11T10:32:38.818Z"
+    },
+    {
+      "id": "teacher-1760178560067",
+      "name": "Khaoula Missaoui",
+      "email": "misskawla13@gmail.com",
+      "phone": "58755809",
+      "bio": "Physique. Doctorat en Chimie. 15 ans d'éxpérience dans l'enseignement dont 4 and à l'esenignement supérieur. Tous les niveaux : Mathsn physique, chimie.",
+      "subjects": [
+        "Mathématiques",
+        "Physique"
+      ],
+      "payment_terms": {
+        "hourly_rate": 15,
+        "category": "B1-B4"
+      },
+      "status": "active",
+      "created_at": "2025-10-11T10:29:20.067Z",
+      "updated_at": "2025-10-11T10:29:46.627Z"
+    },
+    {
+      "id": "teacher-1760178372739",
+      "name": "Sahla Soltani",
+      "email": "Soltanisahla1@gmail.com",
+      "phone": "24768062",
+      "bio": "Matière: Arabe. Enseignante d'arabe dans établissement publique. Expérience 26 ans. Tous les niveaux du collège et du secondaire",
+      "subjects": [
+        "Arabe"
+      ],
+      "payment_terms": {
+        "hourly_rate": 15,
+        "category": "B1-B4"
+      },
+      "status": "active",
+      "created_at": "2025-10-11T10:26:12.739Z",
+      "updated_at": "2025-10-11T10:26:12.739Z"
+    },
+    {
+      "id": "teacher-1760177231544",
+      "name": "Mohamed Amara",
+      "email": "amaramoh59@gmail.com",
+      "phone": "53214449",
+      "bio": "Retraité, 34 ans expérience. ensigne tous les niveaux du collège et du seconadire jusqu'au les 3éA secondaire et Bac sciences, Bac éco, Bac info, Bac technique.",
+      "subjects": [
+        "Mathématiques"
+      ],
+      "payment_terms": {
+        "hourly_rate": 15,
+        "category": "B1-B4"
+      },
+      "status": "active",
+      "created_at": "2025-10-11T10:07:11.544Z",
+      "updated_at": "2025-10-11T10:24:01.693Z"
+    },
+    {
+      "id": "teacher-003",
+      "name": "Mohamed Gharbi",
+      "email": "mohamed.gharbi@gmail.com",
+      "phone": "+216 99 345 678",
+      "bio": "Expert en informatique et développement web avec un doctorat en sciences informatiques. 12 ans d'expérience professionnelle en entreprise et 6 ans dans l'enseignement. Spécialisé en programmation (Python, JavaScript, Java), algorithmique et préparation au Bac Informatique. Pédagogie pratique basée sur des projets concrets et des cas réels.",
+      "subjects": [
+        "Informatique"
+      ],
+      "payment_terms": {
+        "hourly_rate": 40,
+        "category": "A1-A2"
+      },
+      "status": "active",
+      "created_at": "2025-02-01T00:00:00.000Z",
+      "updated_at": "2025-10-11T10:03:20.581Z"
+    },
+    {
+      "id": "teacher-002",
+      "name": "Fatma Trabelsi",
+      "email": "fatma.trabelsi@gmail.com",
+      "phone": "+216 97 234 567",
+      "bio": "Professeure certifiée en langues étrangères avec une maîtrise en linguistique appliquée. 8 ans d'expérience dans l'enseignement du français et de l'anglais pour tous les niveaux. Certifiée DELF/DALF et experte en préparation aux examens internationaux (TOEFL, IELTS). Approche communicative et interactive pour garantir des résultats rapides.",
+      "subjects": [
+        "Français",
+        "Anglais"
+      ],
+      "payment_terms": {
+        "hourly_rate": 35,
+        "category": "B1-B4"
+      },
+      "status": "active",
+      "created_at": "2025-01-20T00:00:00.000Z",
+      "updated_at": "2025-10-11T10:03:21.182Z"
+    },
+    {
+      "id": "teacher-001",
+      "name": "Ahmed Ben Salah",
+      "email": "ahmed.bensalah@gmail.com",
+      "phone": "+216 98 123 456",
+      "bio": "Ingénieur diplômé avec 10 ans d'expérience dans l'enseignement des mathématiques et de la physique. Spécialisé dans la préparation au Baccalauréat avec un taux de réussite de 95%. Passionné par les méthodes pédagogiques innovantes et l'accompagnement personnalisé des élèves.",
+      "subjects": [
+        "Mathématiques",
+        "Physique"
+      ],
+      "payment_terms": {
+        "hourly_rate": 40,
+        "category": "A1-A2"
+      },
+      "status": "active",
+      "created_at": "2025-01-15T00:00:00.000Z",
+      "updated_at": "2025-01-15T00:00:00.000Z"
+    },
+    {
+      "id": "teacher-1760179001866",
+      "name": "Belhassan Dridi",
+      "email": "belhassendridi73@gmail.com",
+      "phone": "23860280",
+      "bio": "Matière: Gestion . Expérience 14 ans. Tous les niveaux. Spécialité : Gestion tous les niveaux + économie 2éme Année.",
+      "subjects": [
+        "Économie & Gestion"
+      ],
+      "payment_terms": {
+        "hourly_rate": 15,
+        "category": "B1-B4"
+      },
+      "status": "active",
+      "created_at": "2025-10-11T10:36:41.866Z",
+      "updated_at": "2025-10-11T10:36:41.866Z"
+    }
+  ],
+  "students": [
+    {
+      "id": "student-001",
+      "name": "Yasmine Jebali",
+      "date_of_birth": "2008-05-15",
+      "id_number": "08154523",
+      "grade": "4ème année secondaire (Bac)",
+      "email": "yasmine.jebali@gmail.com",
+      "phone": "+216 92 111 222",
+      "address": "15 Avenue Habib Bourguiba, Tunis",
+      "parent_name": "Karim Jebali",
+      "parent_relationship": "father",
+      "parent_phone": "+216 98 111 222",
+      "parent_email": "karim.jebali@gmail.com",
+      "emergency_contact_name": "Samia Jebali",
+      "emergency_contact_phone": "+216 97 111 222",
+      "registration_date": "2025-09-01",
+      "status": "active",
+      "notes": "Élève sérieuse, niveau Bac Mathématiques",
+      "created_at": "2025-09-01T00:00:00.000Z",
+      "updated_at": "2025-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "student-002",
+      "name": "Omar Hamdi",
+      "date_of_birth": "2009-03-22",
+      "id_number": "09325678",
+      "grade": "3ème année secondaire",
+      "email": "omar.hamdi@gmail.com",
+      "phone": "+216 93 222 333",
+      "address": "28 Rue de Marseille, Tunis",
+      "parent_name": "Leila Hamdi",
+      "parent_relationship": "mother",
+      "parent_phone": "+216 98 222 333",
+      "parent_email": "leila.hamdi@gmail.com",
+      "emergency_contact_name": "Hichem Hamdi",
+      "emergency_contact_phone": "+216 99 222 333",
+      "registration_date": "2025-09-05",
+      "status": "active",
+      "notes": "Besoin de soutien en mathématiques",
+      "created_at": "2025-09-05T00:00:00.000Z",
+      "updated_at": "2025-09-05T00:00:00.000Z"
+    },
+    {
+      "id": "student-003",
+      "name": "Mariem Khedri",
+      "date_of_birth": "2008-11-08",
+      "id_number": "08113456",
+      "grade": "4ème année secondaire (Bac)",
+      "email": "mariem.khedri@gmail.com",
+      "phone": "+216 94 333 444",
+      "address": "42 Avenue de la Liberté, Tunis",
+      "parent_name": "Nadia Khedri",
+      "parent_relationship": "mother",
+      "parent_phone": "+216 98 333 444",
+      "parent_email": "nadia.khedri@gmail.com",
+      "emergency_contact_name": "Tarek Khedri",
+      "emergency_contact_phone": "+216 97 333 444",
+      "registration_date": "2025-09-10",
+      "status": "active",
+      "notes": "Excellente élève, niveau Bac Sciences",
+      "created_at": "2025-09-10T00:00:00.000Z",
+      "updated_at": "2025-09-10T00:00:00.000Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "group-001",
+      "group_name": "G1 - Mathématiques Bac",
+      "teacher_id": "teacher-001",
+      "subject": "Mathématiques",
+      "level": "Bac",
+      "schedule": [
+        {
+          "day": "monday",
+          "start_time": "14:00",
+          "end_time": "16:00"
+        },
+        {
+          "day": "wednesday",
+          "start_time": "14:00",
+          "end_time": "16:00"
+        }
+      ],
+      "capacity": 9,
+      "current_enrollment": 3,
+      "status": "active",
+      "created_at": "2025-09-01T00:00:00.000Z",
+      "updated_at": "2025-10-03T00:00:00.000Z"
+    },
+    {
+      "id": "group-002",
+      "group_name": "G2 - Physique Bac",
+      "teacher_id": "teacher-001",
+      "subject": "Physique",
+      "level": "Bac",
+      "schedule": [
+        {
+          "day": "tuesday",
+          "start_time": "10:00",
+          "end_time": "12:00"
+        },
+        {
+          "day": "thursday",
+          "start_time": "10:00",
+          "end_time": "12:00"
+        }
+      ],
+      "capacity": 9,
+      "current_enrollment": 2,
+      "status": "active",
+      "created_at": "2025-09-15T00:00:00.000Z",
+      "updated_at": "2025-09-15T00:00:00.000Z"
+    },
+    {
+      "id": "group-003",
+      "group_name": "G3 - Français 4ème",
+      "teacher_id": "teacher-002",
+      "subject": "Français",
+      "level": "4ème année secondaire",
+      "schedule": [
+        {
+          "day": "monday",
+          "start_time": "16:00",
+          "end_time": "18:00"
+        },
+        {
+          "day": "friday",
+          "start_time": "16:00",
+          "end_time": "18:00"
+        }
+      ],
+      "capacity": 9,
+      "current_enrollment": 1,
+      "status": "active",
+      "created_at": "2025-09-20T00:00:00.000Z",
+      "updated_at": "2025-09-20T00:00:00.000Z"
+    },
+    {
+      "id": "group-004",
+      "group_name": "G4 - Anglais Bac",
+      "teacher_id": "teacher-002",
+      "subject": "Anglais",
+      "level": "Bac",
+      "schedule": [
+        {
+          "day": "wednesday",
+          "start_time": "10:00",
+          "end_time": "12:00"
+        },
+        {
+          "day": "saturday",
+          "start_time": "10:00",
+          "end_time": "12:00"
+        }
+      ],
+      "capacity": 9,
+      "current_enrollment": 1,
+      "status": "active",
+      "created_at": "2025-09-25T00:00:00.000Z",
+      "updated_at": "2025-09-25T00:00:00.000Z"
+    },
+    {
+      "id": "group-005",
+      "group_name": "G5 - Informatique Bac",
+      "teacher_id": "teacher-003",
+      "subject": "Informatique",
+      "level": "Bac",
+      "schedule": [
+        {
+          "day": "tuesday",
+          "start_time": "14:00",
+          "end_time": "16:00"
+        },
+        {
+          "day": "thursday",
+          "start_time": "14:00",
+          "end_time": "16:00"
+        }
+      ],
+      "capacity": 9,
+      "current_enrollment": 1,
+      "status": "active",
+      "created_at": "2025-10-01T00:00:00.000Z",
+      "updated_at": "2025-10-01T00:00:00.000Z"
+    }
+  ],
+  "bookings": [
+    {
+      "id": "booking-1759487839392",
+      "room_id": "1",
+      "group_id": "group-001",
+      "date": "2025-10-04",
+      "start_time": "10:00",
+      "end_time": "12:00",
+      "notes": "",
+      "teacher_id": "teacher-001",
+      "duration_hours": 2,
+      "status": "confirmed",
+      "created_at": "2025-10-03T10:37:19.393Z",
+      "updated_at": "2025-10-03T10:37:19.393Z"
+    }
+  ],
+  "student_enrollments": [
+    {
+      "id": "enrollment-001",
+      "student_id": "student-001",
+      "group_id": "group-001",
+      "enrollment_date": "2025-09-01",
+      "status": "active",
+      "notes": "Inscription initiale",
+      "created_at": "2025-09-01T00:00:00.000Z",
+      "updated_at": "2025-09-01T00:00:00.000Z"
+    },
+    {
+      "id": "enrollment-002",
+      "student_id": "student-002",
+      "group_id": "group-001",
+      "enrollment_date": "2025-09-05",
+      "status": "active",
+      "notes": "Inscription initiale",
+      "created_at": "2025-09-05T00:00:00.000Z",
+      "updated_at": "2025-09-05T00:00:00.000Z"
+    },
+    {
+      "id": "enrollment-003",
+      "student_id": "student-003",
+      "group_id": "group-001",
+      "enrollment_date": "2025-09-10",
+      "status": "active",
+      "notes": "Inscription initiale",
+      "created_at": "2025-09-10T00:00:00.000Z",
+      "updated_at": "2025-09-10T00:00:00.000Z"
+    },
+    {
+      "id": "enrollment-004",
+      "student_id": "student-001",
+      "group_id": "group-002",
+      "enrollment_date": "2025-09-15",
+      "status": "active",
+      "notes": "Ajouté au groupe Physique",
+      "created_at": "2025-09-15T00:00:00.000Z",
+      "updated_at": "2025-09-15T00:00:00.000Z"
+    },
+    {
+      "id": "enrollment-005",
+      "student_id": "student-003",
+      "group_id": "group-002",
+      "enrollment_date": "2025-09-15",
+      "status": "active",
+      "notes": "Ajouté au groupe Physique",
+      "created_at": "2025-09-15T00:00:00.000Z",
+      "updated_at": "2025-09-15T00:00:00.000Z"
+    },
+    {
+      "id": "enrollment-006",
+      "student_id": "student-002",
+      "group_id": "group-003",
+      "enrollment_date": "2025-09-20",
+      "status": "active",
+      "notes": "Ajouté au groupe Français",
+      "created_at": "2025-09-20T00:00:00.000Z",
+      "updated_at": "2025-09-20T00:00:00.000Z"
+    },
+    {
+      "id": "enrollment-007",
+      "student_id": "student-003",
+      "group_id": "group-004",
+      "enrollment_date": "2025-09-25",
+      "status": "active",
+      "notes": "Ajouté au groupe Anglais",
+      "created_at": "2025-09-25T00:00:00.000Z",
+      "updated_at": "2025-09-25T00:00:00.000Z"
+    },
+    {
+      "id": "enrollment-008",
+      "student_id": "student-001",
+      "group_id": "group-005",
+      "enrollment_date": "2025-10-01",
+      "status": "active",
+      "notes": "Ajouté au groupe Informatique",
+      "created_at": "2025-10-01T00:00:00.000Z",
+      "updated_at": "2025-10-01T00:00:00.000Z"
+    }
+  ],
+  "student_payments": [],
+  "teacher_payments": [],
+  "working_hours": [
+    {
+      "day": "monday",
+      "is_open": true,
+      "time_slots": [
+        {
+          "start_time": "08:00",
+          "end_time": "20:00",
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "day": "tuesday",
+      "is_open": true,
+      "time_slots": [
+        {
+          "start_time": "08:00",
+          "end_time": "20:00",
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "day": "wednesday",
+      "is_open": true,
+      "time_slots": [
+        {
+          "start_time": "08:00",
+          "end_time": "20:00",
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "day": "thursday",
+      "is_open": true,
+      "time_slots": [
+        {
+          "start_time": "08:00",
+          "end_time": "20:00",
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "day": "friday",
+      "is_open": true,
+      "time_slots": [
+        {
+          "start_time": "08:00",
+          "end_time": "20:00",
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "day": "saturday",
+      "is_open": true,
+      "time_slots": [
+        {
+          "start_time": "08:00",
+          "end_time": "20:00",
+          "is_available": true
+        }
+      ]
+    },
+    {
+      "day": "sunday",
+      "is_open": false,
+      "time_slots": []
+    }
+  ],
+  "holidays": [],
+  "waitlist": [],
+  "users": [
+    {
+      "id": "admin-001",
+      "email": "jalel.chniti@smarthub.com.tn",
+      "name": "Jalel Chniti",
+      "role": "manager",
+      "password_hash": "demo_password_hash_replace_in_production",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "last_updated": "2025-10-11T10:36:41.975Z",
+  "version": "1.0.0"
+}

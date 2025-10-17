@@ -69,6 +69,9 @@ const StudentRegistration: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+      <link rel="canonical" href="https://smarthub.com.tn/student-registration" />
+      <title>Inscription Étudiant - SmartHub</title>
+      <meta name="description" content="Inscrivez-vous en tant qu'étudiant à SmartHub pour accéder à nos programmes de formation, nos cours de soutien scolaire et nos enseignants qualifiés." />
       <Navigation />
       
       <main className="container mx-auto px-4 py-12">

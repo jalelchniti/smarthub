@@ -32,9 +32,8 @@ export class AdminDataStorage {
       console.error('Failed to load admin data from backend:', error);
 
       // Fallback: return empty structure if backend is unavailable
-      alert('Erreur: Impossible de se connecter au serveur backend. Assurez-vous que le serveur est démarré (npm run server).');
-
-      return this.getEmptyData();
+      // Components should handle this gracefully with their own fallback data
+      throw error;
     }
   }
 
