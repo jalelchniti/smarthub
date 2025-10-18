@@ -4,7 +4,34 @@ import { AdminDataStorage } from '../utils/adminDataStorage';
 import type { Teacher } from '../types/admin.types';
 
 // Static fallback data for production (when backend is unavailable)
+// Ordered by years of experience (descending: most experienced first)
 const FALLBACK_TEACHERS: Teacher[] = [
+  {
+    id: "teacher-1760177231544",
+    name: "Mohamed Amara",
+    email: "amaramoh59@gmail.com",
+    phone: "53214449",
+    bio: "Titulaire d'une maîtrise en mathématiques depuis 1989 avec 34 ans d'enseignement aux lycées et collèges. Expérience également sur les plateformes éducatives en ligne. A enseigné tous les niveaux de la 7ème de base jusqu'au baccalauréat toutes sections. Dispose d'une chaîne YouTube dédiée aux mathématiques.",
+    subjects: ["Mathématiques"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:07:11.544Z",
+    updated_at: "2025-10-13T09:10:34.590Z",
+    photo: "/uploads/teachers/teacher-1760181301130.jpg"
+  },
+  {
+    id: "teacher-1760179158355",
+    name: "Hasna Ben Jeddou",
+    email: "nomail@gmail.com",
+    phone: "52833204",
+    bio: "Enseignante chevronnée avec 30 ans d'expérience professionnelle. Spécialisée en français, arabe et mathématiques pour le primaire. Enseigne également l'arabe pour tous les niveaux et le français pour le collège et secondaire. Expertise particulière dans l'accompagnement des élèves présentant des difficultés comportementales.",
+    subjects: ["Français", "Arabe", "Mathématiques"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:39:18.355Z",
+    updated_at: "2025-10-13T09:29:33.090Z",
+    photo: "/uploads/teachers/teacher-1760344750026.jpg"
+  },
   {
     id: "teacher-1760347610830",
     name: "Jalel Chniti",
@@ -17,6 +44,71 @@ const FALLBACK_TEACHERS: Teacher[] = [
     status: "active",
     created_at: "2025-10-13T09:26:50.830Z",
     updated_at: "2025-10-13T12:13:05.080Z"
+  },
+  {
+    id: "teacher-1760178372739",
+    name: "Sahla Soltani",
+    email: "Soltanisahla1@gmail.com",
+    phone: "24768062",
+    bio: "Enseignante d'arabe avec 26 ans d'expérience dans l'enseignement public. Spécialisée dans l'enseignement de la langue arabe pour tous les niveaux du collège et du secondaire. Expertise dans la grammaire, la littérature arabe classique et moderne, et la préparation aux examens nationaux.",
+    subjects: ["Arabe"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:26:12.739Z",
+    updated_at: "2025-10-17T09:49:05.901Z",
+    photo: "/uploads/teachers/teacher-1760694545672.jpg"
+  },
+  {
+    id: "teacher-1760179508272",
+    name: "Alaya Hassan",
+    email: "hassen.allaya@yahoo.fr",
+    phone: "93572857",
+    bio: "Docteur en Biologie avec 21 ans d'expérience dans l'enseignement public des Sciences de la Vie et de la Terre. Actuellement enseignant au prestigieux Lycée Pilote de Tunis. Spécialisé dans l'enseignement de la SVT pour tous les niveaux secondaires avec une approche scientifique rigoureuse et des méthodes pédagogiques adaptées aux programmes tunisiens et internationaux.",
+    subjects: ["Sciences de la Vie et de la Terre"],
+    payment_terms: { hourly_rate: 40, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:45:08.272Z",
+    updated_at: "2025-10-13T12:13:28.638Z",
+    photo: "/uploads/teachers/teacher-1760357608465.jpg"
+  },
+  {
+    id: "teacher-1760178560067",
+    name: "Khaoula Missaoui",
+    email: "misskawla13@gmail.com",
+    phone: "58755809",
+    bio: "Docteure en Chimie avec 15 ans d'expérience dans l'enseignement des mathématiques et de la physique, dont 4 ans dans l'enseignement supérieur. Spécialisée dans l'enseignement de la physique-chimie pour tous les niveaux académiques du collège au baccalauréat. Approche pédagogique basée sur l'expérimentation et la compréhension approfondie des concepts scientifiques.",
+    subjects: ["Mathématiques", "Physique"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:29:20.067Z",
+    updated_at: "2025-10-13T12:13:47.045Z",
+    photo: "/uploads/teachers/teacher-1760357626872.jpg"
+  },
+  {
+    id: "teacher-1760178861202",
+    name: "Arbia kéfi",
+    email: "arbiakefi81@gmail.com",
+    phone: "22167823",
+    bio: "Enseignante d'informatique avec 15 ans d'expérience dans l'enseignement public. Spécialisée dans l'enseignement de l'informatique pour tous les niveaux du collège au baccalauréat. Expertise en programmation, algorithmique et préparation au Bac Informatique. Approche pédagogique moderne basée sur la pratique et les projets concrets.",
+    subjects: ["Informatique"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:34:21.202Z",
+    updated_at: "2025-10-14T10:00:24.552Z",
+    photo: "/uploads/teachers/teacher-1760436024328.jpg"
+  },
+  {
+    id: "teacher-1760179001866",
+    name: "Belhassan Dridi",
+    email: "belhassendridi73@gmail.com",
+    phone: "23860280",
+    bio: "Enseignant en Économie et Gestion avec 14 ans d'expérience dans le soutien scolaire. Spécialisé dans l'enseignement de la gestion pour tous les niveaux académiques et de l'économie pour la 2ème année secondaire. Approche pédagogique adaptée aux besoins spécifiques de chaque élève.",
+    subjects: ["Économie & Gestion"],
+    payment_terms: { hourly_rate: 15, category: "B1-B4" },
+    status: "active",
+    created_at: "2025-10-11T10:36:41.866Z",
+    updated_at: "2025-10-13T08:58:07.759Z",
+    photo: "/uploads/teachers/teacher-1760345887547.jpg"
   },
   {
     id: "teacher-1760346451966",
@@ -43,97 +135,6 @@ const FALLBACK_TEACHERS: Teacher[] = [
     created_at: "2025-10-11T10:52:00.783Z",
     updated_at: "2025-10-13T09:09:11.437Z",
     photo: "/uploads/teachers/teacher-1760344727117.jpg"
-  },
-  {
-    id: "teacher-1760179508272",
-    name: "Alaya Hassan",
-    email: "hassen.allaya@yahoo.fr",
-    phone: "93572857",
-    bio: "Docteur en Biologie avec 21 ans d'expérience dans l'enseignement public des Sciences de la Vie et de la Terre. Actuellement enseignant au prestigieux Lycée Pilote de Tunis. Spécialisé dans l'enseignement de la SVT pour tous les niveaux secondaires avec une approche scientifique rigoureuse et des méthodes pédagogiques adaptées aux programmes tunisiens et internationaux.",
-    subjects: ["Sciences de la Vie et de la Terre"],
-    payment_terms: { hourly_rate: 40, category: "B1-B4" },
-    status: "active",
-    created_at: "2025-10-11T10:45:08.272Z",
-    updated_at: "2025-10-13T12:13:28.638Z",
-    photo: "/uploads/teachers/teacher-1760357608465.jpg"
-  },
-  {
-    id: "teacher-1760179158355",
-    name: "Hasna Ben Jeddou",
-    email: "nomail@gmail.com",
-    phone: "52833204",
-    bio: "Enseignante chevronnée avec 30 ans d'expérience professionnelle. Spécialisée en français, arabe et mathématiques pour le primaire. Enseigne également l'arabe pour tous les niveaux et le français pour le collège et secondaire. Expertise particulière dans l'accompagnement des élèves présentant des difficultés comportementales.",
-    subjects: ["Français", "Arabe", "Mathématiques"],
-    payment_terms: { hourly_rate: 15, category: "B1-B4" },
-    status: "active",
-    created_at: "2025-10-11T10:39:18.355Z",
-    updated_at: "2025-10-13T09:29:33.090Z",
-    photo: "/uploads/teachers/teacher-1760344750026.jpg"
-  },
-  {
-    id: "teacher-1760179001866",
-    name: "Belhassan Dridi",
-    email: "belhassendridi73@gmail.com",
-    phone: "23860280",
-    bio: "Enseignant en Économie et Gestion avec 14 ans d'expérience dans le soutien scolaire. Spécialisé dans l'enseignement de la gestion pour tous les niveaux académiques et de l'économie pour la 2ème année secondaire. Approche pédagogique adaptée aux besoins spécifiques de chaque élève.",
-    subjects: ["Économie & Gestion"],
-    payment_terms: { hourly_rate: 15, category: "B1-B4" },
-    status: "active",
-    created_at: "2025-10-11T10:36:41.866Z",
-    updated_at: "2025-10-13T08:58:07.759Z",
-    photo: "/uploads/teachers/teacher-1760345887547.jpg"
-  },
-  {
-    id: "teacher-1760178560067",
-    name: "Khaoula Missaoui",
-    email: "misskawla13@gmail.com",
-    phone: "58755809",
-    bio: "Docteure en Chimie avec 15 ans d'expérience dans l'enseignement des mathématiques et de la physique, dont 4 ans dans l'enseignement supérieur. Spécialisée dans l'enseignement de la physique-chimie pour tous les niveaux académiques du collège au baccalauréat. Approche pédagogique basée sur l'expérimentation et la compréhension approfondie des concepts scientifiques.",
-    subjects: ["Mathématiques", "Physique"],
-    payment_terms: { hourly_rate: 15, category: "B1-B4" },
-    status: "active",
-    created_at: "2025-10-11T10:29:20.067Z",
-    updated_at: "2025-10-13T12:13:47.045Z",
-    photo: "/uploads/teachers/teacher-1760357626872.jpg"
-  },
-  {
-    id: "teacher-1760178372739",
-    name: "Sahla Soltani",
-    email: "Soltanisahla1@gmail.com",
-    phone: "24768062",
-    bio: "Enseignante d'arabe avec 26 ans d'expérience dans l'enseignement public. Spécialisée dans l'enseignement de la langue arabe pour tous les niveaux du collège et du secondaire. Expertise dans la grammaire, la littérature arabe classique et moderne, et la préparation aux examens nationaux.",
-    subjects: ["Arabe"],
-    payment_terms: { hourly_rate: 15, category: "B1-B4" },
-    status: "active",
-    created_at: "2025-10-11T10:26:12.739Z",
-    updated_at: "2025-10-17T09:49:05.901Z",
-    photo: "/uploads/teachers/teacher-1760694545672.jpg"
-  },
-  {
-    id: "teacher-1760177231544",
-    name: "Mohamed Amara",
-    email: "amaramoh59@gmail.com",
-    phone: "53214449",
-    bio: "Titulaire d'une maîtrise en mathématiques depuis 1989 avec 34 ans d'enseignement aux lycées et collèges. Expérience également sur les plateformes éducatives en ligne. A enseigné tous les niveaux de la 7ème de base jusqu'au baccalauréat toutes sections. Dispose d'une chaîne YouTube dédiée aux mathématiques.",
-    subjects: ["Mathématiques"],
-    payment_terms: { hourly_rate: 15, category: "B1-B4" },
-    status: "active",
-    created_at: "2025-10-11T10:07:11.544Z",
-    updated_at: "2025-10-13T09:10:34.590Z",
-    photo: "/uploads/teachers/teacher-1760181301130.jpg"
-  },
-  {
-    id: "teacher-1760178861202",
-    name: "Arbia kéfi",
-    email: "arbiakefi81@gmail.com",
-    phone: "22167823",
-    bio: "Enseignante d'informatique avec 15 ans d'expérience dans l'enseignement public. Spécialisée dans l'enseignement de l'informatique pour tous les niveaux du collège au baccalauréat. Expertise en programmation, algorithmique et préparation au Bac Informatique. Approche pédagogique moderne basée sur la pratique et les projets concrets.",
-    subjects: ["Informatique"],
-    payment_terms: { hourly_rate: 15, category: "B1-B4" },
-    status: "active",
-    created_at: "2025-10-11T10:34:21.202Z",
-    updated_at: "2025-10-14T10:00:24.552Z",
-    photo: "/uploads/teachers/teacher-1760436024328.jpg"
   }
 ];
 
@@ -151,14 +152,9 @@ const Teachers = () => {
         // Try to load from backend
         const data = await AdminDataStorage.load();
 
-        // Get only active teachers with photos, sorted by creation date (newest first)
+        // Get only active teachers with photos (preserves backend ordering by experience)
         const activeTeachersWithPhotos = data.teachers
-          .filter(t => t.status === 'active' && t.photo && t.photo.trim() !== '')
-          .sort((a, b) => {
-            const dateA = new Date(a.created_at || 0).getTime();
-            const dateB = new Date(b.created_at || 0).getTime();
-            return dateB - dateA;
-          });
+          .filter(t => t.status === 'active' && t.photo && t.photo.trim() !== '');
 
         setTeachers(activeTeachersWithPhotos);
         setError(null);
